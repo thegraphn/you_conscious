@@ -1,4 +1,6 @@
 import csv
+import os
+
 from progressbar import *
 
 root_folder = os.path.dirname(os.path.realpath(__file__))
@@ -59,6 +61,8 @@ labeled_data_feed_path = os.path.join(labeled_data_feed_path, "data_working_dire
 labeled_data_feed_path = os.path.join(labeled_data_feed_path, "filtered")
 labeled_data_feed_path = os.path.join(labeled_data_feed_path, "labeled_data_feed.csv")
 
+
+number_processes = 4
 
 categoryName_index = 43
 fashionSuitableFor_index = 25

@@ -5,7 +5,8 @@ import tqdm
 
 from data_processing.filter_datafeed.utils import getFilters
 from data_processing.utils.utils import filters_file_path, getLinesCSV, merged_data_feed_path, filtered_data_feed_path, \
-    write2File, label_index, material_index, features_affiliateId_data_feed_path, labeled_data_feed_path
+    write2File, label_index, material_index, features_affiliateId_data_feed_path, labeled_data_feed_path, \
+    number_processes
 
 global vegan_filters
 vegan_filters = getFilters(filters_file_path)
@@ -40,7 +41,7 @@ def getListVeganArticles(list_articles):
     :return:
     """
 
-    with Pool() as p:
+    with Pool(processes=number_processes) as p:
         result_vegan = list(tqdm.tqdm(p.imap(isArticleVegan, list_articles), total=len(list_articles)))
     return result_vegan
 
@@ -55,7 +56,7 @@ def removeArticleWithNoLabel(article):
 
 
 def removeArticlesWithNoLabel(list_articles):
-    with Pool() as p:
+    with Pool(processes=number_processes) as p:
         list_articles_with_label = list(tqdm.tqdm(p.imap(removeArticleWithNoLabel, list_articles),
                                                   total=len(list_articles)))
 
