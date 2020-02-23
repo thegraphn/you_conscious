@@ -72,7 +72,7 @@ material_index = 3
 search_price_index = 79
 delivery_cost_index = 7
 rrp_price_index = 70
-
+maxNumberFashionSizeColumns = 100
 affiliateId = "?affiliates=3"
 
 
