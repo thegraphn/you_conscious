@@ -1,3 +1,4 @@
+from collections import defaultdict
 from multiprocessing import Pool
 
 import tqdm
@@ -7,7 +8,8 @@ from data_processing.utils.getHeaders import mapping_columnHeader
 from data_processing.utils.utils import createMappingBetween2Columns, files_mapping_categories_path, \
     getLinesCSV, filtered_data_feed_path, write2File, \
     mapping_fashionSuitableFor, cleansed_categories_data_feed_path, cleansed_sex_data_feed_path, categoryName_index, \
-    fashionSuitableFor_index, rrp_price_index, search_price_index, delivery_cost_index, categoryName_index
+    fashionSuitableFor_index, rrp_price_index, search_price_index, delivery_cost_index, categoryName_index, \
+    maxNumberFashionSizeColumns, getMappingColumnIndex
 
 global feature_mapping
 feature_mapping = createMappingBetween2Columns(files_mapping_categories_path, 1, 2, ";")
@@ -18,7 +20,6 @@ fashionSuitableFor_mapping = fashionSuitableFor_mapping
 
 
 def renameCategory(article):
-
     content_category_name = article[categoryName_index]
     for string2find, new_category in feature_mapping.items():
         if string2find in content_category_name:
@@ -83,30 +84,52 @@ def cleanPrices(list_articles):
     return cleanedPrices_articles
 
 
-def mergedProductBySize(list_articles):
-    mapping_awImageUrl_sizes = {}
-    mapping_article_awImageUrl = {}
-    for article in list_articles:
+def mergedProductBySize(input_list_articles):
+    """
+    :param input_list_articles: List of all articles with "duplicates" by size
+    :return: list_articles_merged
+    """
+    headers = input_list_articles[0]
+    list_art = input_list_articles[1:]
+    list_articles_merged = []
+    mapping_awImageUrl_sizes = defaultdict(list)
+    mapping_awImageUrl_article = {}
+    mapping_columnHeader = getMappingColumnIndex(filtered_data_feed_path, ",")
+
+    for article in list_art:
         size_content = article[mapping_columnHeader["Fashion:size"]]
         size_content = cleanSize(size_content)
-        mapping_awImageUrl_sizes[article[mapping_columnHeader["aw_image_url"]]] = size_content
-        mapping_article_awImageUrl[article] = article[mapping_columnHeader["aw_image_url"]]
-    maxNumberFashionSizeColumns = max(len(x) for x in list(mapping_awImageUrl_sizes.values()))
-    headers = list_articles[0]
+        mapping_awImageUrl_sizes[article[mapping_columnHeader["aw_image_url"]]].append(
+            size_content)  # Mapping URL sizes
+        mapping_awImageUrl_article[article[mapping_columnHeader["aw_image_url"]]] = article  # Mapping URL article
     mapping_article_sizes = {}
+    # Add the sizes columns to the headers
+    headers = [header.replace("Fashion:size", "Fashion:size0") for header in headers]
     for i in range(maxNumberFashionSizeColumns):
-        headers.append("Fashion:size_" + str(i + 1))
-    for article1, aw_image_url1 in mapping_article_awImageUrl.items():
-        for article2, aw_image_url2 in mapping_article_awImageUrl.items():
-            if aw_image_url1 == aw_image_url2:
-                mapping_article_sizes[article1] = mapping_awImageUrl_sizes[aw_image_url1]
+        headers.append("Fashion:size" + str(i + 1))
+
+    mapping_header_columnId = {header: columnId for columnId, header in enumerate(headers)}
+    # Put the size into the size column
+    for url, sizes in mapping_awImageUrl_sizes.items():
+        list_size = []
+        for lt in sizes:
+            for size in lt:
+                list_size.append(size)
+        article = mapping_awImageUrl_article[url]
+        # Append empty rows for the new sizes column
+        for i in range(maxNumberFashionSizeColumns):
+            article.append("")
+        for i, size in enumerate(list_size):
+            article[mapping_header_columnId["Fashion:size" + str(i)]] = size
+        list_articles_merged.append(article)
+    return list_articles_merged
 
 
 def cleansing():
     print("Begin cleansing")
     list_articles = getLinesCSV(filtered_data_feed_path, ",")
     print("Cleansing - Merging by size: Begin")
-    # todo merged_articles_by_size = mergedProductBySize(list_articles)
+    list_articles = mergedProductBySize(list_articles)
     print("Cleansing - Merging by size: Done")
     headers = list_articles[0]
     list_articles = list_articles[1:]
@@ -123,20 +146,3 @@ def cleansing():
     print("Cleansing - Sexes and Prices: Done")
     cleansed_articles = [headers] + cleansed_prices
     write2File(cleansed_articles, cleansed_sex_data_feed_path)
-
-
-'''
-
-
-mergingProductBySizes(path + "datafeeds_preprocessing/filtered_datafeeds/only_featured_articles_pricesCleaned.csv",
-                      path + "datafeeds_preprocessing/filtered_datafeeds/only_featured_articles_mergedSizes.csv")
-print("Merging Sizes: done")
-
-print("Clean Categories: Start")
-cleanCategories(path + "utils/category/categoriesCleaning_mapping.csv",
-                path + "datafeeds_preprocessing/filtered_datafeeds/only_featured_articles_mergedSizes.csv",
-                path + "datafeeds_preprocessing/filtered_datafeeds/datafeed.csv")
-print("Script Adding features: Done", datetime.datetime.now())
-
-
-    '''
