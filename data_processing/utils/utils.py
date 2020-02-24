@@ -62,26 +62,12 @@ labeled_data_feed_path = os.path.join(labeled_data_feed_path, "filtered")
 labeled_data_feed_path = os.path.join(labeled_data_feed_path, "labeled_data_feed.csv")
 
 
-number_processes = 4
-
-categoryName_index = 43
-fashionSuitableFor_index = 25
-awDeepLink_index = 42
-label_index = 0
-material_index = 3
-search_price_index = 79
-delivery_cost_index = 7
-rrp_price_index = 70
-maxNumberFashionSizeColumns = 100
-affiliateId = "?affiliates=3"
-
-
 def getMappingColumnIndex(file, delimiter):
     '''
     Create the mapping columnName: Index
     :param delimiter:
     :param file:
-    :return:
+    :return: dictionary: columnName: index
     '''
     mapping = {}
     with open(file, "r", encoding="utf-8") as f:
@@ -138,3 +124,15 @@ def write2File(list_articles, output_file):
                 csv_writer.writerow(element)
 
 
+number_processes = os.cpu_count() - 1
+
+categoryName_index = getMappingColumnIndex(filtered_data_feed_path, ",")["category_name"]
+fashionSuitableFor_index = 25
+awDeepLink_index = 42
+label_index = 0
+material_index = 3
+search_price_index = 79
+delivery_cost_index = 7
+rrp_price_index = 70
+maxNumberFashionSizeColumns = 100
+affiliateId = "?affiliates=3"

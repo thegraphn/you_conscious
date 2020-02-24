@@ -105,10 +105,11 @@ def mergedProductBySize(input_list_articles):
     mapping_article_sizes = {}
     # Add the sizes columns to the headers
     headers = [header.replace("Fashion:size", "Fashion:size0") for header in headers]
-    for i in range(maxNumberFashionSizeColumns):
-        headers.append("Fashion:size" + str(i + 1))
+    for i in range(1, maxNumberFashionSizeColumns):  # Start at one because we already use Fashion:size0
+        headers.append("Fashion:size" + str(i))
 
     mapping_header_columnId = {header: columnId for columnId, header in enumerate(headers)}
+    print(mapping_header_columnId)
     # Put the size into the size column
     for url, sizes in mapping_awImageUrl_sizes.items():
         list_size = []
@@ -119,10 +120,12 @@ def mergedProductBySize(input_list_articles):
         # Append empty rows for the new sizes column
         for i in range(maxNumberFashionSizeColumns):
             article.append("")
+        list_size = list_size[:maxNumberFashionSizeColumns]
         for i, size in enumerate(list_size):
             article[mapping_header_columnId["Fashion:size" + str(i)]] = size
         list_articles_merged.append(article)
-    return list_articles_merged
+
+    return [headers]+list_articles_merged
 
 
 def cleansing():
