@@ -148,6 +148,7 @@ def merging():
     print("Changing ID to Name: Done")
 
     os.system("rm " + merged_data_feed_path)
-    os.system("mv " + merged_data_feed_with_IdNames_path + " " + merged_data_feed_path)
+    os.rename(merged_data_feed_with_IdNames_path,merged_data_feed_path)
+    #os.system("mv " + merged_data_feed_with_IdNames_path + "  " + merged_data_feed_path)
     print("Merging script: Done ", datetime.datetime.now())
     end = datetime.datetime.now()
