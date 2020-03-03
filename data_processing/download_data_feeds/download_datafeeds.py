@@ -14,7 +14,6 @@ import tqdm
 folder = os.path.dirname(os.path.realpath(__file__))
 folder = folder.replace("/data_processing/download_data_feeds", "")
 folder = folder.replace(r"\data_processing\download_data_feeds", "")
-print(folder)
 sys.path.append(folder)
 import glob
 import urllib.request
@@ -23,7 +22,7 @@ from multiprocessing import Process, Pool
 
 # pathname = "/Users/ConnyContini/Downloads/backend_backup_2019-2-28/backend/"
 # pathname = "/home/thegraphn/repositories/YC/backend"
-from data_processing.utils.utils import download_data_feeds_path, createMappingBetween2Columns, file_url_shop_path, \
+from data_processing.utils.utils import download_data_feeds_directory_path, createMappingBetween2Columns, file_url_shop_path, \
     number_processes
 
 path = "/mnt/c/Users/graphn/PycharmProjects/you_conscious/data_processing/data_working_directory/download"
@@ -85,7 +84,7 @@ def downloadDatafeed(tupel_shop_url):
         frmt = ".csv"
     else:
         frmt = ".gz"
-    path_file = os.path.join(download_data_feeds_path, shop_name + "-" +
+    path_file = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
                              datetime.datetime.now().strftime("%y-%m-%d") + frmt)
     urllib.request.urlretrieve(link, path_file)
 
@@ -116,22 +115,22 @@ def deleteNonCsvDataFeeds(list_files):
         else:
             pass
 
-def main():
+def dowloading():
     mapping_url_shop = createMappingBetween2Columns(file_url_shop_path, 0, 1, ";")
     list_tpl_shops_urls = [(shop, url) for shop, url in mapping_url_shop.items()]
     list_tpl_shops_urls = list_tpl_shops_urls[1:]  # remove the headers
     print("Downloading - Downloading data feeds: Begin")
     downloadDatafeeds(list_tpl_shops_urls)
     print("Downloading - Downloading data feeds: End")
-    list_downloaded_files = glob.glob(os.path.join(download_data_feeds_path, "*"))
+    list_downloaded_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*"))
     print("Downloading - Unzipping data feeds: Begin")
     unzipFiles(list_downloaded_files)
     print("Downloading - Unzipping data feeds: Begin")
-    list_files_in_download_dir = glob.glob(os.path.join(download_data_feeds_path, "*"))
+    list_files_in_download_dir = glob.glob(os.path.join(download_data_feeds_directory_path, "*"))
     deleteNonCsvDataFeeds(list_files_in_download_dir)
 
 
-main()
+dowloading()
 
 # writeLog("download_datafeeds.py : Downloading begin", LOG_FILE)
 # dict_url = readDatafeedUrlFile(

@@ -28,20 +28,39 @@ mapping_fashionSuitableFor = os.path.join(mapping_fashionSuitableFor,
 
 column_mapping_merging_path = os.path.join(root_folder,"utils")
 column_mapping_merging_path = os.path.join(column_mapping_merging_path,"data_dependencies")
-column_mapping_merging_path = os.path.join(column_mapping_merging_path,"column_mapping_merging_path.csv")
+column_mapping_merging_path = os.path.join(column_mapping_merging_path,"column_mapping_merging.csv")
 
 features_mapping_path = os.path.join(root_folder, "utils")
 features_mapping_path = os.path.join(features_mapping_path, "data_dependencies")
 features_mapping_path = os.path.join(features_mapping_path, "features.csv")
 
-download_data_feeds_path = os.path.join(root_folder,"data_processing")
-download_data_feeds_path = os.path.join(download_data_feeds_path,"data_working_directory")
-download_data_feeds_path = os.path.join(download_data_feeds_path,"download")
+download_data_feeds_directory_path = os.path.join(root_folder, "data_processing")
+download_data_feeds_directory_path = os.path.join(download_data_feeds_directory_path, "data_working_directory")
+download_data_feeds_directory_path = os.path.join(download_data_feeds_directory_path, "download")
+
+merged_data_feeds_directory_path = os.path.join(root_folder,"data_processing")
+merged_data_feeds_directory_path = os.path.join(merged_data_feeds_directory_path,"data_working_directory")
+merged_data_feeds_directory_path = os.path.join(merged_data_feeds_directory_path,"merged")
+
+
+merging_features_path = os.path.join(root_folder,"utils")
+merging_features_path = os.path.join(merging_features_path,"data_dependencies")
+merging_features_path = os.path.join(merging_features_path,"merging_features.csv")
+
+shops_ids_names_path = os.path.join(root_folder,"utils")
+shops_ids_names_path = os.path.join(shops_ids_names_path,"data_dependencies")
+shops_ids_names_path = os.path.join(shops_ids_names_path,"shops_ids_names.csv")
 
 merged_data_feed_path = os.path.join(root_folder, "data_processing")
 merged_data_feed_path = os.path.join(merged_data_feed_path, "data_working_directory")
 merged_data_feed_path = os.path.join(merged_data_feed_path, "merged")
 merged_data_feed_path = os.path.join(merged_data_feed_path, "merged_datafeeds.csv")
+
+merged_data_feed_with_IdNames_path = os.path.join(root_folder, "data_processing")
+merged_data_feed_with_IdNames_path = os.path.join(merged_data_feed_path, "data_working_directory")
+merged_data_feed_with_IdNames_path = os.path.join(merged_data_feed_path, "merged")
+merged_data_feed_with_IdNames_path = os.path.join(merged_data_feed_path, "merged_datafeeds.csvshopId2Name.csv")
+
 
 filtered_data_feed_path = os.path.join(root_folder, "data_processing")
 filtered_data_feed_path = os.path.join(filtered_data_feed_path, "data_working_directory")
