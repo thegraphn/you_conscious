@@ -25,6 +25,11 @@ mapping_fashionSuitableFor = os.path.join(mapping_fashionSuitableFor, "data_depe
 mapping_fashionSuitableFor = os.path.join(mapping_fashionSuitableFor,
                                           "categoriesCleaning_fashionSuitableFor_mapping.csv")
 
+
+column_mapping_merging_path = os.path.join(root_folder,"utils")
+column_mapping_merging_path = os.path.join(column_mapping_merging_path,"data_dependencies")
+column_mapping_merging_path = os.path.join(column_mapping_merging_path,"column_mapping_merging_path.csv")
+
 features_mapping_path = os.path.join(root_folder, "utils")
 features_mapping_path = os.path.join(features_mapping_path, "data_dependencies")
 features_mapping_path = os.path.join(features_mapping_path, "features.csv")

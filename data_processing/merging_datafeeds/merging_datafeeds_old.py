@@ -2,10 +2,10 @@ import csv
 import glob
 import os
 import datetime
-from utils import writeLog
 import sys
-path = sys.argv[1]
-#path = "/home/thegraphn/ownCloud/it/download_merge_datafeeds/backend/"
+
+from data_processing.utils.utils import download_data_feeds_path, column_mapping_merging_path
+
 begin = datetime.datetime.now()
 print("Merging script: Started ", begin)
 enc = "utf-8"
@@ -115,42 +115,33 @@ def getNewColumnNames(file):
     set_column_names = list(set_column_names)
     return set_column_names
 
-writeLog("merged_datafeeds.py : Merging begin", LOG_FILE)
 
-list_files = glob.glob(path+"datafeeds_preprocessing/downloaded_datafeeds/*.csv")
-writeLog("merged_datafeeds.py : List of files in downloaded_datafeeds/ # " + str(len(list_files)) + str(list_files), LOG_FILE)
+list_files = glob.glob(os.path.join(download_data_feeds_path,"*.csv"))
 
 set_col = set()
 for file in list_files:
-    changeColumnName(file,path+"utils/category/column-mapping.csv")
+    changeColumnName(file,column_mapping_merging_path)
 
-list_files = glob.glob(path+"datafeeds_preprocessing/downloaded_datafeeds/*.csvchange.csv")
-writeLog("merged_datafeeds.py : List of files which have their column names changed # " + str(len(list_files)) + str(list_files), LOG_FILE)
+list_files = glob.glob(os.path.join(download_data_feeds_path,"*.csvchange.csv"))
 
 for file in list_files:
     for name in getColumNames(file):
         set_col.add(name)
 set_col = list(set_col)
-writeLog("merged_datafeeds.py : Set of the column names # " + str(len(set_col)) + str(set_col), LOG_FILE)
 newColumnNames = getNewColumnNames(path+"utils/features/features.csv") + set_col
-writeLog("merged_datafeeds.py : The new columns names are # " + str(len(newColumnNames)) + str(newColumnNames), LOG_FILE)
 print("Changing column names: Done")
 
 
 list_files = glob.glob(path+"datafeeds_preprocessing/downloaded_datafeeds/*.csvchange.csv")
-writeLog("merged_datafeeds.py : List of files who will be merged # " + str(len(list_files)) + str(list_files), LOG_FILE)
 mergeCSV(list_files,newColumnNames,path+"datafeeds_preprocessing/merged_datafeeds/merged_datafeeds.csv")
 os.system("rm "+path+"datafeeds_preprocessing/downloaded_datafeeds/*.csvchange.csv")
 print("Merging: Done")
 
 changeProgrammId2MerchentName(path+"datafeeds_preprocessing/merged_datafeeds/merged_datafeeds.csv",path+"utils/shop_ids/shops-ids-names.csv")
-writeLog("merged_datafeeds.py : changeProgrammId2MerchentName has been executed with the file " + path+"utils/shop_ids/shops-ids-names.csv", LOG_FILE)
 print("Changing ID to Name: Done")
 
 os.system("rm "+path+"datafeeds_preprocessing/merged_datafeeds/merged_datafeeds.csv")
 os.system("mv "+path+"datafeeds_preprocessing/merged_datafeeds/merged_datafeeds.csvshopId2Name.csv "+path+"datafeeds_preprocessing/merged_datafeeds/merged_datafeeds.csv")
-writeLog("merged_datafeeds.py : Merging end", LOG_FILE)
 print("Merging script: Done ", datetime.datetime.now())
 end = datetime.datetime.now()
 
-writeLog("merged_datafeeds.py : Merging took " + str(end - begin), LOG_FILE)
