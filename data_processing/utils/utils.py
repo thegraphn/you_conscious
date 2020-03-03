@@ -157,10 +157,10 @@ def write2File(list_articles, output_file):
 
 
 number_processes = os.cpu_count() - 1
-try:
+if os.path.exists(filtered_data_feed_path):
     categoryName_index = getMappingColumnIndex(filtered_data_feed_path, ",")["category_name"]
-except:
-    pass
+else:
+    categoryName_index = None
 fashionSuitableFor_index = 25
 awDeepLink_index = 42
 label_index = 0
