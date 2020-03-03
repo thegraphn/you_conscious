@@ -3,7 +3,13 @@ This scripts executes the data processing pipe line.
 At the end of this script the used data feed for the web site will have been
 generated.
 """
+import os
+import sys
 
+folder = os.path.dirname(os.path.realpath(__file__))
+folder = folder.replace("/data_processing/main", "")
+folder = folder.replace(r"\data_processing\main", "")
+sys.path.append(folder)
 import datetime
 from data_processing.add_features.add_features import add_features
 from data_processing.cleansing_datafeed.cleansing_datafeed import cleansing
