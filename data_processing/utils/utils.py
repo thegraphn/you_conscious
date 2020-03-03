@@ -16,6 +16,10 @@ files_mapping_categories_path = os.path.join(root_folder, "utils")
 files_mapping_categories_path = os.path.join(files_mapping_categories_path, "data_dependencies")
 files_mapping_categories_path = os.path.join(files_mapping_categories_path, "categories_mapping.csv")
 
+file_url_shop_path = os.path.join(root_folder,"utils")
+file_url_shop_path = os.path.join(file_url_shop_path,"data_dependencies")
+file_url_shop_path = os.path.join(file_url_shop_path,"datafeed-locations.csv")
+
 mapping_fashionSuitableFor = os.path.join(root_folder, "utils")
 mapping_fashionSuitableFor = os.path.join(mapping_fashionSuitableFor, "data_dependencies")
 mapping_fashionSuitableFor = os.path.join(mapping_fashionSuitableFor,
@@ -24,6 +28,10 @@ mapping_fashionSuitableFor = os.path.join(mapping_fashionSuitableFor,
 features_mapping_path = os.path.join(root_folder, "utils")
 features_mapping_path = os.path.join(features_mapping_path, "data_dependencies")
 features_mapping_path = os.path.join(features_mapping_path, "features.csv")
+
+download_data_feeds_path = os.path.join(root_folder,"data_processing")
+download_data_feeds_path = os.path.join(download_data_feeds_path,"data_working_directory")
+download_data_feeds_path = os.path.join(download_data_feeds_path,"download")
 
 merged_data_feed_path = os.path.join(root_folder, "data_processing")
 merged_data_feed_path = os.path.join(merged_data_feed_path, "data_working_directory")
@@ -125,8 +133,10 @@ def write2File(list_articles, output_file):
 
 
 number_processes = os.cpu_count() - 1
-
-categoryName_index = getMappingColumnIndex(filtered_data_feed_path, ",")["category_name"]
+try:
+    categoryName_index = getMappingColumnIndex(filtered_data_feed_path, ",")["category_name"]
+except:
+    pass
 fashionSuitableFor_index = 25
 awDeepLink_index = 42
 label_index = 0
