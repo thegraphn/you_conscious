@@ -156,7 +156,7 @@ def write2File(list_articles, output_file):
                 csv_writer.writerow(element)
 
 
-number_processes = os.cpu_count() - 1
+number_processes = os.cpu_count() #- 1
 if os.path.exists(filtered_data_feed_path):
     categoryName_index = getMappingColumnIndex(filtered_data_feed_path, ",")["category_name"]
 else:

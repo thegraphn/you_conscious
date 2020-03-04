@@ -22,7 +22,8 @@ from multiprocessing import Process, Pool
 
 # pathname = "/Users/ConnyContini/Downloads/backend_backup_2019-2-28/backend/"
 # pathname = "/home/thegraphn/repositories/YC/backend"
-from data_processing.utils.utils import download_data_feeds_directory_path, createMappingBetween2Columns, file_url_shop_path, \
+from data_processing.utils.utils import download_data_feeds_directory_path, createMappingBetween2Columns, \
+    file_url_shop_path, \
     number_processes
 
 path = "/mnt/c/Users/graphn/PycharmProjects/you_conscious/data_processing/data_working_directory/download"
@@ -108,12 +109,14 @@ def unzipFile(file):
         lenght_to_delete = -3
         os.system("gunzip -kc " + str(file) + " > " + str(file[:lenght_to_delete]) + ".csv")
 
+
 def deleteNonCsvDataFeeds(list_files):
     for file in list_files:
         if file.endwith("gz"):
-            os.system("rm "+ file)
+            os.system("rm " + file)
         else:
             pass
+
 
 def dowloading():
     mapping_url_shop = createMappingBetween2Columns(file_url_shop_path, 0, 1, ";")
@@ -128,9 +131,6 @@ def dowloading():
     print("Downloading - Unzipping data feeds: Begin")
     list_files_in_download_dir = glob.glob(os.path.join(download_data_feeds_directory_path, "*"))
     deleteNonCsvDataFeeds(list_files_in_download_dir)
-
-
-dowloading()
 
 # writeLog("download_datafeeds.py : Downloading begin", LOG_FILE)
 # dict_url = readDatafeedUrlFile(
