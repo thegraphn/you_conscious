@@ -28,6 +28,7 @@ merge the files :
 
 `python3 merged_datafeeds.py /home/backend/backend/`
 
+#### Download the merged_datafeeds.zip
 
 Now you have the merged file. You can download it and put into `you_conscious/data_processing/data_working_directory/merged`
 
