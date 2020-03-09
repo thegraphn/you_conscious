@@ -9,10 +9,10 @@ This repository contains all the scripts in order to process the data showed on 
 #### Prepare the server to download and merge the data feed files 
 `ssh root@54.37.73.34`
 
-  Go to `cd /home/backend/backend/datafeeds_preprocessing/downloaded_datafeeds/`
-  Delete all the files in `/home/backend/backend/datafeeds_preprocessing/downloaded_datafeeds` : `rm  *`
-  Go to `cd /home/backend/backend/datafeeds_preprocessing/merged_datafeeds/`
-  Delete all the file in `/home/backend/backend/datafeeds_preprocessing/merged_datafeeds/` : `rm *`
+    Go to `cd /home/backend/backend/datafeeds_preprocessing/downloaded_datafeeds/`
+    Delete all the files in `/home/backend/backend/datafeeds_preprocessing/downloaded_datafeeds` : `rm  *`
+    Go to `cd /home/backend/backend/datafeeds_preprocessing/merged_datafeeds/`
+    Delete all the file in `/home/backend/backend/datafeeds_preprocessing/merged_datafeeds/` : `rm *`
 
 
 #### Download and merge the data feed files
