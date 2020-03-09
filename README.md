@@ -37,4 +37,6 @@ Please be aware the path might not be 100% the same :)
 
 #### Run the app on your pc
 
-Now you have the file on your computer you can run  `main.py` 
+Now you have the file on your computer you need first to unpack `merged_datafeeds.zip` into `merged_datafeeds.csv`.
+
+You can run  `you_conscious/data_processing/main/main.py` 
