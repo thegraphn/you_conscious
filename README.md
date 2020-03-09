@@ -19,11 +19,11 @@ This repository contains all the scripts in order to process the data showed on 
 
 Download the files : 
 
-`python3 download_datafeeds.py /home/backend/backend/`
+`python3 /home/backend/backend/datafeeds_preprocessing/download_datafeeds.py /home/backend/backend/`
 
 Merge the files : 
 
-`python3 merged_datafeeds.py /home/backend/backend/`
+`python3 /home/backend/backend/datafeeds_preprocessing/merged_datafeeds.py /home/backend/backend/`
 
 #### Download merged_datafeeds.zip
 
