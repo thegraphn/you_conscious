@@ -33,7 +33,7 @@ Now you have the merged file. You can download it and put into `you_conscious/da
 
 e.g.
 
-`scp root@54.37.73.34:/home/backend/backend/datafeeds_preprocessing/merged_datafeeds/merged.zip /home/conny/repositories/you_conscious/data_processing/data_working_directory/merged`
+`scp root@54.37.73.34:/home/backend/backend/datafeeds_preprocessing/merged_datafeeds/merged_datafeeds.zip  /home/conny/repositories/you_conscious/data_processing/data_working_directory/merged`
 
 Please be aware the path might not be 100% the same :) 
 
