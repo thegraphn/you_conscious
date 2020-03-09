@@ -29,8 +29,13 @@ merge the files :
 `python3 merged_datafeeds.py /home/backend/backend/`
 
 
-Now you have the merged file. You can downlaod it and put into `you_conscious/data_processing/data_working_directory/merged`
+Now you have the merged file. You can download it and put into `you_conscious/data_processing/data_working_directory/merged`
 
+e.g.
+
+`scp root@54.37.73.34:/home/backend/backend/datafeeds_preprocessing/merged_datafeeds/merged.zip /home/conny/repositories/you_conscious/data_processing/data_working_directory/merged`
+
+Please be aware the path might not be 100% the same :) 
 
 #### Run the app on your pc
 
