@@ -19,9 +19,6 @@ import glob
 import urllib.request
 import datetime
 from multiprocessing import Process, Pool
-
-# pathname = "/Users/ConnyContini/Downloads/backend_backup_2019-2-28/backend/"
-# pathname = "/home/thegraphn/repositories/YC/backend"
 from data_processing.utils.utils import download_data_feeds_directory_path, createMappingBetween2Columns, \
     file_url_shop_path, \
     number_processes
@@ -40,8 +37,8 @@ def readDatafeedUrlFile(file):
     datafeed_url_links = {}
 
     with open(file) as f:
-        csvreader = csv.reader(f, delimiter=";")
-        for row in csvreader:
+        csv_reader = csv.reader(f, delimiter=";")
+        for row in csv_reader:
             name_shop = row[0]
             url = row[1]
             if name_shop != "Advertiser Name" and url != "URL":
@@ -49,15 +46,15 @@ def readDatafeedUrlFile(file):
     return datafeed_url_links
 
 
-def addMerchentName(inFile, name):
+def addMerchantName(in_file, name):
     '''
     Only for SORBRAS
-    :param file: datafeed file
-    :param name: name to add into the datafeed
+    :param in_file: datafeed file
+    :param name: name to add into the data feed
     :return: write file with a new column
     '''
     headers = []
-    with open(inFile, encoding="utf-8") as in_file:
+    with open(in_file, encoding="utf-8") as in_file:
         with open(path + "datafeeds_preprocessing\downloaded_datafeeds/SORBAS_with_merchant_name.csv", 'w',
                   encoding="utf-8") as o:
             csv_reader = csv.reader(in_file)
@@ -70,18 +67,20 @@ def addMerchentName(inFile, name):
             for row in csv_reader:
                 row = row + [name]
                 csv_writer.writerow(row)
-    os.system("rm " + inFile)
+    os.system("rm " + in_file)
 
 
 def downloadDatafeeds(list_tuples_shops_urls):
-    with Pool(processes=number_processes)as p:
+    with Pool(processes=2)as p:
         list(tqdm.tqdm(p.imap(downloadDatafeed, list_tuples_shops_urls), total=len(list_tuples_shops_urls)))
 
 
 def downloadDatafeed(tupel_shop_url):
     shop_name, link = tupel_shop_url
     shop_name = shop_name.replace(" ", "_")
-    if "affili.net" in link or ".csv" in link:
+    if "affili.net" in link or ".csv" :
+        frmt = ".csv"
+    elif "LOVECO" in shop_name:
         frmt = ".csv"
     else:
         frmt = ".gz"
@@ -103,8 +102,8 @@ def unzipFile(file):
     if ".csv" in file:
         pass
 
-    # if "LOVECO" in file:
-    #   os.system("mv " + file + " " + file[:-2] + "csv")
+    if "LOVECO" in file:
+        os.system("mv " + file + " " + file[:-2] + "csv")
     if "gz" in file:
         lenght_to_delete = -3
         os.system("gunzip -kc " + str(file) + " > " + str(file[:lenght_to_delete]) + ".csv")
@@ -112,7 +111,7 @@ def unzipFile(file):
 
 def deleteNonCsvDataFeeds(list_files):
     for file in list_files:
-        if file.endwith("gz"):
+        if file.endswith("gz"):
             os.system("rm " + file)
         else:
             pass

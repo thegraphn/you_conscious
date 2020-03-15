@@ -60,22 +60,6 @@ def cleanPrice(article):
     if article[delivery_cost_index] == '"0,00 EUR"' or article[delivery_cost_index] == ''"0.00 EUR"'':
         article[delivery_cost_index] == "0"
     return article
-    '''
-    for columnName in columnNameList:
-        index_price = getColumnIndex(csv_file, columnName)
-        row[index_price] = row[index_price].replace(".", ",")
-        if len(row[index_price]) == 2:
-            row[index_price] = row[index_price] + ",00"
-        if "," in row[index_price] and len(row[index_price][row[index_price].index(","):]) == 2:
-            row[index_price] = row[index_price] + "0"
-    if row[index_rppPrice] == "0" or row[index_rppPrice] == "0,00" or row[index_rppPrice] == "0.00":
-        row[index_rppPrice] = row[index_searchPrice]
-    if row[index_rppPrice] == "":
-        row[index_rppPrice] = row[index_searchPrice]
-    if row[index_deliveryCost] == '"0,00 EUR"' or row[index_deliveryCost] == ''"0.00 EUR"'':
-        row[index_deliveryCost] == "0"
-    csv_writer.writerow(row)
-    '''
 
 
 def cleanPrices(list_articles):

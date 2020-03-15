@@ -20,8 +20,8 @@ from data_processing.merging_datafeeds.merging_datafeeds_old import merging
 if __name__ == '__main__':
     begin = datetime.datetime.now()
     print("Begin data processing", begin)
-    #dowloading()
-    #merging()
+    dowloading()
+    merging()
     filter_data_feed()
     cleansing()
     add_features()

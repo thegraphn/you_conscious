@@ -57,9 +57,9 @@ merged_data_feed_path = os.path.join(merged_data_feed_path, "merged")
 merged_data_feed_path = os.path.join(merged_data_feed_path, "merged_datafeeds.csv")
 
 merged_data_feed_with_IdNames_path = os.path.join(root_folder, "data_processing")
-merged_data_feed_with_IdNames_path = os.path.join(merged_data_feed_path, "data_working_directory")
-merged_data_feed_with_IdNames_path = os.path.join(merged_data_feed_path, "merged")
-merged_data_feed_with_IdNames_path = os.path.join(merged_data_feed_path, "merged_datafeeds.csvshopId2Name.csv")
+merged_data_feed_with_IdNames_path = os.path.join(merged_data_feed_with_IdNames_path, "data_working_directory")
+merged_data_feed_with_IdNames_path = os.path.join(merged_data_feed_with_IdNames_path, "merged")
+merged_data_feed_with_IdNames_path = os.path.join(merged_data_feed_with_IdNames_path, "merged_datafeeds.csvshopId2Name.csv")
 
 
 filtered_data_feed_path = os.path.join(root_folder, "data_processing")
@@ -126,14 +126,14 @@ def getLinesCSV(file, delimiter):
 
 
 def createMappingBetween2Columns(file, column1_id, column2_id, delimiter):
-    '''
+    """
     From a file create a dict in order to map 2 columns
     :param delimiter:
     :param file:
     :param column1_id:
     :param column2_id:
     :return:
-    '''
+    """
     mapping = {}
     with open(file, "r", encoding="utf-8") as f:
         for line in f:
@@ -143,12 +143,12 @@ def createMappingBetween2Columns(file, column1_id, column2_id, delimiter):
 
 
 def write2File(list_articles, output_file):
-    '''
+    """
     write a list to a csv file
     :param output_file:
     :param list_articles:
     :return:
-    '''
+    """
     with open(output_file, "w", encoding="utf-8", newline="") as o:
         csv_writer = csv.writer(o, delimiter=",")
         for element in list_articles:
@@ -156,7 +156,7 @@ def write2File(list_articles, output_file):
                 csv_writer.writerow(element)
 
 
-number_processes = os.cpu_count() #- 1
+number_processes = os.cpu_count() - 1
 if os.path.exists(filtered_data_feed_path):
     categoryName_index = getMappingColumnIndex(filtered_data_feed_path, ",")["category_name"]
 else:
