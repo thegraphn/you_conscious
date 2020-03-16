@@ -78,9 +78,8 @@ def downloadDatafeeds(list_tuples_shops_urls):
 def downloadDatafeed(tupel_shop_url):
     shop_name, link = tupel_shop_url
     shop_name = shop_name.replace(" ", "_")
-    if "affili.net" in link or ".csv" :
-        frmt = ".csv"
-    elif "LOVECO" in shop_name:
+
+    if "LOVECO" in shop_name:
         frmt = ".csv"
     else:
         frmt = ".gz"
