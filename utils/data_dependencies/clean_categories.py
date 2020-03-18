@@ -8,7 +8,7 @@ from data_processing.utils.utils import getMappingColumnIndex
 
 from nltk import word_tokenize
 
-csv_file = "/Volumes/home/YouConscious/YouConscious/it/data_checking/labeled_data_feed_1.csv"
+csv_file = r"/mnt/c/Users/aurel/repositories/you_conscious/data_processing/data_working_directory/filtered/labeled_data_feed.csv"
 index_Sex = getMappingColumnIndex(csv_file, ",")["Fashion:suitable_for"]
 index_titel = getMappingColumnIndex(csv_file, ",")["Title"]
 index_description = getMappingColumnIndex(csv_file, ",")["description"]
@@ -25,8 +25,8 @@ def createMapping(csv_file):
 
 
 mapping = createMapping(
-    "/Users/ConnyContini/repositories/you_conscious/utils/data_dependencies/categoriesCleaning_fashionSuitableFor_mapping.csv")
-output_csv_file = "/Volumes/home/YouConscious/YouConscious/it/data_checking/datafeed_cleaned_categories.csv"
+    r"/mnt/c/Users/aurel/repositories/you_conscious/utils/data_dependencies/categoriesCleaning_fashionSuitableFor_mapping.csv")
+output_csv_file =r"/mnt/c/Users/aurel/repositories/you_conscious/data_processing/data_working_directory/filtered/labeled_data_feed_cc.csv"
 with open(csv_file, encoding="utf-8") as f:
     with open(output_csv_file, 'w', encoding="utf-8") as o:
         csv_writer = csv.writer(o)

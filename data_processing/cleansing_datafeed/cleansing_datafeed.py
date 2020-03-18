@@ -2,6 +2,7 @@ from collections import defaultdict
 from multiprocessing import Pool
 
 import tqdm
+from nltk import word_tokenize
 
 from data_processing.cleansing_datafeed.utils import cleanSize
 from data_processing.utils.getHeaders import mapping_columnHeader
@@ -9,7 +10,8 @@ from data_processing.utils.utils import createMappingBetween2Columns, files_mapp
     getLinesCSV, filtered_data_feed_path, write2File, \
     mapping_fashionSuitableFor, cleansed_categories_data_feed_path, cleansed_sex_data_feed_path, categoryName_index, \
     fashionSuitableFor_index, rrp_price_index, search_price_index, delivery_cost_index, categoryName_index, \
-    maxNumberFashionSizeColumns, getMappingColumnIndex
+    maxNumberFashionSizeColumns, getMappingColumnIndex, mapping_cleaning_fashionSuitableFor, title_index, merchantName, \
+    synonym_female, synonym_euro
 
 global feature_mapping
 feature_mapping = createMappingBetween2Columns(files_mapping_categories_path, 1, 2, ";")
@@ -24,6 +26,35 @@ def renameCategory(article):
     for string2find, new_category in feature_mapping.items():
         if string2find in content_category_name:
             article[categoryName_index] = new_category
+    sexe = article[fashionSuitableFor_index]
+    words_title = word_tokenize(article[title_index])
+    cat = article[categoryName_index]
+    for word in words_title:
+        for k, v in mapping_cleaning_fashionSuitableFor.items():
+            if word == k:
+                article[categoryName_index] = v
+                cat = article[categoryName_index].split(" > ")
+                if len(cat) >1 and len(article) > 20:
+                    cat[1] = article[fashionSuitableFor_index]
+                    if cat[1] == "" or cat[1] == " ":
+                        cat[1] = "Damen"
+                    cat = " > ".join(cat)
+                    cat = cat.replace("female", "Damen")
+                    cat = cat.replace("Female", "Damen")
+                    cat = cat.replace("male", "Herren")
+                    cat = cat.replace("Male", "Herren")
+                    break
+            else:
+                cat = article[categoryName_index]
+    article[categoryName_index] = cat
+    # Change the content within Topman category to man
+    if "Topman" in article[merchantName]:
+        article[categoryName_index]: str = article[categoryName_index].replace("Damen", "Herren")
+    for female_token in synonym_female:
+        #todo fsf
+        if female_token in article[fashionSuitableFor_index]:
+            if "Herren" in article[categoryName_index]:
+                article[categoryName_index]: str = article[categoryName_index].replace("Herren", "Damen")
     return article
 
 
@@ -53,12 +84,25 @@ def renamingFashionSuitableForColumns(list_articles):
 
 
 def cleanPrice(article):
+    # todo
     if article[rrp_price_index] == "0" or article[rrp_price_index] == "0,00" or article[rrp_price_index] == "0.00":
         article[rrp_price_index] = article[search_price_index]
-    if article[rrp_price_index] == "":
+    if article[rrp_price_index] == "" or len(article[rrp_price_index]) == 0:
         article[rrp_price_index] = article[search_price_index]
     if article[delivery_cost_index] == '"0,00 EUR"' or article[delivery_cost_index] == ''"0.00 EUR"'':
-        article[delivery_cost_index] == "0"
+        article[delivery_cost_index] = "0"
+    for euro_token in synonym_euro:
+        if euro_token in article[search_price_index]:
+            article[search_price_index]: str = article[search_price_index].replace(euro_token, "")
+        if euro_token in article[rrp_price_index]:
+            article[rrp_price_index]: str = article[rrp_price_index].replace(euro_token, "")
+        if euro_token in article[delivery_cost_index]:
+            article[delivery_cost_index]: str = article[delivery_cost_index].replace(euro_token, "")
+
+    article[search_price_index]: str = article[search_price_index].replace(".", ",")
+    article[rrp_price_index]: str = article[rrp_price_index].replace(".", ",")
+    article[delivery_cost_index]: str = article[delivery_cost_index].replace(".", ",")
+
     return article
 
 
@@ -93,7 +137,6 @@ def mergedProductBySize(input_list_articles):
         headers.append("Fashion:size" + str(i))
 
     mapping_header_columnId = {header: columnId for columnId, header in enumerate(headers)}
-    print(mapping_header_columnId)
     # Put the size into the size column
     for url, sizes in mapping_awImageUrl_sizes.items():
         list_size = []
@@ -109,7 +152,7 @@ def mergedProductBySize(input_list_articles):
             article[mapping_header_columnId["Fashion:size" + str(i)]] = size
         list_articles_merged.append(article)
 
-    return [headers]+list_articles_merged
+    return [headers] + list_articles_merged
 
 
 def cleansing():

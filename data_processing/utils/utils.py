@@ -94,6 +94,12 @@ labeled_data_feed_path = os.path.join(labeled_data_feed_path, "filtered")
 labeled_data_feed_path = os.path.join(labeled_data_feed_path, "labeled_data_feed.csv")
 
 
+
+cleaning_categories_fashionSuitableFor_path: str = os.path.join(root_folder,"utils")
+cleaning_categories_fashionSuitableFor_path: str = os.path.join(cleaning_categories_fashionSuitableFor_path,"data_dependencies")
+cleaning_categories_fashionSuitableFor_path: str = os.path.join(cleaning_categories_fashionSuitableFor_path,"categoriesCleaning_fashionSuitableFor_mapping.csv")
+
+
 def getMappingColumnIndex(file, delimiter):
     '''
     Create the mapping columnName: Index
@@ -156,17 +162,40 @@ def write2File(list_articles, output_file):
                 csv_writer.writerow(element)
 
 
-number_processes = os.cpu_count() - 1
+number_processes = os.cpu_count()
 if os.path.exists(filtered_data_feed_path):
     categoryName_index = getMappingColumnIndex(filtered_data_feed_path, ",")["category_name"]
+    title_index = getMappingColumnIndex(filtered_data_feed_path, ",")["Title"]
+    merchantName = getMappingColumnIndex(filtered_data_feed_path,",")["merchant_name"]
+    fashionSuitableFor_index = getMappingColumnIndex(filtered_data_feed_path,",")["Fashion:suitable_for"]
+
 else:
     categoryName_index = None
-fashionSuitableFor_index = 25
+    title_index = None
+    merchantName = None
+    fashionSuitableFor_index = None
+
+if os.path.exists(features_affiliateId_data_feed_path):
+    material_features_affiliateId_data_feed_path_index = getMappingColumnIndex(features_affiliateId_data_feed_path, ",")["Material"]
+    label_features_affiliateId_data_feed_path_index = getMappingColumnIndex(features_affiliateId_data_feed_path, ",")["Labels"]
+else:
+    material_index = None
+    label_index = None
+
+mapping_cleaning_fashionSuitableFor = createMappingBetween2Columns(cleaning_categories_fashionSuitableFor_path,2,6,";")
+
 awDeepLink_index = 42
-label_index = 0
-material_index = 3
+
 search_price_index = 79
 delivery_cost_index = 7
 rrp_price_index = 70
 maxNumberFashionSizeColumns = 100
 affiliateId = "?affiliates=3"
+
+
+synonym_female = ["female","weiblich","damen","Female","Weiblich","Damen"]
+synonym_euro = ["€","EUR"]
+
+
+m = getMappingColumnIndex(filtered_data_feed_path,",")
+print(m["merchant_name"])
