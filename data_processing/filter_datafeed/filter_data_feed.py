@@ -4,10 +4,9 @@ from nltk import word_tokenize
 import tqdm
 
 from data_processing.filter_datafeed.utils import getFilters
+from data_processing.utils.getHeaders import getHeadersIndex
 from data_processing.utils.utils import filters_file_path, getLinesCSV, merged_data_feed_path, filtered_data_feed_path, \
-    write2File,  features_affiliateId_data_feed_path, labeled_data_feed_path, \
-    number_processes, label_features_affiliateId_data_feed_path_index, \
-    material_features_affiliateId_data_feed_path_index
+    write2File, features_affiliateId_data_feed_path, labeled_data_feed_path
 
 global vegan_filters
 vegan_filters = getFilters(filters_file_path)
@@ -42,7 +41,7 @@ def getListVeganArticles(list_articles):
     :return:
     """
 
-    with Pool(10) as p:
+    with Pool() as p:
         result_vegan = list(tqdm.tqdm(p.imap(isArticleVegan, list_articles), total=len(list_articles)))
     return result_vegan
 
@@ -52,12 +51,14 @@ def removeArticleWithNoLabel(article):
     :param article: Article in a list format
     :return: Return the article if it has a label
     """
-    if article[label_features_affiliateId_data_feed_path_index] or article[material_features_affiliateId_data_feed_path_index] != "":
+
+    if article[getHeadersIndex("Labels",features_affiliateId_data_feed_path)] \
+            or article[getHeadersIndex("Material",features_affiliateId_data_feed_path)] != "":
         return article
 
 
 def removeArticlesWithNoLabel(list_articles):
-    with Pool(10) as p:
+    with Pool() as p:
         list_articles_with_label = list(tqdm.tqdm(p.imap(removeArticleWithNoLabel, list_articles),
                                                   total=len(list_articles)))
 
@@ -80,7 +81,7 @@ def filter_data_feed():
 
 
 def getArticlesWithLabel():
-    list_articles = getLinesCSV(features_affiliateId_data_feed_path, ",")
+    list_articles = getLinesCSV(features_affiliateId_data_feed_path, "\t")
     headers = list_articles[0]
     list_articles = list_articles[1:]
     print("Filtering - remove articles without label: Begin")

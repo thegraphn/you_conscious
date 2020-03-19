@@ -75,6 +75,8 @@ def downloadDatafeeds(list_tuples_shops_urls):
         list(tqdm.tqdm(p.imap(downloadDatafeed, list_tuples_shops_urls), total=len(list_tuples_shops_urls)))
 
 
+# todo use ray
+
 def downloadDatafeed(tupel_shop_url):
     """
     :param tupel_shop_url: tupel containing (shop_name,url)
@@ -120,7 +122,13 @@ def deleteNonCsvDataFeeds(list_files):
             pass
 
 
+def delete_all_csv_file():
+    for file in glob.glob(os.path.join(download_data_feeds_directory_path, "*.csv")):
+        os.system("rm " + file)
+
+
 def dowloading():
+    delete_all_csv_file()
     mapping_url_shop = createMappingBetween2Columns(file_url_shop_path, 0, 1, ";")
     list_tpl_shops_urls = [(shop, url) for shop, url in mapping_url_shop.items()]
     list_tpl_shops_urls = list_tpl_shops_urls[1:]  # remove the headers

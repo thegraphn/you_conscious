@@ -156,7 +156,7 @@ def write2File(list_articles, output_file):
     :return:
     """
     with open(output_file, "w", encoding="utf-8", newline="") as o:
-        csv_writer = csv.writer(o, delimiter=",")
+        csv_writer = csv.writer(o, delimiter="\t")
         for element in list_articles:
             if element is not None:
                 csv_writer.writerow(element)
@@ -164,31 +164,27 @@ def write2File(list_articles, output_file):
 
 number_processes = os.cpu_count()
 if os.path.exists(filtered_data_feed_path):
-    categoryName_index = getMappingColumnIndex(filtered_data_feed_path, ",")["category_name"]
-    title_index = getMappingColumnIndex(filtered_data_feed_path, ",")["Title"]
-    merchantName = getMappingColumnIndex(filtered_data_feed_path,",")["merchant_name"]
-    fashionSuitableFor_index = getMappingColumnIndex(filtered_data_feed_path,",")["Fashion:suitable_for"]
+    title_index = getMappingColumnIndex(filtered_data_feed_path, "\t")["Title"]
+    merchantName = getMappingColumnIndex(filtered_data_feed_path,"\t")["merchant_name"]
+    fashionSuitableFor_index = getMappingColumnIndex(filtered_data_feed_path,"\t")["Fashion:suitable_for"]
 
 else:
-    categoryName_index = None
     title_index = None
     merchantName = None
     fashionSuitableFor_index = None
 
 if os.path.exists(features_affiliateId_data_feed_path):
-    material_features_affiliateId_data_feed_path_index = getMappingColumnIndex(features_affiliateId_data_feed_path, ",")["Material"]
-    label_features_affiliateId_data_feed_path_index = getMappingColumnIndex(features_affiliateId_data_feed_path, ",")["Labels"]
+    pass
 else:
     material_index = None
     label_index = None
+    label_features_affiliateId_data_feed_path_index = None
 
 mapping_cleaning_fashionSuitableFor = createMappingBetween2Columns(cleaning_categories_fashionSuitableFor_path,2,6,";")
 
 awDeepLink_index = 42
 
-search_price_index = 79
-delivery_cost_index = 7
-rrp_price_index = 70
+
 maxNumberFashionSizeColumns = 100
 affiliateId = "?affiliates=3"
 
@@ -197,5 +193,4 @@ synonym_female = ["female","weiblich","damen","Female","Weiblich","Damen"]
 synonym_euro = ["€","EUR"]
 
 
-m = getMappingColumnIndex(filtered_data_feed_path,",")
-print(m["merchant_name"])
+
