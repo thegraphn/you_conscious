@@ -28,7 +28,7 @@ def renameCategory(article):
         if string2find in content_category_name:
             article[categoryName_index] = new_category
     #sexe = article[fashionSuitableFor_index]
-    words_title = word_tokenize(article[title_index])
+    words_title = word_tokenize(article[getHeadersIndex("Title")])
     cat = article[categoryName_index]
     for word in words_title:
         for k, v in mapping_cleaning_fashionSuitableFor.items():
