@@ -16,19 +16,18 @@ files_mapping_categories_path = os.path.join(root_folder, "utils")
 files_mapping_categories_path = os.path.join(files_mapping_categories_path, "data_dependencies")
 files_mapping_categories_path = os.path.join(files_mapping_categories_path, "categories_mapping.csv")
 
-file_url_shop_path = os.path.join(root_folder,"utils")
-file_url_shop_path = os.path.join(file_url_shop_path,"data_dependencies")
-file_url_shop_path = os.path.join(file_url_shop_path,"datafeed-locations.csv")
+file_url_shop_path = os.path.join(root_folder, "utils")
+file_url_shop_path = os.path.join(file_url_shop_path, "data_dependencies")
+file_url_shop_path = os.path.join(file_url_shop_path, "datafeed-locations.csv")
 
 mapping_fashionSuitableFor = os.path.join(root_folder, "utils")
 mapping_fashionSuitableFor = os.path.join(mapping_fashionSuitableFor, "data_dependencies")
 mapping_fashionSuitableFor = os.path.join(mapping_fashionSuitableFor,
                                           "categoriesCleaning_fashionSuitableFor_mapping.csv")
 
-
-column_mapping_merging_path = os.path.join(root_folder,"utils")
-column_mapping_merging_path = os.path.join(column_mapping_merging_path,"data_dependencies")
-column_mapping_merging_path = os.path.join(column_mapping_merging_path,"column_mapping_merging.csv")
+column_mapping_merging_path = os.path.join(root_folder, "utils")
+column_mapping_merging_path = os.path.join(column_mapping_merging_path, "data_dependencies")
+column_mapping_merging_path = os.path.join(column_mapping_merging_path, "column_mapping_merging.csv")
 
 features_mapping_path = os.path.join(root_folder, "utils")
 features_mapping_path = os.path.join(features_mapping_path, "data_dependencies")
@@ -38,18 +37,17 @@ download_data_feeds_directory_path = os.path.join(root_folder, "data_processing"
 download_data_feeds_directory_path = os.path.join(download_data_feeds_directory_path, "data_working_directory")
 download_data_feeds_directory_path = os.path.join(download_data_feeds_directory_path, "download")
 
-merged_data_feeds_directory_path = os.path.join(root_folder,"data_processing")
-merged_data_feeds_directory_path = os.path.join(merged_data_feeds_directory_path,"data_working_directory")
-merged_data_feeds_directory_path = os.path.join(merged_data_feeds_directory_path,"merged")
+merged_data_feeds_directory_path = os.path.join(root_folder, "data_processing")
+merged_data_feeds_directory_path = os.path.join(merged_data_feeds_directory_path, "data_working_directory")
+merged_data_feeds_directory_path = os.path.join(merged_data_feeds_directory_path, "merged")
 
+merging_features_path = os.path.join(root_folder, "utils")
+merging_features_path = os.path.join(merging_features_path, "data_dependencies")
+merging_features_path = os.path.join(merging_features_path, "merging_features.csv")
 
-merging_features_path = os.path.join(root_folder,"utils")
-merging_features_path = os.path.join(merging_features_path,"data_dependencies")
-merging_features_path = os.path.join(merging_features_path,"merging_features.csv")
-
-shops_ids_names_path = os.path.join(root_folder,"utils")
-shops_ids_names_path = os.path.join(shops_ids_names_path,"data_dependencies")
-shops_ids_names_path = os.path.join(shops_ids_names_path,"shops_ids_names.csv")
+shops_ids_names_path = os.path.join(root_folder, "utils")
+shops_ids_names_path = os.path.join(shops_ids_names_path, "data_dependencies")
+shops_ids_names_path = os.path.join(shops_ids_names_path, "shops_ids_names.csv")
 
 merged_data_feed_path = os.path.join(root_folder, "data_processing")
 merged_data_feed_path = os.path.join(merged_data_feed_path, "data_working_directory")
@@ -59,8 +57,8 @@ merged_data_feed_path = os.path.join(merged_data_feed_path, "merged_datafeeds.cs
 merged_data_feed_with_IdNames_path = os.path.join(root_folder, "data_processing")
 merged_data_feed_with_IdNames_path = os.path.join(merged_data_feed_with_IdNames_path, "data_working_directory")
 merged_data_feed_with_IdNames_path = os.path.join(merged_data_feed_with_IdNames_path, "merged")
-merged_data_feed_with_IdNames_path = os.path.join(merged_data_feed_with_IdNames_path, "merged_datafeeds.csvshopId2Name.csv")
-
+merged_data_feed_with_IdNames_path = os.path.join(merged_data_feed_with_IdNames_path,
+                                                  "merged_datafeeds.csvshopId2Name.csv")
 
 filtered_data_feed_path = os.path.join(root_folder, "data_processing")
 filtered_data_feed_path = os.path.join(filtered_data_feed_path, "data_working_directory")
@@ -93,11 +91,11 @@ labeled_data_feed_path = os.path.join(labeled_data_feed_path, "data_working_dire
 labeled_data_feed_path = os.path.join(labeled_data_feed_path, "filtered")
 labeled_data_feed_path = os.path.join(labeled_data_feed_path, "labeled_data_feed.csv")
 
-
-
-cleaning_categories_fashionSuitableFor_path: str = os.path.join(root_folder,"utils")
-cleaning_categories_fashionSuitableFor_path: str = os.path.join(cleaning_categories_fashionSuitableFor_path,"data_dependencies")
-cleaning_categories_fashionSuitableFor_path: str = os.path.join(cleaning_categories_fashionSuitableFor_path,"categoriesCleaning_fashionSuitableFor_mapping.csv")
+cleaning_categories_fashionSuitableFor_path: str = os.path.join(root_folder, "utils")
+cleaning_categories_fashionSuitableFor_path: str = os.path.join(cleaning_categories_fashionSuitableFor_path,
+                                                                "data_dependencies")
+cleaning_categories_fashionSuitableFor_path: str = os.path.join(cleaning_categories_fashionSuitableFor_path,
+                                                                "categoriesCleaning_fashionSuitableFor_mapping.csv")
 
 
 def getMappingColumnIndex(file, delimiter):
@@ -162,11 +160,26 @@ def write2File(list_articles, output_file):
                 csv_writer.writerow(element)
 
 
+def changeDelimiterCsv(csv_input: str, csv_output: str, delimiter_input: str, delimiter_output: str):
+    """
+    Change the format of the csv file 
+    """
+    input_rows: list = []
+    with open(csv_input, "r", encoding="utf-8") as ic:
+        csv_reader = csv.reader(ic, delimiter=delimiter_input)
+        for row in csv_reader:
+            input_rows.append(row)
+    with open(csv_output, "w", encoding="utf-8",newline="") as oc:
+        csv_writer = csv.writer(oc, delimiter=delimiter_output, quoting=csv.QUOTE_ALL)
+        for element in input_rows:
+            csv_writer.writerow(element)
+
+
 number_processes = os.cpu_count()
 if os.path.exists(filtered_data_feed_path):
     title_index = getMappingColumnIndex(filtered_data_feed_path, "\t")["Title"]
-    merchantName = getMappingColumnIndex(filtered_data_feed_path,"\t")["merchant_name"]
-    fashionSuitableFor_index = getMappingColumnIndex(filtered_data_feed_path,"\t")["Fashion:suitable_for"]
+    merchantName = getMappingColumnIndex(filtered_data_feed_path, "\t")["merchant_name"]
+    fashionSuitableFor_index = getMappingColumnIndex(filtered_data_feed_path, "\t")["Fashion:suitable_for"]
 
 else:
     title_index = None
@@ -180,17 +193,14 @@ else:
     label_index = None
     label_features_affiliateId_data_feed_path_index = None
 
-mapping_cleaning_fashionSuitableFor = createMappingBetween2Columns(cleaning_categories_fashionSuitableFor_path,2,6,";")
+mapping_cleaning_fashionSuitableFor = createMappingBetween2Columns(cleaning_categories_fashionSuitableFor_path, 2, 6,
+                                                                   ";")
 
 awDeepLink_index = 42
-
 
 maxNumberFashionSizeColumns = 100
 affiliateId = "?affiliates=3"
 
-
-synonym_female = ["female","weiblich","damen","Female","Weiblich","Damen"]
-synonym_euro = ["€","EUR"]
-
-
-
+synonym_female = ["female", "weiblich", "damen", "Female", "Weiblich", "Damen"]
+synonym_male = ["male", "Male", "Herren", "Man", "männlich"]
+synonym_euro = ["€", "EUR"]

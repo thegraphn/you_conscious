@@ -11,7 +11,7 @@ from data_processing.utils.utils import createMappingBetween2Columns, files_mapp
     mapping_fashionSuitableFor, cleansed_categories_data_feed_path, cleansed_sex_data_feed_path, \
     fashionSuitableFor_index, \
     maxNumberFashionSizeColumns, getMappingColumnIndex, mapping_cleaning_fashionSuitableFor, title_index, merchantName, \
-    synonym_female, synonym_euro, labeled_data_feed_path
+    synonym_female, synonym_euro, labeled_data_feed_path, synonym_male
 
 global feature_mapping
 feature_mapping = createMappingBetween2Columns(files_mapping_categories_path, 1, 2, ";")
@@ -52,10 +52,17 @@ def renameCategory(article):
     if "Topman" in article[merchantName]:
         article[categoryName_index]: str = article[categoryName_index].replace("Damen", "Herren")
     for female_token in synonym_female:
-        # todo fsf
         if female_token in article[fashionSuitableFor_index]:
             if "Herren" in article[categoryName_index]:
                 article[categoryName_index]: str = article[categoryName_index].replace("Herren", "Damen")
+
+
+    for male_token in synonym_male:
+        if male_token in article[fashionSuitableFor_index]:
+            if "Damen" in article[categoryName_index]:
+                article[categoryName_index]: str = article[categoryName_index].replace("Damen", "Herren")
+
+
     return article
 
 
