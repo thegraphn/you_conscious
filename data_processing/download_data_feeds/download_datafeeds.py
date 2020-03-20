@@ -108,7 +108,7 @@ def unzipFile(file):
         pass
 
     if "LOVECO" in file:
-        os.system("mv " + file + " " + file[:-2] + "csv")
+        os.system("mv " + file + " " + file[:-3] + "csv")
     if "gz" in file:
         lenght_to_delete = -3
         os.system("gunzip -kc " + str(file) + " > " + str(file[:lenght_to_delete]) + ".csv")
