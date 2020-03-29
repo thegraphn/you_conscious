@@ -51,30 +51,29 @@ def addMerchantName(in_file: str, name: str):
     Only for SORBRAS
     :param in_file: datafeed file
     :param name: name to add into the data feed
-    :return: write file with a new column
     '''
-    headers = []
-    with open(in_file, encoding="utf-8") as in_file:
+    headers: list = []
+    with open(in_file, encoding="utf-8") as file:
         with open(os.path.join(path, "datafeeds_preprocessing\downloaded_datafeeds/SORBAS_with_merchant_name.csv"), 'w',
                   encoding="utf-8") as o:
-            csv_reader = csv.reader(in_file)
-            csv_writer = csv.writer(o)
+            csv_reader: csv.reader = csv.reader(file)
+            csv_writer: csv.writer = csv.writer(o)
             for row in csv_reader:
                 headers = row
                 break
-            headers: list = headers + ["merchant_name"]
+            headers = headers + ["merchant_name"]
             csv_writer.writerow(headers)
             for row in csv_reader:
-                row: list = row + [name]
+                row = row + [name]
                 csv_writer.writerow(row)
     os.system("rm " + in_file)
 
 
 def downloadDatafeeds(list_tuples_shops_urls: list):
     """
-    This function uses Pool and call the sub-function in order to do the task download data feed
-    :param list_tuples_shops_urls:
-    :return:
+    This function uses Pool and call the sub-function  downloadDatafeed.
+    The number of processes is set to 2 because of the internet connection.
+    :param list_tuples_shops_urls: List of tuples (shop name, link)
     """
     with Pool(processes=2)as p:
         list(tqdm.tqdm(p.imap(downloadDatafeed, list_tuples_shops_urls), total=len(list_tuples_shops_urls)))
@@ -82,10 +81,11 @@ def downloadDatafeeds(list_tuples_shops_urls: list):
 
 def downloadDatafeed(tuple_shop_url: tuple):
     """
-    :param tuple_shop_url: tupel containing (shop_name,url)
-    :return:
+    Download a data feed. If the file is LOVECO, the extension of the file is immediately changed into csv
+    :param tuple_shop_url: tuple containing (shop_name,url)
     """
-    shop_name, link = tuple_shop_url
+    shop_name: str = tuple_shop_url[0]
+    link: str = tuple_shop_url[1]
     shop_name = shop_name.replace(" ", "_")
     if "LOVECO" in shop_name:
         format_file: str = ".csv"
@@ -98,8 +98,8 @@ def downloadDatafeed(tuple_shop_url: tuple):
 
 def unzipFiles(list_files: list):
     """
-     This function uses Pool and call the sub-function in order to do the task unzipFile
-    :param list_files: List of the file to try to unzip
+     This function uses Pool and call the sub-function unzipFile
+    :param list_files: List of the files to try to unzip
     """
 
     with Pool(processes=number_processes)as p:
@@ -108,7 +108,8 @@ def unzipFiles(list_files: list):
 
 def unzipFile(file: str):
     """
-    unzip a given file
+    Try to unzip a given file. If the datafeed is LOVECO the file is not zipped. It is
+    just required to change the file's extension
     :param file: file to unzip
     """
     if ".csv" in file:
@@ -116,21 +117,27 @@ def unzipFile(file: str):
     if "LOVECO" in file:
         os.system("mv " + file + " " + file[:-3] + "csv")
     if "gz" in file:
-        length_to_delete = -3
+        length_to_delete: int = -3
         os.system("gunzip -kc " + str(file) + " > " + str(file[:length_to_delete]) + ".csv")
 
 
 def delete_non_csv_datafeeds(directory: str):
+    """
+    Delete all file in a directory except py and csv files
+    :param directory: Directory where the files will be deleted
+    """
     list_files: list = glob.glob(os.path.join(directory, "*"))
     for file in list_files:
         if not file.endswith("csv") and not file.endswith(".py"):
             os.system("rm " + file)
-        else:
-            pass
 
 
-def delete_all_csv_file():
-    for file in glob.glob(os.path.join(download_data_feeds_directory_path, "*.csv")):
+def delete_all_csv_file(directory: str = download_data_feeds_directory_path):
+    """
+    Delete all csv files in a given directory
+    :param directory: Directory where the csv files are
+    """
+    for file in glob.glob(os.path.join(directory, "*.csv")):
         os.system("rm " + file)
 
 
