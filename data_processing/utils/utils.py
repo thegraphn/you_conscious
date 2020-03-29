@@ -179,12 +179,11 @@ number_processes = os.cpu_count()
 if os.path.exists(filtered_data_feed_path):
     title_index = getMappingColumnIndex(filtered_data_feed_path, "\t")["Title"]
     merchantName = getMappingColumnIndex(filtered_data_feed_path, "\t")["merchant_name"]
-    fashionSuitableFor_index = getMappingColumnIndex(filtered_data_feed_path, "\t")["Fashion:suitable_for"]
 
 else:
     title_index = None
     merchantName = None
-    fashionSuitableFor_index = None
+
 
 if os.path.exists(features_affiliateId_data_feed_path):
     pass

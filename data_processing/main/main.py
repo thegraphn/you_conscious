@@ -6,6 +6,7 @@ generated.
 import os
 import sys
 
+
 folder = os.path.dirname(os.path.realpath(__file__))
 folder = folder.replace("/data_processing/main", "")
 folder = folder.replace(r"\data_processing\main", "")

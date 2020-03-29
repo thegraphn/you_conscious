@@ -36,7 +36,7 @@ def changeProgrammId2MerchentName(csv_file, shop_id_name_mapping_csv, ):
 
     with open(csv_file, encoding=enc) as input:
         csv_reader2 = csv.reader(input, delimiter=",", quotechar='"')
-        with open(csv_file + "shopId2Name.csv", 'a', encoding="utf-8") as o:
+        with open(csv_file + "shopId2Name.csv", 'w', encoding="utf-8") as o:
             csv_writer = csv.writer(o, delimiter=",", quotechar='"')
             c = 0
             for row in csv_reader2:
@@ -53,17 +53,20 @@ def changeProgrammId2MerchentName(csv_file, shop_id_name_mapping_csv, ):
 
 def changeColumnName(csv_file, mapping_file):
     dict_mapping_column = {}
+    print(csv_file)
+
     with open(mapping_file, encoding="utf-8-sig") as mapping_csv:
         csv_reader = csv.reader(mapping_csv, delimiter=";")
         for row in csv_reader:
             dict_mapping_column[row[0]] = row[1]
     with open(csv_file, encoding=enc) as csv_to_rename:
+
         csv_reader = csv.reader(csv_to_rename, delimiter=",", quotechar='"')
         with open(csv_file + "change.csv", 'w') as output_csv:
             c = True
             csv_writer = csv.writer(output_csv, delimiter=",", quotechar='"')
             for row in csv_reader:
-                if c == True:
+                if c:
                     for key, value in dict_mapping_column.items():
                         for i in range(len(row)):
                             if key == row[i]:
@@ -75,7 +78,7 @@ def changeColumnName(csv_file, mapping_file):
 
 def mergeCSV(list_files, fieldnames, output_data):
     fieldnames = list(fieldnames)
-    with open(output_data, 'a', encoding=enc) as output_csvfile:
+    with open(output_data, 'w', encoding=enc) as output_csvfile:
         writer = csv.DictWriter(output_csvfile, fieldnames=fieldnames, delimiter=",", quotechar='"')
         csv_writer = csv.writer(output_csvfile, delimiter=",", quotechar='"')
         csv_writer.writerow(fieldnames)
@@ -124,31 +127,31 @@ def getNewColumnNames(file):
     return set_column_names
 
 def merging():
-    list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csv"))
 
+    print("Begin merging")
+    os.system("rm "+ merged_data_feed_path)
+    list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csv"))
+    print("Merging - Changing column names: Begin")
     set_col = set()
     for file in list_files:
         changeColumnName(file, column_mapping_merging_path)
-
     list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csvchange.csv"))
-
     for file in list_files:
         for name in getColumNames(file):
             set_col.add(name)
     set_col = list(set_col)
     newColumnNames = getNewColumnNames(merging_features_path) + set_col
-    print("Changing column names: Done")
-
+    print("Merging - Changing column names: Done")
+    print("Merging - Merging : Begin")
     list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csvchange.csv"))
     mergeCSV(list_files, newColumnNames, merged_data_feed_path)
     os.system("rm " + os.path.join(download_data_feeds_directory_path, "*.csvchange.csv"))
-    print("Merging: Done")
-
+    print("Merging - Merging : Done")
+    print("Merging - Changing ID to Name: Begin")
     changeProgrammId2MerchentName(merged_data_feed_path, shops_ids_names_path)
-    print("Changing ID to Name: Done")
-
+    print("Merging - Changing ID to Name: Done")
     os.system("rm " + merged_data_feed_path)
+
     os.rename(merged_data_feed_with_IdNames_path,merged_data_feed_path)
     #os.system("mv " + merged_data_feed_with_IdNames_path + "  " + merged_data_feed_path)
-    print("Merging script: Done ", datetime.datetime.now())
-    end = datetime.datetime.now()
+    print("Merging: Done ", datetime.datetime.now())
