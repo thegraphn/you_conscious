@@ -15,8 +15,11 @@ class Filter:
     def __init__(self):
         self.vegan_filters = getFilters(filters_file_path)
         self.vegan_filters.sort()
-        self.label_index_feature_datafeed = getHeadersIndex("Labels", features_affiliateId_data_feed_path)
-        self.material_index_feature_datafeed = getHeadersIndex("Material", features_affiliateId_data_feed_path)
+        try:
+            self.label_index_feature_datafeed = getHeadersIndex("Labels", features_affiliateId_data_feed_path)
+            self.material_index_feature_datafeed = getHeadersIndex("Material", features_affiliateId_data_feed_path)
+        except:
+            pass
 
     def isArticleVegan(self, article: list) -> Union[None, list]:
         """

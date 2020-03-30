@@ -21,6 +21,7 @@ class Cleanser:
         self.rrp_price_index = getHeadersIndex("rrp_price", file=filtered_data_feed_path)
         self.delivery_cost_index = getHeadersIndex("delivery_cost", file=filtered_data_feed_path)
         self.search_price_index = getHeadersIndex("search_price", file=filtered_data_feed_path)
+        self.merchantName_index = getHeadersIndex("merchant_name", file=filtered_data_feed_path)
 
     def renameCategory(self, article):
 
@@ -30,7 +31,7 @@ class Cleanser:
                 article[self.categoryName_index] = new_category
         article[self.categoryName_index] = clean_category_sex(article)
         # Change the content within Topman category to man
-        if "Topman" in article[merchantName]:
+        if "Topman" in article[self.merchantName_index]:
             article[self.categoryName_index]: str = article[self.categoryName_index].replace("Damen", "Herren")
         for female_token in synonym_female:
 
@@ -78,7 +79,8 @@ class Cleanser:
         if article[self.rrp_price_index] == "0" or article[self.rrp_price_index] == "0,00" \
                 or article[self.rrp_price_index] == "0.00":
             article[self.rrp_price_index] = article[self.search_price_index]
-        if article[self.rrp_price_index] == "" or len(article[self.rrp_price_index]) == 0 or article[self.rrp_price_index] == "0.00 €"\
+        if article[self.rrp_price_index] == "" or len(article[self.rrp_price_index]) == 0 or article[
+            self.rrp_price_index] == "0.00 €" \
                 or article[self.rrp_price_index] == "0.00":
             article[self.rrp_price_index] = article[self.search_price_index]
         if article[self.delivery_cost_index] == '"0,00 EUR"' or article[self.delivery_cost_index] == ''"0.00 EUR"'':
