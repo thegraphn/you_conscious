@@ -35,6 +35,15 @@ class Filter:
         vegan = True
         for filter_veg in self.vegan_filters:
             filter_veg = filter_veg.split(" ")
+
+
+            if "Fritzi aus Preußen" in article:
+                if len(set(filter_veg).intersection(article_words)) == len(filter_veg):
+                    vegan = False
+                    print(filter_veg)
+
+
+
             if len(set(filter_veg).intersection(article_words)) == len(filter_veg):
                 vegan = False
                 break

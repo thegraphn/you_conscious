@@ -129,7 +129,7 @@ def getNewColumnNames(file):
 def merging():
 
     print("Begin merging")
-    os.system("rm "+ merged_data_feed_path)
+    #os.system("rm "+ merged_data_feed_path)
     list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csv"))
     print("Merging - Changing column names: Begin")
     set_col = set()

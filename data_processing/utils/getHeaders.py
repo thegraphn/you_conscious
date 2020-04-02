@@ -1,15 +1,8 @@
-from data_processing.utils.utils import getMappingColumnIndex, cleansed_sex_data_feed_path, filtered_data_feed_path, \
-    features_affiliateId_data_feed_path
-import os
-
-if os.path.exists(filtered_data_feed_path):
-    mapping_columnHeader = getMappingColumnIndex(filtered_data_feed_path, "\t")
-    mapping_columnHeader["DUMMY_VALUE"] = 9999
-else:
-    mapping_columnHeader = None
+from data_processing.utils.utils import getMappingColumnIndex, filtered_data_feed_path
 
 
 def getHeadersIndex(header, file=filtered_data_feed_path):
+    print("+"*20,getMappingColumnIndex(filtered_data_feed_path, "\t"))
     if header == "category_name":
         return getMappingColumnIndex(filtered_data_feed_path, "\t")["category_name"]
     if header == "Labels":
@@ -28,5 +21,7 @@ def getHeadersIndex(header, file=filtered_data_feed_path):
         return getMappingColumnIndex(filtered_data_feed_path, "\t")["Fashion:suitable_for"]
     if header =="merchant_name":
         return getMappingColumnIndex(filtered_data_feed_path, "\t")["merchant_name"]
+    if header == "aw_deep_link":
+        return getMappingColumnIndex(filtered_data_feed_path,"\t")["aw_deep_link"]
     else:
         print("HEADER NOT IMPLEMENTED")

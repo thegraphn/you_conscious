@@ -1,16 +1,18 @@
 import re
 from multiprocessing.pool import Pool
 import tqdm
-from data_processing.utils.getHeaders import mapping_columnHeader
+
+from data_processing.utils.getHeaders import getHeadersIndex
 from data_processing.utils.utils import getLinesCSV, cleansed_sex_data_feed_path, \
-    getMappingColumnIndex, write2File, features_data_feed_path, awDeepLink_index, affiliateId, \
-    features_affiliateId_data_feed_path, number_processes, features_mapping_path
+    getMappingColumnIndex, write2File, features_data_feed_path,  affiliateId, \
+    features_affiliateId_data_feed_path, number_processes, features_mapping_path, filtered_data_feed_path
 
 
 class featuresAdder:
     def __init__(self):
         self.features_list = getLinesCSV(features_mapping_path, ";")[1:]
-
+        self.mapping_columnHeader = getMappingColumnIndex(filtered_data_feed_path,"\t")
+        self.awDeepLink_index = getHeadersIndex("aw_deep_link")
     def addFeaturesArticle(self, article):
         """
         Iterate over "cell" in the article and search possible features.
@@ -24,10 +26,10 @@ class featuresAdder:
                 feature2Write = string2Find_feature2Write_columnFeature[1]
                 columnFeature = string2Find_feature2Write_columnFeature[2]
                 if re.match(string2Find, cell) is not None:
-                    article[mapping_columnHeader[columnFeature]] = feature2Write
+                    article[self.mapping_columnHeader[columnFeature]] = feature2Write
                     break
                 elif string2Find in cell:
-                    article[mapping_columnHeader[columnFeature]] = feature2Write
+                    article[self.mapping_columnHeader[columnFeature]] = feature2Write
                     break
         return article
 
@@ -38,13 +40,13 @@ class featuresAdder:
         return result_featuredArticles
 
     def addAffiliateIdArticle(self, article):
-        content_awDeepLink_index = article[awDeepLink_index]
+        content_awDeepLink_index = article[self.awDeepLink_index]
         if "https://sorbasshoes.com" in content_awDeepLink_index:
             for i, char in enumerate(content_awDeepLink_index):
                 if char == "?":
                     link = content_awDeepLink_index[:i] + affiliateId
                     break
-            article[awDeepLink_index] = link
+            article[self.awDeepLink_index] = link
         return article
 
     def addAffiliateIdArticles(self, list_articles):

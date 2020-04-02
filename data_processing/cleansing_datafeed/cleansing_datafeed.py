@@ -8,12 +8,13 @@ from data_processing.utils.getHeaders import getHeadersIndex
 from data_processing.utils.utils import createMappingBetween2Columns, files_mapping_categories_path, \
     getLinesCSV, filtered_data_feed_path, write2File, \
     mapping_fashionSuitableFor, cleansed_categories_data_feed_path, cleansed_sex_data_feed_path, \
-    maxNumberFashionSizeColumns, getMappingColumnIndex, merchantName, \
+    maxNumberFashionSizeColumns, getMappingColumnIndex,  \
     synonym_female, synonym_euro, synonym_male
 
 
 class Cleanser:
     def __init__(self):
+
         self.feature_mapping = createMappingBetween2Columns(files_mapping_categories_path, 1, 2, ";")
         self.fashionSuitableFor_mapping = createMappingBetween2Columns(mapping_fashionSuitableFor, 2, 6, ";")
         self.categoryName_index = getHeadersIndex("category_name")
