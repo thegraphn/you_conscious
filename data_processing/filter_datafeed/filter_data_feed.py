@@ -5,9 +5,10 @@ from nltk import word_tokenize
 import tqdm
 
 from data_processing.filter_datafeed.utils import getFilters
+from data_processing.utils.file_paths import file_paths
 from data_processing.utils.getHeaders import getHeadersIndex
-from data_processing.utils.utils import filters_file_path, getLinesCSV, merged_data_feed_path, filtered_data_feed_path, \
-    write2File, features_affiliateId_data_feed_path, labeled_data_feed_path
+from data_processing.utils.utils import filters_file_path, getLinesCSV, merged_data_feed_path, \
+    write2File
 
 
 class Filter:
@@ -16,8 +17,10 @@ class Filter:
         self.vegan_filters = getFilters(filters_file_path)
         self.vegan_filters.sort()
         try:
-            self.label_index_feature_datafeed = getHeadersIndex("Labels", features_affiliateId_data_feed_path)
-            self.material_index_feature_datafeed = getHeadersIndex("Material", features_affiliateId_data_feed_path)
+            self.label_index_feature_datafeed = getHeadersIndex("Labels",
+                                                                file_paths["featured_affiliateIds_datafeed_path"])
+            self.material_index_feature_datafeed = getHeadersIndex("Material",
+                                                                   file_paths["featured_affiliateIds_datafeed_path"])
         except:
             pass
 
@@ -35,15 +38,6 @@ class Filter:
         vegan = True
         for filter_veg in self.vegan_filters:
             filter_veg = filter_veg.split(" ")
-
-
-            if "Fritzi aus Preußen" in article:
-                if len(set(filter_veg).intersection(article_words)) == len(filter_veg):
-                    vegan = False
-                    print(filter_veg)
-
-
-
             if len(set(filter_veg).intersection(article_words)) == len(filter_veg):
                 vegan = False
                 break
@@ -89,18 +83,18 @@ def filter_data_feed():
     list_articles_vegan = fltr.getListVeganArticles(list_articles)
     print("Filtering - filtering: Done")
     list_articles_vegan = [headers] + list_articles_vegan
-    write2File(list_articles_vegan, filtered_data_feed_path)
+    write2File(list_articles_vegan, file_paths["filtered_data_feed_path"])
     print("Filtering: Done")
 
 
 def getArticlesWithLabel():
     fltr = Filter()
-    list_articles = getLinesCSV(features_affiliateId_data_feed_path, "\t")
+    list_articles = getLinesCSV(file_paths["featured_affiliateIds_datafeed_path"], "\t")
     headers = list_articles[0]
     list_articles = list_articles[1:]
     print("Filtering - remove articles without label: Begin")
     list_articles_withLabel = fltr.removeArticlesWithNoLabel(list_articles)
     print("Filtering - remove articles without label: End")
     list_articles_withLabel = [headers] + list_articles_withLabel
-    write2File(list_articles_withLabel, labeled_data_feed_path)
+    write2File(list_articles_withLabel, file_paths["labeled_data_feed_path"])
     print("Removed all articles without label")
