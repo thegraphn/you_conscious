@@ -2,17 +2,20 @@ import re
 from multiprocessing.pool import Pool
 import tqdm
 
+from data_processing.utils.file_paths import file_paths
 from data_processing.utils.getHeaders import getHeadersIndex
 from data_processing.utils.utils import getLinesCSV, cleansed_sex_data_feed_path, \
-    getMappingColumnIndex, write2File, features_data_feed_path,  affiliateId, \
-    features_affiliateId_data_feed_path, number_processes, features_mapping_path, filtered_data_feed_path
+    getMappingColumnIndex, write2File, features_data_feed_path, affiliateId, \
+     number_processes, features_mapping_path
 
 
 class featuresAdder:
     def __init__(self):
+        self.input_file: str = file_paths["filtered_data_feed_path"]
         self.features_list = getLinesCSV(features_mapping_path, ";")[1:]
-        self.mapping_columnHeader = getMappingColumnIndex(filtered_data_feed_path,"\t")
-        self.awDeepLink_index = getHeadersIndex("aw_deep_link")
+        self.mapping_columnHeader = getMappingColumnIndex(self.input_file, "\t")
+        self.awDeepLink_index = getHeadersIndex("aw_deep_link", file=self.input_file)
+
     def addFeaturesArticle(self, article):
         """
         Iterate over "cell" in the article and search possible features.
@@ -59,7 +62,7 @@ class featuresAdder:
 def add_features():
     ft_adder = featuresAdder()
     print("Begin adding features")
-    list_articles = getLinesCSV(cleansed_sex_data_feed_path, "\t")
+    list_articles = getLinesCSV(ft_adder.input_file, "\t")
     headers = list_articles[0]
     list_articles = list_articles[1:]
     print("Adding Features - add features: Begin")
@@ -74,4 +77,4 @@ def add_features():
     list_articles_with_affiliateIds = ft_adder.addAffiliateIdArticles(list_articles)
     print("Adding Features - add affiliate ids: Done")
     list_articles_with_affiliateIds = [headers] + list_articles_with_affiliateIds
-    write2File(list_articles_with_affiliateIds, features_affiliateId_data_feed_path)
+    write2File(list_articles_with_affiliateIds, file_paths["featured_affiliateIds_datafeed_path"])

@@ -89,6 +89,8 @@ def downloadDatafeed(tuple_shop_url: tuple):
     shop_name = shop_name.replace(" ", "_")
     if "LOVECO" in shop_name:
         format_file: str = ".csv"
+    if "SORBAS" in shop_name:
+        format_file: str = ".csv"
     else:
         format_file: str = ".gz"
     path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +

@@ -21,18 +21,16 @@ from data_processing.merging_datafeeds.merging_datafeeds_old import merging
 def main_app():
     begin = datetime.datetime.now()
     print("Begin data processing", begin)
-    downloading()
-    merging()
-    filter_data_feed()
-    cleansing()
-    add_features()
-    getArticlesWithLabel()
 
+    downloading()
+    #merging()
+    #filter_data_feed()
+    #add_features()
+    #getArticlesWithLabel()
+    #cleansing()
     end = datetime.datetime.now()
     print("End data processing", end)
     print("It took ", end - begin)
 
 
-
 main_app()
-

@@ -60,11 +60,6 @@ merged_data_feed_with_IdNames_path = os.path.join(merged_data_feed_with_IdNames_
 merged_data_feed_with_IdNames_path = os.path.join(merged_data_feed_with_IdNames_path,
                                                   "merged_datafeeds.csvshopId2Name.csv")
 
-filtered_data_feed_path = os.path.join(root_folder, "data_processing")
-filtered_data_feed_path = os.path.join(filtered_data_feed_path, "data_working_directory")
-filtered_data_feed_path = os.path.join(filtered_data_feed_path, "filtered")
-filtered_data_feed_path = os.path.join(filtered_data_feed_path, "filtered_datafeed.csv")
-
 cleansed_categories_data_feed_path = os.path.join(root_folder, "data_processing")
 cleansed_categories_data_feed_path = os.path.join(cleansed_categories_data_feed_path, "data_working_directory")
 cleansed_categories_data_feed_path = os.path.join(cleansed_categories_data_feed_path, "cleansed")
@@ -79,17 +74,6 @@ features_data_feed_path = os.path.join(root_folder, "data_processing")
 features_data_feed_path = os.path.join(features_data_feed_path, "data_working_directory")
 features_data_feed_path = os.path.join(features_data_feed_path, "featured")
 features_data_feed_path = os.path.join(features_data_feed_path, "featured_datafeed.csv")
-
-features_affiliateId_data_feed_path = os.path.join(root_folder, "data_processing")
-features_affiliateId_data_feed_path = os.path.join(features_affiliateId_data_feed_path, "data_working_directory")
-features_affiliateId_data_feed_path = os.path.join(features_affiliateId_data_feed_path, "featured")
-features_affiliateId_data_feed_path = os.path.join(features_affiliateId_data_feed_path,
-                                                   "featured_affiliateIds_datafeed.csv")
-
-labeled_data_feed_path = os.path.join(root_folder, "data_processing")
-labeled_data_feed_path = os.path.join(labeled_data_feed_path, "data_working_directory")
-labeled_data_feed_path = os.path.join(labeled_data_feed_path, "filtered")
-labeled_data_feed_path = os.path.join(labeled_data_feed_path, "labeled_data_feed.csv")
 
 cleaning_categories_fashionSuitableFor_path: str = os.path.join(root_folder, "utils")
 cleaning_categories_fashionSuitableFor_path: str = os.path.join(cleaning_categories_fashionSuitableFor_path,
@@ -169,22 +153,13 @@ def changeDelimiterCsv(csv_input: str, csv_output: str, delimiter_input: str, de
         csv_reader = csv.reader(ic, delimiter=delimiter_input)
         for row in csv_reader:
             input_rows.append(row)
-    with open(csv_output, "w", encoding="utf-8",newline="") as oc:
+    with open(csv_output, "w", encoding="utf-8", newline="") as oc:
         csv_writer = csv.writer(oc, delimiter=delimiter_output, quoting=csv.QUOTE_ALL)
         for element in input_rows:
             csv_writer.writerow(element)
 
 
 number_processes = os.cpu_count()
-
-
-
-if os.path.exists(features_affiliateId_data_feed_path):
-    pass
-else:
-    material_index = None
-    label_index = None
-    label_features_affiliateId_data_feed_path_index = None
 
 mapping_cleaning_fashionSuitableFor = createMappingBetween2Columns(cleaning_categories_fashionSuitableFor_path, 2, 6,
                                                                    ";")
