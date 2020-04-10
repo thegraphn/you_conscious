@@ -194,7 +194,6 @@ Obermaterial:Baumwolle=100%;Baumwolle;Material
 Material:Polyester=100%;Polyester;Material
 100% Polyamid;Polyamid;Material
 Kork;Kork;Material
-Living Crafts;Vegan;Labels
 Matt & Nat;Vegan;Labels
 aus kontrolliert biologischem Anbau;Bio-Baumwolle;Material
 (aus kontrolliert biologischem Anbau);Bio-Baumwolle;Material
@@ -258,4 +257,16 @@ ASOS PLUS;ASOS DESIGN Plus;plus_sizes
 Dirndl;Trachtenstore;specials
 PETA-Approved Vegan;VERIFIED BY YOU|CONSCIOUS;verified
 Vegan;VERIFIED BY YOU|CONSCIOUS;verified
-Fritzi aus Preußen;PETA-Approved Vegan;Labels
+PETA verifiziert;PETA-Approved Vegan;Labels
+PETA-zertifiziert (vegan);PETA-Approved Vegan;Labels
+Peta approved Vegan;PETA-Approved Vegan;Labels
+Peta approved;PETA-Approved Vegan;Labels
+Peta- approved Vegan;PETA-Approved Vegan;Labels
+PeTA zertifiziert vegan;PETA-Approved Vegan;Labels
+PETA approved vegan;PETA-Approved Vegan;Labels
+Vegan approved by PETA;PETA-Approved Vegan;Labels
+PETA zertifiziert;PETA-Approved Vegan;Labels
+PETA-zertifiziert;PETA-Approved Vegan;Labels
+vegane Machart wurde durch Peta;PETA-Approved Vegan;Labels
+PETA-Verifizierung;PETA-Approved Vegan;Labels
+in veganer Peta zertifierter;PETA-Approved Vegan;Labels
