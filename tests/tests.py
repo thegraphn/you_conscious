@@ -307,7 +307,8 @@ class UnitTest(unittest.TestCase):
                                  "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
                                  "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
                                  "", "", "", "", "", "", "", "", "", ""]
-        excepted_article_6: list = ["Polyester", "", "", "", "", "ABOUT YOU", "149,95", "", "", "", "", "Kleid Herren",
+
+        expected_article_6: list = ["Polyester", "", "", "", "", "ABOUT YOU", "149,95", "", "", "", "", "Kleid Herren",
                                  "weiß",
                                  "Herren", "", "", "", "", "0", "", "",
                                  "https://cdn.aboutyou.de/file/5e65cff7714a087caa88d381f5722f6d?width=2000&height=2000",
@@ -339,19 +340,20 @@ class UnitTest(unittest.TestCase):
         output_article_5: list = cleanser.article_cleansing(input_article_5)
         output_article_6: list = cleanser.article_cleansing(input_article_6)
 
-
+        print(output_article_1)
+        print(excepted_article_1)
 
         self.assertEqual(output_article_1, excepted_article_1)
         self.assertEqual(output_article_2, excepted_article_2)
         self.assertEqual(output_article_3, excepted_article_3)
         self.assertEqual(output_article_4, excepted_article_4)
         self.assertEqual(output_article_5, excepted_article_5)
-        self.assertEqual(output_article_6, excepted_article_6)
+        self.assertEqual(output_article_6, expected_article_6)
 
 
 unit_test = UnitTest()
 # UnitTest.test_isArticleVegan(unit_test)
 # UnitTest.test_addFeaturesArticle(unit_test)
 
-UnitTest.test_cleansing_article_merchant_name(unit_test)
+#UnitTest.test_cleansing_article_merchant_name(unit_test)
 UnitTest.test_cleansing_article_category_name(unit_test)

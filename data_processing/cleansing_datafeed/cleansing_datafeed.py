@@ -8,7 +8,7 @@ from data_processing.utils.file_paths import file_paths
 from data_processing.utils.getHeaders import getHeadersIndex
 from data_processing.utils.utils import createMappingBetween2Columns, files_mapping_categories_path, \
     getLinesCSV, write2File, \
-    mapping_fashionSuitableFor, cleansed_categories_data_feed_path, cleansed_sex_data_feed_path, \
+    mapping_fashionSuitableFor, cleansed_categories_data_feed_path, \
     maxNumberFashionSizeColumns, getMappingColumnIndex, \
     synonym_female, synonym_euro, synonym_male
 
@@ -170,27 +170,30 @@ class Cleanser:
 
 
 def cleansing():
-    clnsr = Cleanser()
-    print("Begin cleansing")
-    list_articles = getLinesCSV(clnsr.input_data_feed, "\t")
-    print("Cleansing - Merging by size: Begin")
-    list_articles = clnsr.mergedProductBySize(list_articles)
-    print("Cleansing - Merging by size: Done")
-    headers = list_articles[0]
-    list_articles = list_articles[1:]
-    print("Cleansing - Renaming Categories: Begin")
-    renamed_category_articles = clnsr.cleansing_articles(list_articles)
-    renamed_category_articles = [headers] + renamed_category_articles
-    write2File(renamed_category_articles, cleansed_categories_data_feed_path)
-    print("Cleansing - Renaming Categories: Done")
-    headers = renamed_category_articles[0]
-    renamed_category_articles = renamed_category_articles[1:]
-    print("Cleansing - Sexes and Prices: Begin")
-    cleansed_fashion_suitable_for = clnsr.renamingFashionSuitableForColumns(renamed_category_articles)
-    cleansed_prices = clnsr.cleanPrices(cleansed_fashion_suitable_for)
-    print("Cleansing - Sexes and Prices: Done")
-    cleansed_articles = [headers] + cleansed_prices
-    write2File(cleansed_articles, cleansed_sex_data_feed_path)
+    with Pool() as p:
+        clnsr = Cleanser()
+        print("Begin cleansing")
+        list_articles = getLinesCSV(clnsr.input_data_feed, "\t")
+        print("Cleansing - Merging by size: Begin")
+        list_articles = clnsr.mergedProductBySize(list_articles)
+        print("Cleansing - Merging by size: Done")
+        headers = list_articles[0]
+        list_articles = list_articles[1:]
+        print("Cleansing - Renaming Categories: Begin")
+        renamed_category_articles = list(tqdm.tqdm(p.imap(clnsr.article_cleansing, list_articles),
+                                            total=len(list_articles)))#clnsr.cleansing_articles(list_articles)
+        renamed_category_articles = [headers] + renamed_category_articles
+        write2File(renamed_category_articles, cleansed_categories_data_feed_path)
+        print("Cleansing - Renaming Categories: Done")
+        headers = renamed_category_articles[0]
+        renamed_category_articles = renamed_category_articles[1:]
+        print("Cleansing - Sexes and Prices: Begin")
+        cleansed_fashion_suitable_for = list(tqdm.tqdm(p.imap(clnsr.renamingFashionSuitableFor, renamed_category_articles)
+                                                               , total=(len(renamed_category_articles))))#clnsr.renamingFashionSuitableForColumns(renamed_category_articles)
+        cleansed_prices = p.map(clnsr.cleanPrice, cleansed_fashion_suitable_for)#clnsr.cleanPrices(cleansed_fashion_suitable_for)
+        print("Cleansing - Sexes and Prices: Done")
+        cleansed_articles = [headers] + cleansed_prices
+        write2File(cleansed_articles, file_paths["cleansed_sex_data_feed_path"])
 
 # print(cleanPrice(getLinesCSV(filtered_data_feed_path, "\t")[1]))
 # print(renameCategory(getLinesCSV(filtered_data_feed_path, "\t")[1]))

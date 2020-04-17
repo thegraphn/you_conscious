@@ -4,6 +4,8 @@ import os
 import datetime
 import sys
 
+from data_processing.utils.columns_order import column_ord
+
 folder = os.path.dirname(os.path.realpath(__file__))
 folder = folder.replace("/data_processing/merging_datafeeds", "")
 folder = folder.replace(r"\data_processing\merging_datafeeds", "")
@@ -126,10 +128,10 @@ def getNewColumnNames(file):
     set_column_names = list(set_column_names)
     return set_column_names
 
-def merging():
 
+def merging():
     print("Begin merging")
-    #os.system("rm "+ merged_data_feed_path)
+    # os.system("rm "+ merged_data_feed_path)
     list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csv"))
     print("Merging - Changing column names: Begin")
     set_col = set()
@@ -140,7 +142,8 @@ def merging():
         for name in getColumNames(file):
             set_col.add(name)
     set_col = list(set_col)
-    newColumnNames = getNewColumnNames(merging_features_path) + set_col
+    # newColumnNames = getNewColumnNames(merging_features_path) + set_col
+    newColumnNames = column_ord
     print("Merging - Changing column names: Done")
     print("Merging - Merging : Begin")
     list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csvchange.csv"))
@@ -152,6 +155,6 @@ def merging():
     print("Merging - Changing ID to Name: Done")
     os.system("rm " + merged_data_feed_path)
 
-    os.rename(merged_data_feed_with_IdNames_path,merged_data_feed_path)
-    #os.system("mv " + merged_data_feed_with_IdNames_path + "  " + merged_data_feed_path)
+    os.rename(merged_data_feed_with_IdNames_path, merged_data_feed_path)
+    # os.system("mv " + merged_data_feed_with_IdNames_path + "  " + merged_data_feed_path)
     print("Merging: Done ", datetime.datetime.now())

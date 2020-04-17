@@ -21,6 +21,7 @@ class Filter:
                                                                 file_paths["featured_affiliateIds_datafeed_path"])
             self.material_index_feature_datafeed = getHeadersIndex("Material",
                                                                    file_paths["featured_affiliateIds_datafeed_path"])
+            self.category_name_index = getHeadersIndex("category_name", file_paths["cleansed_sex_data_feed_path"])
         except:
             pass
 
@@ -70,6 +71,31 @@ class Filter:
 
         return list_articles_with_label
 
+    def delete_non_matching_category(self, article):
+        """
+        Does not return an article if Damen or Herren is not in the category_name
+        :param article: Article to be processed
+        :return: Article if Herren or Damen is in the category_name
+        """
+        category_name_content: str = article[self.category_name_index]
+        category_name_content_tokens: list = word_tokenize(category_name_content)
+        to_return:bool = False
+
+        if "Herren" in category_name_content_tokens:
+            to_return = True
+        if "Damen" in category_name_content_tokens:
+            to_return = True
+        if to_return:
+            return article
+
+    def delete_non_matching_categories(self, list_articles: list) -> list:
+        with Pool() as p:
+            deleted_non_matching_categories: list = list(
+                tqdm.tqdm(p.imap(self.delete_non_matching_category, list_articles),
+                          total=len(list_articles)))
+
+        return deleted_non_matching_categories
+
 
 def filter_data_feed():
     fltr = Filter()
@@ -98,3 +124,16 @@ def getArticlesWithLabel():
     list_articles_withLabel = [headers] + list_articles_withLabel
     write2File(list_articles_withLabel, file_paths["labeled_data_feed_path"])
     print("Removed all articles without label")
+
+
+def delete_non_matching_categories():
+    flt = Filter()
+    print("Delete non matching categories : Begin")
+    list_articles = getLinesCSV(file_paths["cleansed_sex_data_feed_path"],"\t")
+    headers = list_articles[0]
+    list_articles = list_articles[1:]
+    deleted_non_matching_categories_articles = flt.delete_non_matching_categories(
+        list_articles)
+    list_articles = [headers] + deleted_non_matching_categories_articles
+    write2File(list_articles,file_paths["filtered_only_matching_categories_datafeed"])
+    print("Delete non matching categories : Done")

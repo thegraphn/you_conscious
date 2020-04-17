@@ -4,7 +4,7 @@ import tqdm
 
 from data_processing.utils.file_paths import file_paths
 from data_processing.utils.getHeaders import getHeadersIndex
-from data_processing.utils.utils import getLinesCSV, cleansed_sex_data_feed_path, \
+from data_processing.utils.utils import getLinesCSV,  \
     getMappingColumnIndex, write2File, features_data_feed_path, affiliateId, \
      number_processes, features_mapping_path
 
@@ -60,21 +60,24 @@ class featuresAdder:
 
 
 def add_features():
-    ft_adder = featuresAdder()
-    print("Begin adding features")
-    list_articles = getLinesCSV(ft_adder.input_file, "\t")
-    headers = list_articles[0]
-    list_articles = list_articles[1:]
-    print("Adding Features - add features: Begin")
-    list_articles_with_features = ft_adder.addFeaturesArticles(list_articles)
-    list_articles_with_features = [headers] + list_articles_with_features
-    write2File(list_articles_with_features, features_data_feed_path)
-    print("Adding Features - add features: Done")
-    list_articles = getLinesCSV(features_data_feed_path, "\t")
-    headers = list_articles[0]
-    list_articles = list_articles[1:]
-    print("Adding Features - add affiliate ids: Begin")
-    list_articles_with_affiliateIds = ft_adder.addAffiliateIdArticles(list_articles)
-    print("Adding Features - add affiliate ids: Done")
-    list_articles_with_affiliateIds = [headers] + list_articles_with_affiliateIds
-    write2File(list_articles_with_affiliateIds, file_paths["featured_affiliateIds_datafeed_path"])
+    with Pool() as p:
+        ft_adder = featuresAdder()
+        print("Begin adding features")
+        list_articles = getLinesCSV(ft_adder.input_file, "\t")
+        headers = list_articles[0]
+        list_articles = list_articles[1:]
+        print("Adding Features - add features: Begin")
+        list_articles_with_features = list(tqdm.tqdm(p.imap(ft_adder.addFeaturesArticle, list_articles),
+                                                     total=len(list_articles)))#ft_adder.addFeaturesArticles(list_articles)
+        list_articles_with_features = [headers] + list_articles_with_features
+        write2File(list_articles_with_features, features_data_feed_path)
+        print("Adding Features - add features: Done")
+        list_articles = getLinesCSV(features_data_feed_path, "\t")
+        headers = list_articles[0]
+        list_articles = list_articles[1:]
+        print("Adding Features - add affiliate ids: Begin")
+        list_articles_with_affiliateIds = list(tqdm.tqdm(p.imap(ft_adder.addAffiliateIdArticle, list_articles),
+                                                    total=len(list_articles)))#ft_adder.addAffiliateIdArticles(list_articles)
+        print("Adding Features - add affiliate ids: Done")
+        list_articles_with_affiliateIds = [headers] + list_articles_with_affiliateIds
+        write2File(list_articles_with_affiliateIds, file_paths["featured_affiliateIds_datafeed_path"])
