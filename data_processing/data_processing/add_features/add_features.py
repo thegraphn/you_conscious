@@ -4,9 +4,8 @@ import tqdm
 
 from data_processing.utils.file_paths import file_paths
 from data_processing.utils.getHeaders import getHeadersIndex
-from data_processing.utils.utils import getLinesCSV,  \
-    getMappingColumnIndex, write2File, features_data_feed_path, affiliateId, \
-     number_processes, features_mapping_path
+from data_processing.utils.utils import getLinesCSV, getMappingColumnIndex, features_mapping_path, affiliateId, \
+    features_data_feed_path, write2File
 
 
 class featuresAdder:

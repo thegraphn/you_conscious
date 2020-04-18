@@ -65,8 +65,6 @@ cleansed_categories_data_feed_path = os.path.join(cleansed_categories_data_feed_
 cleansed_categories_data_feed_path = os.path.join(cleansed_categories_data_feed_path, "cleansed")
 cleansed_categories_data_feed_path = os.path.join(cleansed_categories_data_feed_path, "cleansed_datafeed.csv")
 
-
-
 features_data_feed_path = os.path.join(root_folder, "data_processing")
 features_data_feed_path = os.path.join(features_data_feed_path, "data_working_directory")
 features_data_feed_path = os.path.join(features_data_feed_path, "featured")
@@ -79,7 +77,7 @@ cleaning_categories_fashionSuitableFor_path: str = os.path.join(cleaning_categor
                                                                 "categoriesCleaning_fashionSuitableFor_mapping.csv")
 
 
-def getMappingColumnIndex(file, delimiter)->dict:
+def getMappingColumnIndex(file, delimiter) -> dict:
     '''
     Create the mapping columnName: Index
     :param delimiter:
@@ -95,7 +93,7 @@ def getMappingColumnIndex(file, delimiter)->dict:
     return mapping
 
 
-def getLinesCSV(file, delimiter)->list:
+def getLinesCSV(file, delimiter) -> list:
     """
     Read a file and return the lines in a list
     :param delimiter:

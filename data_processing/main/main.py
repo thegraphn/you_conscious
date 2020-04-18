@@ -10,16 +10,15 @@ folder = folder.replace("/data_processing/main", "")
 folder = folder.replace(r"\data_processing\main", "")
 sys.path.append(folder)
 
-from data_processing.utils.utils import merged_data_feed_path, features_data_feed_path, \
-    cleansed_categories_data_feed_path, write2File, getLinesCSV
+from data_processing.data_processing.add_features.add_features import add_features
+from data_processing.data_processing.cleansing_datafeed.cleansing_datafeed import cleansing
+from data_processing.data_processing.download_data_feeds.download_datafeeds import downloading
+from data_processing.data_processing.filter_datafeed.filter_data_feed import filter_data_feed, getArticlesWithLabel, \
+    delete_non_matching_categories
+from data_processing.data_processing.merging_datafeeds.merging_datafeeds_old import merging
+
+
 import datetime
-from data_processing.add_features.add_features import add_features, featuresAdder
-from data_processing.cleansing_datafeed.cleansing_datafeed import cleansing, Cleanser
-from data_processing.download_data_feeds.download_datafeeds import downloading
-from data_processing.filter_datafeed.filter_data_feed import filter_data_feed, getArticlesWithLabel, \
-    delete_non_matching_categories, Filter
-from data_processing.merging_datafeeds.merging_datafeeds_old import merging
-from data_processing.utils import file_paths
 
 
 def main_app():
@@ -30,10 +29,10 @@ def main_app():
     if download:
         downloading()
     if not download:
-        #merging()
-        #filter_data_feed()
-        #add_features()
-        #getArticlesWithLabel()
+        merging()
+        filter_data_feed()
+        add_features()
+        getArticlesWithLabel()
         cleansing()
         delete_non_matching_categories()
     end = datetime.datetime.now()

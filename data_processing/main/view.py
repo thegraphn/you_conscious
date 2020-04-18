@@ -5,7 +5,7 @@ from data_processing.cleansing_datafeed.cleansing_datafeed import cleansing
 from data_processing.download_data_feeds.download_datafeeds import downloading
 from data_processing.filter_datafeed.filter_data_feed import filter_data_feed, getArticlesWithLabel
 from data_processing.main.main import main_app
-from data_processing.merging_datafeeds.merging_datafeeds_old import merging
+from data_processing.data_processing.merging_datafeeds import merging
 
 sg.theme('DarkAmber')  # Keep things interesting for your users
 

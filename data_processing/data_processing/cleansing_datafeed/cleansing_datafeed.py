@@ -3,14 +3,12 @@ from multiprocessing import Pool
 
 import tqdm
 
-from data_processing.cleansing_datafeed.utils import cleanSize, clean_category_sex
+from data_processing.data_processing.cleansing_datafeed.utils import clean_category_sex, cleanSize
 from data_processing.utils.file_paths import file_paths
 from data_processing.utils.getHeaders import getHeadersIndex
 from data_processing.utils.utils import createMappingBetween2Columns, files_mapping_categories_path, \
-    getLinesCSV, write2File, \
-    mapping_fashionSuitableFor, cleansed_categories_data_feed_path, \
-    maxNumberFashionSizeColumns, getMappingColumnIndex, \
-    synonym_female, synonym_euro, synonym_male
+    mapping_fashionSuitableFor, synonym_female, synonym_male, synonym_euro, getMappingColumnIndex, \
+    maxNumberFashionSizeColumns, getLinesCSV, write2File, cleansed_categories_data_feed_path
 
 
 class Cleanser:
@@ -18,6 +16,7 @@ class Cleanser:
         self.input_data_feed: str = file_paths["labeled_data_feed_path"]
         self.feature_mapping = createMappingBetween2Columns(files_mapping_categories_path, 1, 2, ";")
         self.fashionSuitableFor_mapping = createMappingBetween2Columns(mapping_fashionSuitableFor, 2, 6, ";")
+
         self.categoryName_index = getHeadersIndex("category_name")
         self.fashionSuitableFor_index = getHeadersIndex("Fashion:suitable_for")
         self.rrp_price_index = getHeadersIndex("rrp_price", file=self.input_data_feed)

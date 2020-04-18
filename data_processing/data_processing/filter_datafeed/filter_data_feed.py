@@ -4,7 +4,7 @@ from typing import Union
 from nltk import word_tokenize
 import tqdm
 
-from data_processing.filter_datafeed.utils import getFilters
+from data_processing.data_processing.filter_datafeed.utils import getFilters
 from data_processing.utils.file_paths import file_paths
 from data_processing.utils.getHeaders import getHeadersIndex
 from data_processing.utils.utils import filters_file_path, getLinesCSV, merged_data_feed_path, \

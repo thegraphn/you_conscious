@@ -4,6 +4,8 @@ import re
 import tqdm
 from nltk import word_tokenize
 
+from data_processing.utils.getHeaders import getHeadersIndex
+
 
 def pre_procesing_step(text):
     pattern_euros = r'\s(\<number\>\s)?(million(en)? |billion(en)? |bn |bn. )?([eE]uros?|€)'
@@ -67,20 +69,33 @@ def read_data(data_path: str, label_pos: int) -> list:
     return data
 
 
-def createMatrices(trainingData, label2id, word2id):
+def createMatrices(training_data: list, label2id: dict, word2id: dict, label_pos: int, text_pos: int) -> list:
     '''
     The model works with integer, therefore we need to convert the strings into integers
-    :param trainingData:
+    :param text_pos:
+    :param word2id:
+    :param label2id:
+    :param label_pos:
+    :param training_data:
     :return: The same structure but with integers instead of strings
     '''
-    for data in trainingData:
+    for data in training_data:
 
-        text = data[0]
-        label = data[1]
-        data[1] = label2id[label]
+        text = data[text_pos]
+        label = data[label_pos]
+        data[label_pos] = label2id[label]
         text_temp = []
         for word in text:
             word = word2id.get(word, word2id["UNKNOWN_TOKEN"])
             text_temp.append(word)
-        data[0] = text_temp
-    return trainingData
+        data[text_pos] = text_temp
+    return training_data
+
+
+def create_data_set(file: str) -> list:
+    training_data: list = []
+    with open(file, "r", encoding="utf-8") as f:
+        csv_reader = csv.reader(f, delimiter="\t")
+        for row in csv_reader:
+            training_data.append([row[getHeadersIndex("category_name")], row[getHeadersIndex("description")]])
+    return training_data

@@ -11,6 +11,9 @@ import sys
 
 import tqdm
 
+from data_processing.utils.utils import download_data_feeds_directory_path, createMappingBetween2Columns, \
+    file_url_shop_path
+
 folder = os.path.dirname(os.path.realpath(__file__))
 folder = folder.replace("/data_processing/download_data_feeds", "")
 folder = folder.replace(r"\data_processing\download_data_feeds", "")
@@ -19,9 +22,7 @@ import glob
 import urllib.request
 import datetime
 from multiprocessing import Process, Pool
-from data_processing.utils.utils import download_data_feeds_directory_path, createMappingBetween2Columns, \
-    file_url_shop_path, \
-    number_processes
+
 
 path = "/mnt/c/Users/graphn/PycharmProjects/you_conscious/data_processing/data_working_directory/download"
 # path = sys.argv[1]
@@ -104,7 +105,7 @@ def unzipFiles(list_files: list):
     :param list_files: List of the files to try to unzip
     """
 
-    with Pool(processes=number_processes)as p:
+    with Pool(processes=2)as p:
         list(tqdm.tqdm(p.imap(unzipFile, list_files), total=len(list_files)))
 
 
