@@ -1,6 +1,7 @@
 from collections import defaultdict
 from multiprocessing import Pool
 
+import natsort
 import tqdm
 
 from data_processing.data_processing.cleansing_datafeed.size import SizeFinder
@@ -167,7 +168,7 @@ class Cleanser:
         mapping_header_columnId = {header: columnId for columnId, header in enumerate(headers)}
         # Put the size into the size column
         for url, sizes in mapping_awImageUrl_sizes.items():
-            list_size = []
+            list_size:list = []
             for lt in sizes:
                 for size in lt:
                     list_size.append(size)
@@ -176,6 +177,7 @@ class Cleanser:
             for i in range(maxNumberFashionSizeColumns):
                 article.append("")
             list_size = list_size[:maxNumberFashionSizeColumns]
+            list_size = natsort.natsorted(list_size)
             for i, size in enumerate(list_size):
                 article[mapping_header_columnId["Fashion:size" + str(i)]] = size
             list_articles_merged.append(article)
