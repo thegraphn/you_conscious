@@ -1,3 +1,5 @@
 /data_processing/data_working_directory/merged/merged_datafeeds.csv
 /venv/
 /data_processing/data_working_directory/
+/dl_exp/data/
+/dl_exp/model_trained/
