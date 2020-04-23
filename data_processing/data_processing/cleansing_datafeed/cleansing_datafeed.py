@@ -1,8 +1,11 @@
 from collections import defaultdict
 from multiprocessing import Pool
 
+import natsort
 import tqdm
 
+from data_processing.data_processing.cleansing_datafeed.size import SizeFinder
+from data_processing.data_processing.cleansing_datafeed.size_sorter import SizeSorter
 from data_processing.data_processing.cleansing_datafeed.utils import clean_category_sex, cleanSize
 from data_processing.utils.file_paths import file_paths
 from data_processing.utils.getHeaders import getHeadersIndex
@@ -16,19 +19,19 @@ class Cleanser:
         self.input_data_feed: str = file_paths["labeled_data_feed_path"]
         self.feature_mapping = createMappingBetween2Columns(files_mapping_categories_path, 1, 2, ";")
         self.fashionSuitableFor_mapping = createMappingBetween2Columns(mapping_fashionSuitableFor, 2, 6, ";")
-
         self.categoryName_index = getHeadersIndex("category_name")
         self.fashionSuitableFor_index = getHeadersIndex("Fashion:suitable_for")
         self.rrp_price_index = getHeadersIndex("rrp_price", file=self.input_data_feed)
         self.delivery_cost_index = getHeadersIndex("delivery_cost", file=self.input_data_feed)
         self.search_price_index = getHeadersIndex("search_price", file=self.input_data_feed)
         self.merchantName_index = getHeadersIndex("merchant_name", file=self.input_data_feed)
-        self.title_index = getHeadersIndex("Title",file=self.input_data_feed)
+        self.title_index = getHeadersIndex("Title", file=self.input_data_feed)
 
     def article_cleansing(self, article):
         """
         First cleansing of the category_name
         After we cleanse the merchant_name
+        The content in title will also be cleansed. The size, which can be in the title, must be deleted.
         :param article: Article will be cleansed
         :return:
         """
@@ -63,11 +66,24 @@ class Cleanser:
                 if "Damen" == article[self.categoryName_index]:
                     article[self.categoryName_index]: str = article[self.categoryName_index].replace("Damen", "Herren")
 
-
-
         # merchant_name cleansing
-        article[self.merchantName_index] = article[self.merchantName_index].replace(" DE","")
+        article[self.merchantName_index] = article[self.merchantName_index].replace(" DE", "")
 
+        # title cleansing
+        article = self.cleansing_title(article)
+
+        return article
+
+    def cleansing_title(self, article) -> list:
+        """
+        Remove the size in the title string
+        :param article:
+        :return: cleansed title
+        """
+        title_content: str = article[self.title_index]
+        size_finder:SizeFinder =SizeFinder(str_used=title_content)
+        size_position = size_finder.delete_size()
+        article[self.title_index] = size_position
         return article
 
     def cleansing_articles(self, list_vegan_articles):
@@ -75,6 +91,7 @@ class Cleanser:
             result_renamed = list(tqdm.tqdm(p.imap(self.article_cleansing, list_vegan_articles),
                                             total=len(list_vegan_articles)))
         return result_renamed
+
 
     def renamingFashionSuitableFor(self, article):
         content_categoryName = article[self.categoryName_index]
@@ -128,6 +145,7 @@ class Cleanser:
 
     def mergedProductBySize(self, input_list_articles):
         """
+        Merge product by size, based on "unique" the aw_image_url.
         :param input_list_articles: List of all articles with "duplicates" by size
         :return: list_articles_merged
         """
@@ -152,7 +170,7 @@ class Cleanser:
         mapping_header_columnId = {header: columnId for columnId, header in enumerate(headers)}
         # Put the size into the size column
         for url, sizes in mapping_awImageUrl_sizes.items():
-            list_size = []
+            list_size:list = []
             for lt in sizes:
                 for size in lt:
                     list_size.append(size)
@@ -161,6 +179,8 @@ class Cleanser:
             for i in range(maxNumberFashionSizeColumns):
                 article.append("")
             list_size = list_size[:maxNumberFashionSizeColumns]
+            size_sorter:SizeSorter = SizeSorter(list_size)
+            list_size:list = size_sorter.sort_list()
             for i, size in enumerate(list_size):
                 article[mapping_header_columnId["Fashion:size" + str(i)]] = size
             list_articles_merged.append(article)
@@ -180,16 +200,19 @@ def cleansing():
         list_articles = list_articles[1:]
         print("Cleansing - Renaming Categories: Begin")
         renamed_category_articles = list(tqdm.tqdm(p.imap(clnsr.article_cleansing, list_articles),
-                                            total=len(list_articles)))#clnsr.cleansing_articles(list_articles)
+                                                   total=len(list_articles)))  # clnsr.cleansing_articles(list_articles)
         renamed_category_articles = [headers] + renamed_category_articles
         write2File(renamed_category_articles, cleansed_categories_data_feed_path)
         print("Cleansing - Renaming Categories: Done")
         headers = renamed_category_articles[0]
         renamed_category_articles = renamed_category_articles[1:]
         print("Cleansing - Sexes and Prices: Begin")
-        cleansed_fashion_suitable_for = list(tqdm.tqdm(p.imap(clnsr.renamingFashionSuitableFor, renamed_category_articles)
-                                                               , total=(len(renamed_category_articles))))#clnsr.renamingFashionSuitableForColumns(renamed_category_articles)
-        cleansed_prices = p.map(clnsr.cleanPrice, cleansed_fashion_suitable_for)#clnsr.cleanPrices(cleansed_fashion_suitable_for)
+        cleansed_fashion_suitable_for = list(
+            tqdm.tqdm(p.imap(clnsr.renamingFashionSuitableFor, renamed_category_articles)
+                      , total=(len(
+                    renamed_category_articles))))  # clnsr.renamingFashionSuitableForColumns(renamed_category_articles)
+        cleansed_prices = p.map(clnsr.cleanPrice,
+                                cleansed_fashion_suitable_for)  # clnsr.cleanPrices(cleansed_fashion_suitable_for)
         print("Cleansing - Sexes and Prices: Done")
         cleansed_articles = [headers] + cleansed_prices
         write2File(cleansed_articles, file_paths["cleansed_sex_data_feed_path"])

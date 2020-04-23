@@ -1,6 +1,7 @@
 import csv
 import os
 
+import tqdm
 from progressbar import *
 
 root_folder = os.path.dirname(os.path.realpath(__file__))
@@ -150,7 +151,7 @@ def changeDelimiterCsv(csv_input: str, csv_output: str, delimiter_input: str, de
             input_rows.append(row)
     with open(csv_output, "w", encoding="utf-8", newline="") as oc:
         csv_writer = csv.writer(oc, delimiter=delimiter_output, quoting=csv.QUOTE_ALL)
-        for element in input_rows:
+        for element in tqdm.tqdm(input_rows):
             csv_writer.writerow(element)
 
 

@@ -24,6 +24,7 @@ import datetime
 def main_app():
     begin = datetime.datetime.now()
     print("Begin data processing", begin)
+<<<<<<< HEAD
     processes: dict = {"dowloading": True,
                        "merging": False,
                        "filtering": False,
@@ -31,6 +32,15 @@ def main_app():
                        "filtering_without_label": False,
                        "cleansing": False,
                        "filtering_only_matching_category": False}
+=======
+    processes: dict = {"dowloading": False,
+                       "merging": False,
+                       "filtering": True,
+                       "adding_features": True,
+                       "filtering_without_label": True,
+                       "cleansing": True,
+                       "filtering_only_matching_category": True}
+>>>>>>> 953d6bcfc74b500b9c72a0cd461cedb3f0aa8c8a
     for process, todo in processes.items():
         print(process, todo)
         if process == "dowloading":
