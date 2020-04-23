@@ -5,6 +5,7 @@ import natsort
 import tqdm
 
 from data_processing.data_processing.cleansing_datafeed.size import SizeFinder
+from data_processing.data_processing.cleansing_datafeed.size_sorter import SizeSorter
 from data_processing.data_processing.cleansing_datafeed.utils import clean_category_sex, cleanSize
 from data_processing.utils.file_paths import file_paths
 from data_processing.utils.getHeaders import getHeadersIndex
@@ -90,6 +91,7 @@ class Cleanser:
             result_renamed = list(tqdm.tqdm(p.imap(self.article_cleansing, list_vegan_articles),
                                             total=len(list_vegan_articles)))
         return result_renamed
+
 
     def renamingFashionSuitableFor(self, article):
         content_categoryName = article[self.categoryName_index]
@@ -177,7 +179,8 @@ class Cleanser:
             for i in range(maxNumberFashionSizeColumns):
                 article.append("")
             list_size = list_size[:maxNumberFashionSizeColumns]
-            list_size = natsort.natsorted(list_size)
+            size_sorter:SizeSorter = SizeSorter(list_size)
+            list_size:list = size_sorter.sort_list()
             for i, size in enumerate(list_size):
                 article[mapping_header_columnId["Fashion:size" + str(i)]] = size
             list_articles_merged.append(article)
