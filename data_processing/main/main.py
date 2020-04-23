@@ -5,6 +5,7 @@ generated.
 """
 import os
 import sys
+
 folder = os.path.dirname(os.path.realpath(__file__))
 folder = folder.replace("/data_processing/main", "")
 folder = folder.replace(r"\data_processing\main", "")
@@ -17,24 +18,43 @@ from data_processing.data_processing.filter_datafeed.filter_data_feed import fil
     delete_non_matching_categories
 from data_processing.data_processing.merging_datafeeds.merging_datafeeds_old import merging
 
-
 import datetime
 
 
 def main_app():
     begin = datetime.datetime.now()
     print("Begin data processing", begin)
-    download = False
+    processes: dict = {"dowloading": True,
+                       "merging": False,
+                       "filtering": False,
+                       "adding_features": False,
+                       "filtering_without_label": False,
+                       "cleansing": False,
+                       "filtering_only_matching_category": False}
+    for process, todo in processes.items():
+        print(process, todo)
+        if process == "dowloading":
+            if todo:
+                downloading()
+        if process == "merging":
+            if todo:
+                merging()
+        if process == "filtering":
+            if todo:
+                filter_data_feed()
+        if process == "adding_features":
+            if todo:
+                add_features()
+        if process == "filtering_without_label":
+            if todo:
+                getArticlesWithLabel()
+        if process == "cleansing":
+            if todo:
+                cleansing()
+        if process == "filtering_only_matching_category":
+            if todo:
+                delete_non_matching_categories()
 
-    if download:
-        downloading()
-    if not download:
-        merging()
-        filter_data_feed()
-        add_features()
-        getArticlesWithLabel()
-        cleansing()
-        delete_non_matching_categories()
     end = datetime.datetime.now()
     print("End data processing", end)
     print("It took ", end - begin)
