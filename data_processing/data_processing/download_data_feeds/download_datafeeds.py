@@ -23,7 +23,6 @@ import urllib.request
 import datetime
 from multiprocessing import Process, Pool
 
-
 path = "/mnt/c/Users/graphn/PycharmProjects/you_conscious/data_processing/data_working_directory/download"
 # path = sys.argv[1]
 begin = datetime.datetime.now()
@@ -88,18 +87,27 @@ def downloadDatafeed(tuple_shop_url: tuple):
     shop_name: str = tuple_shop_url[0]
     link: str = tuple_shop_url[1]
     shop_name = shop_name.replace(" ", "_")
-    if "LOVECO" in shop_name:
-        format_file: str = ".csv"
-    if "SORBAS" in shop_name:
-        format_file: str = ".csv"
+    format_file: str = ""
+    if "LOVECO" == shop_name:
+        format_file = ".csv"
+        path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
+                                      datetime.datetime.now().strftime("%y-%m-%d") + format_file)
+        urllib.request.urlretrieve(link, path_file)
+
+    if "SORBAS" == shop_name:
+        format_file = ".csv"
+        path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
+                                      datetime.datetime.now().strftime("%y-%m-%d") + format_file)
+        urllib.request.urlretrieve(link, path_file)
     else:
-        format_file: str = ".gz"
-    path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
-                                  datetime.datetime.now().strftime("%y-%m-%d") + format_file)
-    urllib.request.urlretrieve(link, path_file)
+        format_file = ".gz"
+        path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
+                                      datetime.datetime.now().strftime("%y-%m-%d") + format_file)
+        urllib.request.urlretrieve(link, path_file)
 
 
-def unzipFiles(list_files: list):
+
+def unzip_files(list_files: list):
     """
      This function uses Pool and call the sub-function unzipFile
     :param list_files: List of the files to try to unzip
@@ -118,8 +126,9 @@ def unzipFile(file: str):
     if ".csv" in file:
         pass
     if "LOVECO" in file:
-        os.system("mv " + file + " " + file[:-3] + "csv")
-    if "gz" in file:
+        pass
+
+    if "gz" in file and not "LOVECO" in file:
         length_to_delete: int = -3
         os.system("gunzip -kc " + str(file) + " > " + str(file[:length_to_delete]) + ".csv")
 
@@ -154,6 +163,6 @@ def downloading():
     print("Downloading - Downloading data feeds: End")
     list_downloaded_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*"))
     print("Downloading - Unzipping data feeds: Begin")
-    unzipFiles(list_downloaded_files)
+    unzip_files(list_downloaded_files)
     print("Downloading - Unzipping data feeds: Begin")
     delete_non_csv_datafeeds(download_data_feeds_directory_path)
