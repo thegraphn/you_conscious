@@ -8,14 +8,14 @@ from data_processing.utils.utils import getLinesCSV, getMappingColumnIndex, feat
     features_data_feed_path, write2File
 
 
-class featuresAdder:
+class FeaturesAdder:
     def __init__(self):
         self.input_file: str = file_paths["filtered_data_feed_path"]
         self.features_list = getLinesCSV(features_mapping_path, ";")[1:]
         self.mapping_columnHeader = getMappingColumnIndex(self.input_file, "\t")
         self.awDeepLink_index = getHeadersIndex("aw_deep_link", file=self.input_file)
 
-    def addFeaturesArticle(self, article):
+    def add_features_article(self, article) -> list:
         """
         Iterate over "cell" in the article and search possible features.
         Add the features in the given column
@@ -24,50 +24,51 @@ class featuresAdder:
         """
         for cell in article:
             for string2Find_feature2Write_columnFeature in self.features_list:
-                string2Find = string2Find_feature2Write_columnFeature[0]
-                feature2Write = string2Find_feature2Write_columnFeature[1]
-                columnFeature = string2Find_feature2Write_columnFeature[2]
-                if re.match(string2Find, cell) is not None:
-                    article[self.mapping_columnHeader[columnFeature]] = feature2Write
+                string2_find = string2Find_feature2Write_columnFeature[0]
+                feature2_write = string2Find_feature2Write_columnFeature[1]
+                column_feature = string2Find_feature2Write_columnFeature[2]
+                if re.match(string2_find, cell) is not None:
+                    article[self.mapping_columnHeader[column_feature]] = feature2_write
                     break
-                elif string2Find in cell:
-                    article[self.mapping_columnHeader[columnFeature]] = feature2Write
+                elif string2_find in cell:
+                    article[self.mapping_columnHeader[column_feature]] = feature2_write
                     break
         return article
 
-    def addFeaturesArticles(self, list_articles):
+    def add_features_articles(self, list_articles) -> list:
         with Pool() as p:
-            result_featuredArticles = list(tqdm.tqdm(p.imap(self.addFeaturesArticle, list_articles),
-                                                     total=len(list_articles)))
-        return result_featuredArticles
+            result_featured_articles = list(tqdm.tqdm(p.imap(self.add_features_article, list_articles),
+                                                      total=len(list_articles)))
+        return result_featured_articles
 
-    def addAffiliateIdArticle(self, article):
-        content_awDeepLink_index = article[self.awDeepLink_index]
-        if "https://sorbasshoes.com" in content_awDeepLink_index:
-            for i, char in enumerate(content_awDeepLink_index):
+    def add_affiliate_id_article(self, article):
+        content_aw_deep_link_index = article[self.awDeepLink_index]
+        if "https://sorbasshoes.com" in content_aw_deep_link_index:
+            for i, char in enumerate(content_aw_deep_link_index):
                 if char == "?":
-                    link = content_awDeepLink_index[:i] + affiliateId
+                    link = content_aw_deep_link_index[:i] + affiliateId
                     break
             article[self.awDeepLink_index] = link
         return article
 
-    def addAffiliateIdArticles(self, list_articles):
+    def add_affiliate_id_articles(self, list_articles):
         with Pool() as p:
-            result_addAffiliateIds = list(tqdm.tqdm(p.imap(self.addAffiliateIdArticle, list_articles),
-                                                    total=len(list_articles)))
-        return result_addAffiliateIds
+            result_add_affiliate_ids = list(tqdm.tqdm(p.imap(self.add_affiliate_id_article, list_articles),
+                                                      total=len(list_articles)))
+        return result_add_affiliate_ids
 
 
 def add_features():
     with Pool() as p:
-        ft_adder = featuresAdder()
+        ft_adder = FeaturesAdder()
         print("Begin adding features")
         list_articles = getLinesCSV(ft_adder.input_file, "\t")
         headers = list_articles[0]
         list_articles = list_articles[1:]
         print("Adding Features - add features: Begin")
-        list_articles_with_features = list(tqdm.tqdm(p.imap(ft_adder.addFeaturesArticle, list_articles),
-                                                     total=len(list_articles)))#ft_adder.addFeaturesArticles(list_articles)
+        list_articles_with_features = list(tqdm.tqdm(p.imap(ft_adder.add_features_article, list_articles),
+                                                     total=len(
+                                                         list_articles)))  # ft_adder.addFeaturesArticles(list_articles)
         list_articles_with_features = [headers] + list_articles_with_features
         write2File(list_articles_with_features, features_data_feed_path)
         print("Adding Features - add features: Done")
@@ -75,8 +76,9 @@ def add_features():
         headers = list_articles[0]
         list_articles = list_articles[1:]
         print("Adding Features - add affiliate ids: Begin")
-        list_articles_with_affiliateIds = list(tqdm.tqdm(p.imap(ft_adder.addAffiliateIdArticle, list_articles),
-                                                    total=len(list_articles)))#ft_adder.addAffiliateIdArticles(list_articles)
+        list_articles_with_affiliate_ids = list(tqdm.tqdm(p.imap(ft_adder.add_affiliate_id_article, list_articles),
+                                                          total=len(
+                                                              list_articles)))
         print("Adding Features - add affiliate ids: Done")
-        list_articles_with_affiliateIds = [headers] + list_articles_with_affiliateIds
-        write2File(list_articles_with_affiliateIds, file_paths["featured_affiliateIds_datafeed_path"])
+        list_articles_with_affiliate_ids = [headers] + list_articles_with_affiliate_ids
+        write2File(list_articles_with_affiliate_ids, file_paths["featured_affiliateIds_datafeed_path"])
