@@ -2,12 +2,20 @@ import natsort
 
 
 class SizeSorter:
+    """
+    Class to sort the sizes
+    """
+
     def __init__(self, size_list: list):
         self.size_list = size_list
         self.sorting_type: str = self.sorting_type_finder()
         self.sorted_sizes = self.sort_list()
 
     def sorting_type_finder(self) -> str:
+        """
+        Get the kind of size which are in the given list (e.g. number: 38,40 or letter: XL,S)
+        :return: Type of the sizes
+        """
         letter_counter: int = 0
         number_counter: int = 0
         average_letter: float = 0
@@ -32,7 +40,12 @@ class SizeSorter:
             else:
                 return "number"
 
-    def sort_list(self):
+    def sort_list(self) -> list:
+        """
+        Sort the size list based on its type
+        :return: Sorted size list
+        """
+        ordered_sizes: list = []
         if "OneSize" or "NoSize" in self.size_list:
             ordered_sizes = self.size_list
         if self.sorting_type == "one_size":
