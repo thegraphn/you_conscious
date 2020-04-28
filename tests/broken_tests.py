@@ -30,8 +30,8 @@ def test_isArticleVegan(self):
                                                   "Default Category > Bekleidung > Oberteile > T-Shirts"]
 
     filter = Filter()
-    result_vegan = filter.isArticleVegan(article_test_isArticleVegan_vegan)
-    result_notVegan = filter.isArticleVegan(article_test_isArticleVegan_notVegan)
+    result_vegan = filter.is_article_vegan(article_test_isArticleVegan_vegan)
+    result_notVegan = filter.is_article_vegan(article_test_isArticleVegan_notVegan)
     self.assertEqual(result_vegan, result_vegan)
     self.assertEqual(result_notVegan, None)
 

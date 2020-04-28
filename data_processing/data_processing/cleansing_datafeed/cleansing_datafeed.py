@@ -6,12 +6,12 @@ import tqdm
 
 from data_processing.data_processing.cleansing_datafeed.size import SizeFinder
 from data_processing.data_processing.cleansing_datafeed.size_sorter import SizeSorter
-from data_processing.data_processing.cleansing_datafeed.utils import clean_category_sex, cleanSize
+from data_processing.data_processing.cleansing_datafeed.utils import clean_category_sex, clean_size
 from data_processing.utils.file_paths import file_paths
 from data_processing.utils.getHeaders import getHeadersIndex
 from data_processing.utils.utils import createMappingBetween2Columns, files_mapping_categories_path, \
     mapping_fashionSuitableFor, synonym_female, synonym_male, synonym_euro, getMappingColumnIndex, \
-    maxNumberFashionSizeColumns, getLinesCSV, write2File, cleansed_categories_data_feed_path
+    maxNumberFashionSizeColumns, get_lines_csv, write2File, cleansed_categories_data_feed_path
 
 
 class Cleanser:
@@ -157,7 +157,7 @@ class Cleanser:
 
         for article in list_art:
             size_content = article[mapping_columnHeader["Fashion:size"]]
-            size_content = cleanSize(size_content)
+            size_content = clean_size(size_content)
             mapping_awImageUrl_sizes[article[mapping_columnHeader["aw_image_url"]]].append(
                 size_content)  # Mapping URL sizes
             mapping_awImageUrl_article[article[mapping_columnHeader["aw_image_url"]]] = article  # Mapping URL article
@@ -178,7 +178,7 @@ class Cleanser:
             for i in range(maxNumberFashionSizeColumns):
                 article.append("")
             list_size = list_size[:maxNumberFashionSizeColumns]
-            print(article)
+            list_size = list(set(list_size)) # remove dupiclates
             size_sorter: SizeSorter = SizeSorter(list_size)
             list_size: list = size_sorter.sorted_sizes
             for i, size in enumerate(list_size):
@@ -192,7 +192,7 @@ def cleansing():
     with Pool() as p:
         clnsr = Cleanser()
         print("Begin cleansing")
-        list_articles = getLinesCSV(clnsr.input_data_feed, "\t")
+        list_articles = get_lines_csv(clnsr.input_data_feed, "\t")
         print("Cleansing - Merging by size: Begin")
         list_articles = clnsr.mergedProductBySize(list_articles)
         print("Cleansing - Merging by size: Done")

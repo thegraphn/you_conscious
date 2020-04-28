@@ -23,12 +23,14 @@ class DataLoaderCsvTextClassification:
             if skip_header:
                 next(csv_reader)
             for row in csv_reader:
+
                 tokens: list = []
-                text: str = row[self.position_text]
+                text: str = " ".join(row[self.position_text:])
                 for token in tokenizer.tokenize(text):
                     kind, txt, val = token
-                    if txt != None:
+                    if txt is not None:
                         tokens.append(txt)
                 labels: str = row[self.position_label]
+
                 data_set.append([tokens, labels])
         return data_set

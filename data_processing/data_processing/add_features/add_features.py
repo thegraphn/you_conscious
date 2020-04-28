@@ -4,14 +4,14 @@ import tqdm
 
 from data_processing.utils.file_paths import file_paths
 from data_processing.utils.getHeaders import getHeadersIndex
-from data_processing.utils.utils import getLinesCSV, getMappingColumnIndex, features_mapping_path, affiliateId, \
+from data_processing.utils.utils import get_lines_csv, getMappingColumnIndex, features_mapping_path, affiliateId, \
     features_data_feed_path, write2File
 
 
 class FeaturesAdder:
     def __init__(self):
         self.input_file: str = file_paths["filtered_data_feed_path"]
-        self.features_list = getLinesCSV(features_mapping_path, ";")[1:]
+        self.features_list = get_lines_csv(features_mapping_path, ";")[1:]
         self.mapping_columnHeader = getMappingColumnIndex(self.input_file, "\t")
         self.awDeepLink_index = getHeadersIndex("aw_deep_link", file=self.input_file)
 
@@ -62,7 +62,7 @@ def add_features():
     with Pool() as p:
         ft_adder = FeaturesAdder()
         print("Begin adding features")
-        list_articles = getLinesCSV(ft_adder.input_file, "\t")
+        list_articles = get_lines_csv(ft_adder.input_file, "\t")
         headers = list_articles[0]
         list_articles = list_articles[1:]
         print("Adding Features - add features: Begin")
@@ -72,7 +72,7 @@ def add_features():
         list_articles_with_features = [headers] + list_articles_with_features
         write2File(list_articles_with_features, features_data_feed_path)
         print("Adding Features - add features: Done")
-        list_articles = getLinesCSV(features_data_feed_path, "\t")
+        list_articles = get_lines_csv(features_data_feed_path, "\t")
         headers = list_articles[0]
         list_articles = list_articles[1:]
         print("Adding Features - add affiliate ids: Begin")

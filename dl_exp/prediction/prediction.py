@@ -17,13 +17,12 @@ import sys
 from random import shuffle
 
 import numpy as np
-
+import tokenizer
 
 folder = os.path.dirname(os.path.realpath(__file__))
 print(folder)
 folder = folder.replace(r"/you_conscious/dl_exp/prediction", "")
 sys.path.append(folder)
-from you_conscious.dl_exp.prediction.utils_prediction import chunk_batch, prediction_on_batch, write_results
 from absl import flags, app
 from tensorflow.keras import models
 
@@ -34,10 +33,24 @@ flags.DEFINE_string('input_file', '', 'Your input sentence to be prediction')
 flags.DEFINE_integer("max_length_sentence", None, "Maximum length of the sentence, the model has been trained with")
 flags.DEFINE_string("output_predictions", "", "Output file where the predictions are written")
 flags.DEFINE_integer("batch_size", 5000, "Batch size for the prediction on batch")
+import tensorflow as tf
+
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    try:
+        # Currently, memory growth needs to be the same across GPUs
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+        logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+    except RuntimeError as e:
+        # Memory growth must be set before GPUs have been initialized
+        print(e)
 
 
 def main(argv):
     modelDictionaries_directory = glob.glob(os.path.join(FLAGS.input_trained_modelAndDicts, "*"))
+    print(modelDictionaries_directory)
     for file in modelDictionaries_directory:
         if "id2label.pck" in file:
             with open(file, "rb") as o:
@@ -52,41 +65,37 @@ def main(argv):
     with open(FLAGS.input_file, "r", encoding="utf-8") as o:
         for line in o:
             if "\n" != line:
-                list_sentences.append(line)
-    begin = datetime.datetime.now().replace(microsecond=0)
-    print("Begin predictions")
-    shuffle(list_sentences)
-    list_sentences = list_sentences#[100:300]
+                list_sentences.append(line.replace(",", ""))
+    list_sentences_prepared = []
+    for sentence in list_sentences:
+        tokens: list = []
 
-    list_sentences_chunked = chunk_batch(list_sentences, FLAGS.batch_size)
-    batches_prediction = []
-    for chunk in list_sentences_chunked:
-        batches_prediction.append(prediction_on_batch(input_text=chunk, model=model, word2id=word2id,
-                                                      max_length_sentence=FLAGS.max_length_sentence))
+        for token in tokenizer.tokenize(sentence):
+            kind, txt, val = token
+            if txt is not None:
+                tokens.append(txt)
 
+        list_sentences_prepared.append(tokens)
 
-    print(batches_prediction)
-    print(len(id2label))
-    print(model.summary())
-    list_predictions = []
-    if True:
-        print("b")
-        for batch_prediction in batches_prediction:
-            print("c")
-            for prediction in batch_prediction:
-                #prediction = prediction[0]
-                predicted_label = np.argmax(prediction)
-                score_prediction = np.max(prediction)
-                list_predictions.append([id2label[predicted_label], score_prediction])
+    for s, sentence in enumerate(list_sentences_prepared):
+        for t, token in enumerate(sentence):
+            if token not in word2id:
+                sentence[t] = 1
+            else:
 
+                sentence[t] = word2id[token]
+        list_sentences_prepared[s] = sentence
 
-    end = datetime.datetime.now().replace(microsecond=0)
-    print("Predictions took :", end - begin)
+    for sentence in list_sentences_prepared:
+        prediction = model.predict(np.asarray(sentence))
+        prediction = prediction[0]
 
-    for pred, text in zip(list_predictions, list_sentences):
-        write_results(output_result=FLAGS.output_predictions,
-                      prediction_to_write=pred
-                      , text=text)
+        label_index = np.argmax(prediction)
+        print(prediction, id2label[label_index])
+
+    # write_results(output_result=FLAGS.output_predictions,
+    #    prediction_to_write=pred
+    #    , text=text)
 
 
 if __name__ == "__main__":

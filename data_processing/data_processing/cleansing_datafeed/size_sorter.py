@@ -8,6 +8,7 @@ class SizeSorter:
 
     def __init__(self, size_list: list):
         self.size_list = size_list
+
         self.sorting_type: str = self.sorting_type_finder()
         self.sorted_sizes = self.sort_list()
 
@@ -25,7 +26,8 @@ class SizeSorter:
         if len(self.size_list) == 1:
             return "one_size"
         for size in self.size_list:
-
+            if "UK" in size:
+                return "number"
             for ch in size:
                 character_counter += 1
                 if ch.isdigit():
@@ -45,7 +47,9 @@ class SizeSorter:
         Sort the size list based on its type
         :return: Sorted size list
         """
+
         ordered_sizes: list = []
+
         if "OneSize" or "NoSize" in self.size_list:
             ordered_sizes = self.size_list
         if self.sorting_type == "one_size":
@@ -92,4 +96,8 @@ class SizeSorter:
                     tmp_dict_size[size] = order_size[size]
             ordered_sizes: list = list(
                 {k: v for k, v in sorted(tmp_dict_size.items(), key=lambda item: item[1])}.keys())
+        else:
+            ordered_sizes = natsort.natsorted(self.size_list)
+
         return ordered_sizes
+

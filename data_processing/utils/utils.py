@@ -94,7 +94,7 @@ def getMappingColumnIndex(file, delimiter) -> dict:
     return mapping
 
 
-def getLinesCSV(file, delimiter) -> list:
+def get_lines_csv(file, delimiter) -> list:
     """
     Read a file and return the lines in a list
     :param delimiter:
@@ -126,7 +126,7 @@ def createMappingBetween2Columns(file, column1_id, column2_id, delimiter):
     return mapping
 
 
-def write2File(list_articles, output_file):
+def write2File(list_articles, output_file,delimiter:str="\t"):
     """
     write a list to a csv file
     :param output_file:
@@ -134,7 +134,7 @@ def write2File(list_articles, output_file):
     :return:
     """
     with open(output_file, "w", encoding="utf-8", newline="") as o:
-        csv_writer = csv.writer(o, delimiter="\t")
+        csv_writer = csv.writer(o, delimiter=delimiter)
         for element in list_articles:
             if element is not None:
                 csv_writer.writerow(element)

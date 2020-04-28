@@ -10,7 +10,7 @@ from data_processing.utils.file_paths import file_paths
 from data_processing.utils.getHeaders import getHeadersIndex
 from data_processing.utils.utils import createMappingBetween2Columns, files_mapping_categories_path, \
     mapping_fashionSuitableFor, synonym_female, synonym_male, synonym_euro, getMappingColumnIndex, \
-    maxNumberFashionSizeColumns, getLinesCSV, write2File, cleansed_categories_data_feed_path
+    maxNumberFashionSizeColumns, get_lines_csv, write2File, cleansed_categories_data_feed_path
 
 
 class Cleanser:
@@ -191,7 +191,7 @@ def cleansing():
     with Pool() as p:
         clnsr = Cleanser()
         print("Begin cleansing")
-        list_articles = getLinesCSV(clnsr.input_data_feed, "\t")
+        list_articles = get_lines_csv(clnsr.input_data_feed, "\t")
         print("Cleansing - Merging by size: Begin")
         list_articles = clnsr.mergedProductBySize(list_articles)
         print("Cleansing - Merging by size: Done")

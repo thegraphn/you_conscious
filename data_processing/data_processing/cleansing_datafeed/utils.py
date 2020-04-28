@@ -3,14 +3,14 @@ from collections import defaultdict
 
 from nltk import word_tokenize
 
-from data_processing.utils.getHeaders import  getHeadersIndex
+from data_processing.utils.getHeaders import getHeadersIndex
 from data_processing.utils.utils import mapping_cleaning_fashionSuitableFor
 
 
-def cleanSize(size):
+def clean_size(size):
     '''
     clean size, try to split with different separator.
-    delete unnessacry strings etc...
+    delete unnecessary strings etc...
     :param size:
     :return:
     '''
@@ -22,7 +22,11 @@ def cleanSize(size):
     size = size.replace(";", ",")
     size = size.replace("-", ",")
     size = size.replace("|", ",")
+    size = size.replace("/", ",")
+    size = size.replace(".0", "")  # sometimes there is a 0 after the number
     size = size.split(",")
+
+    size = list(set(size))
     return size
 
 

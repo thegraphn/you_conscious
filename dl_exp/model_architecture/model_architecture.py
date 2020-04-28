@@ -3,7 +3,8 @@ from keras.layers import Embedding, Dropout, Conv1D, MaxPooling1D, Bidirectional
 from tensorflow.python.keras.utils.multi_gpu_utils import multi_gpu_model
 
 
-def lstm_model(VOCAB_SIZE:int, EMBEDDING_LENGTH:int, MAX_LENGTH:int, NUM_CLASS:int, COMPILE_MODE:str, UNITS:int,number_hidden_lstm_layers:int):
+def lstm_model(VOCAB_SIZE:int, EMBEDDING_LENGTH:int, MAX_LENGTH:int, NUM_CLASS:int, COMPILE_MODE:str,
+               UNITS:int,number_hidden_lstm_layers:int):
     model = Sequential()
     model.add(Embedding(VOCAB_SIZE, EMBEDDING_LENGTH, input_length=MAX_LENGTH))
     model.add(Dropout(0.5))
@@ -22,9 +23,7 @@ def lstm_model(VOCAB_SIZE:int, EMBEDDING_LENGTH:int, MAX_LENGTH:int, NUM_CLASS:i
 
         model.add(Dense(NUM_CLASS, activation="softmax"))
         model.compile(optimizer=optimizer, loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-    if COMPILE_MODE == "binary":
-        model.add(Dense(1, activation="sigmoid"))
-        model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
+
 
     return model
 
