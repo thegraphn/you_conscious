@@ -3,19 +3,20 @@ import os, sys
 import pickle
 from random import shuffle
 
+from tensorflow import keras
+from tensorflow.python.keras.callbacks import ReduceLROnPlateau, EarlyStopping
+from tensorflow.python.keras.preprocessing.sequence import pad_sequences
+
 PROJECT_FOLDER = os.path.dirname(os.path.abspath(os.getcwd()))
 print(PROJECT_FOLDER)
 PROJECT_FOLDER = PROJECT_FOLDER.replace("dl_exp", "")
 
 sys.path.append(PROJECT_FOLDER)
 print(PROJECT_FOLDER)
-import keras
-from dl_exp.model_architecture.model_architecture import lstm_model
+from dl_exp.model_architecture.model_architecture import lstm_model, easy
 from dl_exp.pre_processing.pre_processing import PreProcessing
 from dl_exp.utils.data_utils import DataLoaderCsvTextClassification
 
-from keras.callbacks import ReduceLROnPlateau, EarlyStopping
-from keras_preprocessing.sequence import pad_sequences
 
 import numpy as np
 import tensorflow as tf
@@ -73,7 +74,7 @@ for data in training_set:
     text, label = data
 
     x_train.append(text)
-    y_train.append(label)
+    y_train.append([label])
 x_train = np.asarray(x_train)
 # add padding
 X_train = pad_sequences(x_train, hyper_parameters["max_length"], dtype='int32', padding='post',
@@ -93,6 +94,7 @@ model = lstm_model(VOCAB_SIZE=len(word2id), EMBEDDING_LENGTH=hyper_parameters["e
                    MAX_LENGTH=hyper_parameters["max_length"], NUM_CLASS=len(labed2id),
                    COMPILE_MODE="categorical", UNITS=hyper_parameters["lstm_units"],
                    number_hidden_lstm_layers=hyper_parameters["number_hidden_lstm_layers"])
+model = easy(len(word2id))
 
 print(model.summary())
 # Train the model
@@ -107,7 +109,7 @@ callbacks = [
 ]
 begin = datetime.datetime.now().replace(microsecond=0)
 
-history_train = model.fit(X_train, [Y_train],
+history_train = model.fit(X_train, Y_train,
                           batch_size=hyper_parameters["batch_size"],
                           epochs=hyper_parameters["number_epochs"],
                           validation_split=0.3,

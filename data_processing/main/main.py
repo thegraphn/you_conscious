@@ -24,19 +24,20 @@ import datetime
 def main_app():
     begin = datetime.datetime.now()
     print("Begin data processing", begin)
-    processes: dict = {"dowloading": False,
-                       "merging": False,
+    processes: dict = {"dowloading": True,
+                       "merging": True,
                        "filtering": True,
-                       "adding_features": False,
-                       "filtering_without_label": False,
-                       "cleansing": False,
-                       "filtering_only_matching_category": False}
+                       "adding_features": True,
+                       "filtering_without_label": True,
+                       "cleansing": True,
+                       "filtering_only_matching_category": True}
 
     for process, todo in processes.items():
         print(process, todo)
         if process == "dowloading":
             if todo:
                 downloading()
+
         if process == "merging":
             if todo:
                 merging()
