@@ -24,17 +24,17 @@ import datetime
 def main_app():
     begin = datetime.datetime.now()
     print("Begin data processing", begin)
-    processes: dict = {"dowloading": False,
+    processes: dict = {"downloading": False,
                        "merging": False,
                        "filtering": False,
-                       "adding_features": False,
-                       "filtering_without_label": False,
+                       "adding_features": True,
+                       "filtering_without_label": True,
                        "cleansing": True,
                        "filtering_only_matching_category": True}
 
     for process, todo in processes.items():
         print(process, todo)
-        if process == "dowloading":
+        if process == "downloading":
             if todo:
                 downloading()
 

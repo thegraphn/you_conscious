@@ -1,4 +1,4 @@
-import csv
+import tokenizer
 from multiprocessing import Pool
 from typing import Union
 
@@ -32,10 +32,17 @@ class Filter:
         :param vegan_filters: List of filter to be apply in oder to know if the article is vegan or not
         :return: The article's line if it is vegan
         """
-        vegan: bool = bool()
         tmp_article = article
         article = " ".join(article)
-        article_words = sorted(set(word_tokenize(article.replace(",", " "))))
+        article_words: list = []
+
+        for info in tokenizer.tokenize(article):
+            _, token, _ = info
+            if token != None:
+                article_words.append(token)
+
+        #article_words = sorted(set(word_tokenize(article.replace(",", " "))))
+        article_words = sorted(set(article_words))
         article_words = list(article_words)
         vegan = True
         for filter_veg in self.vegan_filters:
@@ -65,6 +72,7 @@ class Filter:
                 break
         if not vegan:
             return tmp_article
+
     def get_list_vegan_articles(self, list_articles):
         """
         Iteration over all article in the list and create list of vegan article filtered with the filters
@@ -99,7 +107,7 @@ class Filter:
         """
         category_name_content: str = article[self.category_name_index]
         category_name_content_tokens: list = word_tokenize(category_name_content)
-        to_return:bool = False
+        to_return: bool = False
 
         if "Herren" in category_name_content_tokens:
             to_return = True
@@ -156,5 +164,5 @@ def delete_non_matching_categories():
     deleted_non_matching_categories_articles = flt.delete_non_matching_categories(
         list_articles)
     list_articles = [headers] + deleted_non_matching_categories_articles
-    write2File(list_articles,file_paths["filtered_only_matching_categories_datafeed"])
+    write2File(list_articles, file_paths["filtered_only_matching_categories_datafeed"])
     print("Delete non matching categories : Done")
