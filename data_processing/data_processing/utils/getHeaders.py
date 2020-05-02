@@ -1,5 +1,5 @@
-from data_processing.utils.file_paths import file_paths
-from data_processing.utils.utils import getMappingColumnIndex
+from data_processing.data_processing.utils.file_paths import file_paths
+from data_processing.data_processing.utils.utils import getMappingColumnIndex
 
 filtered_data_feed_path = file_paths["filtered_data_feed_path"]
 

@@ -1,10 +1,9 @@
 import re
-from collections import defaultdict
 
 from nltk import word_tokenize
 
-from data_processing.utils.getHeaders import getHeadersIndex
-from data_processing.utils.utils import mapping_cleaning_fashionSuitableFor
+from data_processing.data_processing.utils.getHeaders import getHeadersIndex
+from data_processing.data_processing.utils.utils import mapping_cleaning_fashionSuitableFor
 
 
 def clean_size(size):

@@ -6,9 +6,9 @@ from nltk import word_tokenize
 import tqdm
 
 from data_processing.data_processing.filter_datafeed.utils import getFilters
-from data_processing.utils.file_paths import file_paths
-from data_processing.utils.getHeaders import getHeadersIndex
-from data_processing.utils.utils import filters_file_path, get_lines_csv, merged_data_feed_path, \
+from data_processing.data_processing.utils.file_paths import file_paths
+from data_processing.data_processing.utils.getHeaders import getHeadersIndex
+from data_processing.data_processing.utils.utils import filters_file_path, get_lines_csv, merged_data_feed_path, \
     write2File
 
 
@@ -43,11 +43,6 @@ class Filter:
             if len(set(filter_veg).intersection(article_words)) == len(filter_veg):
                 vegan = False
                 break
-        if not vegan:
-            with open("/home/graphn/repositories/you_conscious/dl_exp/data/non_vegan.csv", "a", encoding="utf-8") as f:
-                csv_writer = csv.writer(f)
-                csv_writer.writerow(tmp_article)
-
         if vegan:
             return tmp_article
 

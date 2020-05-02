@@ -2,9 +2,9 @@ import re
 from multiprocessing.pool import Pool
 import tqdm
 
-from data_processing.utils.file_paths import file_paths
-from data_processing.utils.getHeaders import getHeadersIndex
-from data_processing.utils.utils import get_lines_csv, getMappingColumnIndex, features_mapping_path, affiliateId, \
+from data_processing.data_processing.utils.file_paths import file_paths
+from data_processing.data_processing.utils.getHeaders import getHeadersIndex
+from data_processing.data_processing.utils.utils import get_lines_csv, getMappingColumnIndex, features_mapping_path, affiliateId, \
     features_data_feed_path, write2File
 
 

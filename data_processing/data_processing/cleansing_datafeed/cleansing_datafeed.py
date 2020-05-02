@@ -1,15 +1,14 @@
 from collections import defaultdict
 from multiprocessing import Pool
 
-import natsort
 import tqdm
 
 from data_processing.data_processing.cleansing_datafeed.size import SizeFinder
 from data_processing.data_processing.cleansing_datafeed.size_sorter import SizeSorter
 from data_processing.data_processing.cleansing_datafeed.utils import clean_category_sex, clean_size
-from data_processing.utils.file_paths import file_paths
-from data_processing.utils.getHeaders import getHeadersIndex
-from data_processing.utils.utils import createMappingBetween2Columns, files_mapping_categories_path, \
+from data_processing.data_processing.utils.file_paths import file_paths
+from data_processing.data_processing.utils.getHeaders import getHeadersIndex
+from data_processing.data_processing.utils.utils import createMappingBetween2Columns, files_mapping_categories_path, \
     mapping_fashionSuitableFor, synonym_female, synonym_male, synonym_euro, getMappingColumnIndex, \
     maxNumberFashionSizeColumns, get_lines_csv, write2File, cleansed_categories_data_feed_path
 

@@ -5,32 +5,41 @@ import tqdm
 from progressbar import *
 
 root_folder = os.path.dirname(os.path.realpath(__file__))
+print(root_folder)
+root_folder = root_folder.replace(r"\data_processing\data_processing\utils", "")
+root_folder = root_folder.replace(r"data_processing/data_processing/utils", "")
+print(root_folder)
 
-root_folder = root_folder.replace(r"\data_processing\utils", "")
-root_folder = root_folder.replace(r"data_processing/utils", "")
-
-filters_file_path = os.path.join(root_folder, "utils")
+filters_file_path = os.path.join(root_folder, "data_processing")
+filters_file_path = os.path.join(filters_file_path, "utils")
 filters_file_path = os.path.join(filters_file_path, "data_dependencies")
 filters_file_path = os.path.join(filters_file_path, "blacklist.csv")
 
-files_mapping_categories_path = os.path.join(root_folder, "utils")
+files_mapping_categories_path = os.path.join(root_folder, "data_processing")
+files_mapping_categories_path = os.path.join(files_mapping_categories_path, "utils")
 files_mapping_categories_path = os.path.join(files_mapping_categories_path, "data_dependencies")
 files_mapping_categories_path = os.path.join(files_mapping_categories_path, "categories_mapping.csv")
 
-file_url_shop_path = os.path.join(root_folder, "utils")
+
+file_url_shop_path = os.path.join(root_folder, "data_processing")
+file_url_shop_path = os.path.join(file_url_shop_path, "utils")
 file_url_shop_path = os.path.join(file_url_shop_path, "data_dependencies")
 file_url_shop_path = os.path.join(file_url_shop_path, "datafeed-locations.csv")
 
-mapping_fashionSuitableFor = os.path.join(root_folder, "utils")
+
+mapping_fashionSuitableFor = os.path.join(root_folder, "data_processing")
+mapping_fashionSuitableFor = os.path.join(mapping_fashionSuitableFor, "utils")
 mapping_fashionSuitableFor = os.path.join(mapping_fashionSuitableFor, "data_dependencies")
 mapping_fashionSuitableFor = os.path.join(mapping_fashionSuitableFor,
                                           "categoriesCleaning_fashionSuitableFor_mapping.csv")
 
-column_mapping_merging_path = os.path.join(root_folder, "utils")
+column_mapping_merging_path = os.path.join(root_folder, "data_processing")
+column_mapping_merging_path = os.path.join(column_mapping_merging_path, "utils")
 column_mapping_merging_path = os.path.join(column_mapping_merging_path, "data_dependencies")
 column_mapping_merging_path = os.path.join(column_mapping_merging_path, "column_mapping_merging.csv")
 
-features_mapping_path = os.path.join(root_folder, "utils")
+features_mapping_path = os.path.join(root_folder, "data_processing")
+features_mapping_path = os.path.join(features_mapping_path, "utils")
 features_mapping_path = os.path.join(features_mapping_path, "data_dependencies")
 features_mapping_path = os.path.join(features_mapping_path, "features.csv")
 
@@ -42,11 +51,13 @@ merged_data_feeds_directory_path = os.path.join(root_folder, "data_processing")
 merged_data_feeds_directory_path = os.path.join(merged_data_feeds_directory_path, "data_working_directory")
 merged_data_feeds_directory_path = os.path.join(merged_data_feeds_directory_path, "merged")
 
-merging_features_path = os.path.join(root_folder, "utils")
+merging_features_path = os.path.join(root_folder, "data_processing")
+merging_features_path = os.path.join(merging_features_path, "utils")
 merging_features_path = os.path.join(merging_features_path, "data_dependencies")
 merging_features_path = os.path.join(merging_features_path, "merging_features.csv")
 
-shops_ids_names_path = os.path.join(root_folder, "utils")
+shops_ids_names_path = os.path.join(root_folder, "data_processing")
+shops_ids_names_path = os.path.join(shops_ids_names_path, "utils")
 shops_ids_names_path = os.path.join(shops_ids_names_path, "data_dependencies")
 shops_ids_names_path = os.path.join(shops_ids_names_path, "shops_ids_names.csv")
 
@@ -71,7 +82,9 @@ features_data_feed_path = os.path.join(features_data_feed_path, "data_working_di
 features_data_feed_path = os.path.join(features_data_feed_path, "featured")
 features_data_feed_path = os.path.join(features_data_feed_path, "featured_datafeed.csv")
 
-cleaning_categories_fashionSuitableFor_path: str = os.path.join(root_folder, "utils")
+cleaning_categories_fashionSuitableFor_path: str = os.path.join(root_folder, "data_processing")
+cleaning_categories_fashionSuitableFor_path: str = os.path.join(cleaning_categories_fashionSuitableFor_path,
+                                                                "utils")
 cleaning_categories_fashionSuitableFor_path: str = os.path.join(cleaning_categories_fashionSuitableFor_path,
                                                                 "data_dependencies")
 cleaning_categories_fashionSuitableFor_path: str = os.path.join(cleaning_categories_fashionSuitableFor_path,
@@ -131,7 +144,6 @@ def write2File(list_articles, output_file,delimiter:str="\t"):
     write a list to a csv file
     :param output_file:
     :param list_articles:
-    :return:
     """
     with open(output_file, "w", encoding="utf-8", newline="") as o:
         csv_writer = csv.writer(o, delimiter=delimiter)

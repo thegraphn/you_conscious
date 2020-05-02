@@ -24,11 +24,11 @@ import datetime
 def main_app():
     begin = datetime.datetime.now()
     print("Begin data processing", begin)
-    processes: dict = {"dowloading": True,
-                       "merging": True,
-                       "filtering": True,
-                       "adding_features": True,
-                       "filtering_without_label": True,
+    processes: dict = {"dowloading": False,
+                       "merging": False,
+                       "filtering": False,
+                       "adding_features": False,
+                       "filtering_without_label": False,
                        "cleansing": True,
                        "filtering_only_matching_category": True}
 

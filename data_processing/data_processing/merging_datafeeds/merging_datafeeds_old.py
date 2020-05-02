@@ -4,14 +4,14 @@ import os
 import datetime
 import sys
 
-from data_processing.utils.columns_order import column_ord
+from data_processing.data_processing.utils.columns_order import column_ord
 
 folder = os.path.dirname(os.path.realpath(__file__))
 folder = folder.replace("/data_processing/merging_datafeeds", "")
 folder = folder.replace(r"\data_processing\merging_datafeeds", "")
 sys.path.append(folder)
-from data_processing.utils.utils import download_data_feeds_directory_path, column_mapping_merging_path, \
-    merging_features_path, merged_data_feed_path, shops_ids_names_path, merged_data_feed_with_IdNames_path
+from data_processing.data_processing.utils.utils import download_data_feeds_directory_path, column_mapping_merging_path, \
+    merged_data_feed_path, shops_ids_names_path, merged_data_feed_with_IdNames_path
 
 begin = datetime.datetime.now()
 print("Merging script: Started ", begin)

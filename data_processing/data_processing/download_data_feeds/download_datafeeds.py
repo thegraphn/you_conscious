@@ -11,7 +11,7 @@ import sys
 
 import tqdm
 
-from data_processing.utils.utils import download_data_feeds_directory_path, createMappingBetween2Columns, \
+from data_processing.data_processing.utils.utils import download_data_feeds_directory_path, createMappingBetween2Columns, \
     file_url_shop_path
 
 folder = os.path.dirname(os.path.realpath(__file__))
@@ -21,7 +21,7 @@ sys.path.append(folder)
 import glob
 import urllib.request
 import datetime
-from multiprocessing import Process, Pool
+from multiprocessing import Pool
 
 path = "/mnt/c/Users/graphn/PycharmProjects/you_conscious/data_processing/data_working_directory/download"
 # path = sys.argv[1]
@@ -157,6 +157,7 @@ def downloading():
     delete_all_csv_file()
     mapping_url_shop = createMappingBetween2Columns(file_url_shop_path, 0, 1, ";")
     list_tpl_shops_urls = [(shop, url) for shop, url in mapping_url_shop.items()]
+    print(list_tpl_shops_urls)
     list_tpl_shops_urls = list_tpl_shops_urls[1:]  # remove the headers
     print("Downloading - Downloading data feeds: Begin")
     downloadDatafeeds(list_tpl_shops_urls)

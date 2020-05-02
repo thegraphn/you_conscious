@@ -2,8 +2,8 @@ import os
 
 root_folder = os.path.dirname(os.path.realpath(__file__))
 
-root_folder = root_folder.replace(r"\data_processing\utils", "")
-root_folder = root_folder.replace(r"data_processing/utils", "")
+root_folder = root_folder.replace(r"\data_processing\data_processing\utils", "")
+root_folder = root_folder.replace(r"data_processing/data_processing/utils", "")
 
 labeled_data_feed_path = os.path.join(root_folder, "data_processing")
 labeled_data_feed_path = os.path.join(labeled_data_feed_path, "data_working_directory")
