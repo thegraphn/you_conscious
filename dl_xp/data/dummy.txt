@@ -1,0 +1,3 @@
+v,Created TensorFlow device
+c, Created TensorFlow device lala
+x, Created TensorFlow device lulu
