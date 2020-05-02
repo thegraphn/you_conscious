@@ -1,1 +1,0 @@
-python3 train.py --input_data_set /home/aurelien/privat_repositories/you_conscious/dl_exp/data/category_training_data_set.csv  --output_trained_modelAndDicts /home/aurelien/privat_repositories/you_conscious/dl_exp/model_trained/test --csv_delimiter "," --position_class 0 --position_text 1 --number_epochs 40 --units 256 --embedding_length 256
