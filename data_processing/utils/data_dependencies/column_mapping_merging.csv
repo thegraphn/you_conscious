@@ -71,3 +71,11 @@ Price;search_price
 Price_old;rrp_price
 shipping;delivery_cost
 Belboon_ProgramId;merchant_id
+Deeplink;aw_deep_link
+Produkt-Titel;Title
+Produktbeschreibung;description
+Preis (Brutto);search_price
+Produktbild-URL;aw_image_url
+Produktkategorie;category_name
+Versandkosten Allgemein;delivery_cost
+Lieferzeit/Verfügbarkeit;delivery_time
