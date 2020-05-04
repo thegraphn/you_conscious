@@ -78,4 +78,4 @@ Preis (Brutto);search_price
 Produktbild-URL;aw_image_url
 Produktkategorie;category_name
 Versandkosten Allgemein;delivery_cost
-Lieferzeit/Verfügbarkeit;delivery_time
+ext_ Lieferzeit/ Verfügbarkeit;delivery_time
