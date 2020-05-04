@@ -16,7 +16,7 @@ from data_processing.data_processing.utils.utils import createMappingBetween2Col
 class Cleanser:
     def __init__(self):
         self.input_data_feed: str = file_paths["labeled_data_feed_path"]
-        self.feature_mapping = createMappingBetween2Columns(files_mapping_categories_path, 1, 2, ";")
+        self.feature_mapping = createMappingBetween2Columns(files_mapping_categories_path, 1, 2, ",")
         self.fashionSuitableFor_mapping = createMappingBetween2Columns(mapping_fashionSuitableFor, 2, 6, ";")
         self.categoryName_index = getHeadersIndex("category_name")
         self.fashionSuitableFor_index = getHeadersIndex("Fashion:suitable_for")
