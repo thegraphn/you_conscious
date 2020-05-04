@@ -60,7 +60,7 @@ class FeaturesAdder:
 
 
 def add_features():
-    with Pool() as p:
+    with Pool(processes=12) as p:
         ft_adder: FeaturesAdder = FeaturesAdder()
         print("Begin adding features")
 

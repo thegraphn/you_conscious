@@ -11,7 +11,9 @@ import sys
 
 import tqdm
 
-from data_processing.data_processing.utils.utils import download_data_feeds_directory_path, createMappingBetween2Columns, \
+from data_processing.data_processing.download_data_feeds.const import cases
+from data_processing.data_processing.utils.utils import download_data_feeds_directory_path, \
+    createMappingBetween2Columns, \
     file_url_shop_path
 
 folder = os.path.dirname(os.path.realpath(__file__))
@@ -88,7 +90,15 @@ def downloadDatafeed(tuple_shop_url: tuple):
     link: str = tuple_shop_url[1]
     shop_name = shop_name.replace(" ", "_")
     format_file: str = ""
+    """
     if "LOVECO" == shop_name:
+
+        format_file = ".csv"
+        path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
+                                      datetime.datetime.now().strftime("%y-%m-%d") + format_file)
+        urllib.request.urlretrieve(link, path_file)
+
+    if "Clockwood" == shop_name:
         format_file = ".csv"
         path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
                                       datetime.datetime.now().strftime("%y-%m-%d") + format_file)
@@ -99,12 +109,20 @@ def downloadDatafeed(tuple_shop_url: tuple):
         path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
                                       datetime.datetime.now().strftime("%y-%m-%d") + format_file)
         urllib.request.urlretrieve(link, path_file)
-    else:
+    if format_file == "":
         format_file = ".gz"
         path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
                                       datetime.datetime.now().strftime("%y-%m-%d") + format_file)
         urllib.request.urlretrieve(link, path_file)
+    """
 
+    if shop_name not in cases:
+        format_file = ".gz"
+    else:
+        format_file = cases[shop_name]
+    path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
+                                  datetime.datetime.now().strftime("%y-%m-%d") + format_file)
+    urllib.request.urlretrieve(link, path_file)
 
 
 def unzip_files(list_files: list):
@@ -125,7 +143,7 @@ def unzipFile(file: str):
     """
     if ".csv" in file:
         pass
-    if "LOVECO" in file:
+    if "LOVECO" in file or "Clockwood" in file:
         pass
 
     if "gz" in file and not "LOVECO" in file:
@@ -157,7 +175,6 @@ def downloading():
     delete_all_csv_file()
     mapping_url_shop = createMappingBetween2Columns(file_url_shop_path, 0, 1, ";")
     list_tpl_shops_urls = [(shop, url) for shop, url in mapping_url_shop.items()]
-    print(list_tpl_shops_urls)
     list_tpl_shops_urls = list_tpl_shops_urls[1:]  # remove the headers
     print("Downloading - Downloading data feeds: Begin")
     downloadDatafeeds(list_tpl_shops_urls)

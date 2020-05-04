@@ -88,10 +88,14 @@ def mergeCSV(list_files, fieldnames, output_data):
             with open(filename, "r", newline="") as f_in:
                 reader = csv.DictReader(f_in, delimiter=",", quotechar='"')  # Uses the field names in this file
                 for line in reader:
-                    try:
-                        writer.writerow(line)
-                    except:
-                        pass
+                    fieldnames_to_remove:list = []
+                    for key, value in line.items():
+                        if key not in fieldnames:
+                            fieldnames_to_remove.append(key)
+                    for fieldname_to_remove in fieldnames_to_remove:
+                        line.pop(fieldname_to_remove,None)
+
+                    writer.writerow(line)
 
 
 def getColumNames(file):
