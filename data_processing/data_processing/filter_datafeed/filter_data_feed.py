@@ -7,7 +7,7 @@ import tqdm
 
 from data_processing.data_processing.filter_datafeed.utils import getFilters
 from data_processing.data_processing.utils.file_paths import file_paths
-from data_processing.data_processing.utils.getHeaders import getHeadersIndex
+from data_processing.data_processing.utils.getHeaders import get_header_index
 from data_processing.data_processing.utils.utils import filters_file_path, get_lines_csv, merged_data_feed_path, \
     write2File
 
@@ -18,11 +18,11 @@ class Filter:
         self.vegan_filters = getFilters(filters_file_path)
         self.vegan_filters.sort()
         try:
-            self.label_index_feature_datafeed = getHeadersIndex("Labels",
-                                                                file_paths["featured_affiliateIds_datafeed_path"])
-            self.material_index_feature_datafeed = getHeadersIndex("Material",
-                                                                   file_paths["featured_affiliateIds_datafeed_path"])
-            self.category_name_index = getHeadersIndex("category_name", file_paths["cleansed_sex_data_feed_path"])
+            self.label_index_feature_datafeed = get_header_index("Labels",
+                                                                 file_paths["featured_affiliateIds_datafeed_path"])
+            self.material_index_feature_datafeed = get_header_index("Material",
+                                                                    file_paths["featured_affiliateIds_datafeed_path"])
+            self.category_name_index = get_header_index("category_name", file_paths["cleansed_sex_data_feed_path"])
         except:
             pass
 

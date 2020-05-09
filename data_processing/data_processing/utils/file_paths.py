@@ -1,3 +1,4 @@
+import datetime
 import os
 
 root_folder = os.path.dirname(os.path.realpath(__file__))
@@ -19,7 +20,7 @@ filtered_only_matching_categories_datafeed = os.path.join(root_folder, "data_pro
 filtered_only_matching_categories_datafeed = os.path.join(filtered_only_matching_categories_datafeed, "data_working_directory")
 filtered_only_matching_categories_datafeed = os.path.join(filtered_only_matching_categories_datafeed, "filtered")
 filtered_only_matching_categories_datafeed = os.path.join(filtered_only_matching_categories_datafeed,
-                                                          "filtered_only_matching_categories_datafeed.csv")
+                                                          "filtered_only_matching_categories_datafeed_"+str(datetime.datetime.now().strftime("%y-%m-%d"))+".csv")
 
 features_affiliateId_data_feed_path = os.path.join(root_folder, "data_processing")
 features_affiliateId_data_feed_path = os.path.join(features_affiliateId_data_feed_path, "data_working_directory")
