@@ -91,7 +91,7 @@ cleaning_categories_fashionSuitableFor_path: str = os.path.join(cleaning_categor
                                                                 "categoriesCleaning_fashionSuitableFor_mapping.csv")
 
 
-def get_mapping_column_index(file, delimiter) -> dict:
+def getMappingColumnIndex(file, delimiter) -> dict:
     '''
     Create the mapping columnName: Index
     :param delimiter:

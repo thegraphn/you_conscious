@@ -47,6 +47,7 @@ image_link;merchant_image_url
 categories;category_name
 additional_image_link;aw_image_url
 product_price_old;rrp_price
+product_short_description;description
 Produktlink;aw_deep_link
 Bildlink;merchant_image_url
 Größe;Fashion:size
@@ -77,6 +78,4 @@ Preis (Brutto);search_price
 Produktbild-URL;aw_image_url
 Produktkategorie;category_name
 Versandkosten Allgemein;delivery_cost
-ext_ Lieferzeit/ Verfügbarkeit;delivery_time
-description;description
-product_short_description;description2
+Lieferzeit/Verfügbarkeit;delivery_time

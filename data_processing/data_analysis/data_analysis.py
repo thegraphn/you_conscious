@@ -1,6 +1,6 @@
 from matplotlib import pyplot
 
-from data_processing.data_processing.utils.getHeaders import get_header_index
+from data_processing.data_processing.utils.getHeaders import getHeadersIndex
 from data_processing.data_processing.utils.utils import get_lines_csv
 import numpy as np
 import matplotlib.pyplot as plt
@@ -49,8 +49,8 @@ class DataAnalyser:
         plt.show()
 
     def get_stats(self, column_name):
-        merchants_index = get_header_index(column_name,
-                                           self.data_feed_path)
+        merchants_index = getHeadersIndex(column_name,
+                                          self.data_feed_path)
         stats: dict = {}
         for row in self.data_feed:
             content = row[merchants_index]

@@ -93,18 +93,4 @@ column_ord: list = [
     'commission_group',
     'description2',
     'aw_product_id'
-    'product_model',
-    'size_stock_status',
-    'Fashion:category',
-    'size_stock_amount',
-    'average_rating',
-    'delivery_weight',
-    'number_available',
-    'product_GTIN',
-    'upc',
-    'is_for_sale',
-    'reviews',
-    'custom_9',
-    'aw_product_id',
-    'product_model'
 ]

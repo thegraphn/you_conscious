@@ -2,7 +2,7 @@ import re
 
 from nltk import word_tokenize
 
-from data_processing.data_processing.utils.getHeaders import get_header_index
+from data_processing.data_processing.utils.getHeaders import getHeadersIndex
 from data_processing.data_processing.utils.utils import mapping_cleaning_fashionSuitableFor
 
 
@@ -47,9 +47,9 @@ def cleanTitleRow(row):
 
 
 def clean_category_sex(article: list) -> str:
-    categoryName_index = get_header_index("category_name")
-    fashionSuitableFor_index = get_header_index("Fashion:suitable_for")
-    words_title = word_tokenize(article[get_header_index("Title")])
+    categoryName_index = getHeadersIndex("category_name")
+    fashionSuitableFor_index = getHeadersIndex("Fashion:suitable_for")
+    words_title = word_tokenize(article[getHeadersIndex("Title")])
     cat = article[categoryName_index]
     for word in words_title:
         for k, v in mapping_cleaning_fashionSuitableFor.items():

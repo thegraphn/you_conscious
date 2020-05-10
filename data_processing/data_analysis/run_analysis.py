@@ -4,10 +4,10 @@ from matplotlib import pyplot
 
 from data_processing.data_analysis.data_analysis import DataAnalyser
 from data_processing.data_processing.utils.file_paths import file_paths
-from data_processing.data_processing.utils.utils import get_mapping_column_index
+from data_processing.data_processing.utils.utils import getMappingColumnIndex
 
 data_analyser: DataAnalyser = DataAnalyser(file_paths["filtered_only_matching_categories_datafeed"])
-headers = get_mapping_column_index(file_paths["filtered_only_matching_categories_datafeed"], "\t")
+headers = getMappingColumnIndex(file_paths["filtered_only_matching_categories_datafeed"], "\t")
 headers = list(headers.keys())
 headers = headers[0:20]
 list_stats: list = []

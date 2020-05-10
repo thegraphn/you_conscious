@@ -3,9 +3,6 @@ import glob
 import os
 import datetime
 import sys
-from multiprocessing import Pool
-
-import tqdm
 
 from data_processing.data_processing.utils.columns_order import column_ord
 
@@ -14,49 +11,11 @@ folder = folder.replace("/data_processing/merging_datafeeds", "")
 folder = folder.replace(r"\data_processing\merging_datafeeds", "")
 sys.path.append(folder)
 from data_processing.data_processing.utils.utils import download_data_feeds_directory_path, column_mapping_merging_path, \
-    merged_data_feed_path, shops_ids_names_path, merged_data_feed_with_IdNames_path, createMappingBetween2Columns
+    merged_data_feed_path, shops_ids_names_path, merged_data_feed_with_IdNames_path
 
 begin = datetime.datetime.now()
 print("Merging script: Started ", begin)
 enc = "utf-8"
-
-
-class FileMerger:
-    def __init__(self, input_directory: str):
-        self.input_directory: str = input_directory
-        self.mapping_column_names: dict = createMappingBetween2Columns(column_mapping_merging_path, 0, 1, ";")
-
-    def change_programme_id_2_merchant_names(self, list_articles: list):
-        with Pool() as p:
-            list_articles = list(tqdm.tqdm(p.imap(self.change_programme_id_2_merchant_name, list_articles),
-                                           total=len(list_articles)))
-
-        return list_articles
-
-    def change_programme_id_2_merchant_name(self):
-        pass
-
-    def change_column_name(self, csv_file):
-        with open(csv_file, encoding=enc) as csv_to_rename:
-
-            csv_reader = csv.reader(csv_to_rename, delimiter=",", quotechar='"')
-            with open(csv_file + "change.csv", 'w') as output_csv:
-                c = True
-                csv_writer = csv.writer(output_csv, delimiter=",", quotechar='"')
-                for row in csv_reader:
-                    if c:
-                        for key, value in self.mapping_column_names.items():
-                            for i in range(len(row)):
-                                if key == row[i]:
-                                    row[i] = value
-                        csv_writer.writerow(row)
-                    else:
-                        csv_writer.writerow(row)
-
-    def change_column_names(self, list_files: list) -> list:
-        with Pool() as p:
-            list(tqdm.tqdm(p.imap(self.change_column_name, list_files),
-                           total=len(list_files)))
 
 
 def changeProgrammId2MerchentName(csv_file, shop_id_name_mapping_csv, ):
@@ -89,6 +48,9 @@ def changeProgrammId2MerchentName(csv_file, shop_id_name_mapping_csv, ):
                             if key == row[i]:
                                 row[pos_merchant_name] = value
                 csv_writer.writerow(row)
+
+    print("id ", pos_merchent_id)
+    print("name ", pos_merchant_name)
 
 
 def changeColumnName(csv_file, mapping_file):
@@ -123,10 +85,13 @@ def mergeCSV(list_files, fieldnames, output_data):
         csv_writer = csv.writer(output_csvfile, delimiter=",", quotechar='"')
         csv_writer.writerow(fieldnames)
         for filename in list_files:
-            with open(filename, "r") as f_in:
+            with open(filename, "r", newline="") as f_in:
                 reader = csv.DictReader(f_in, delimiter=",", quotechar='"')  # Uses the field names in this file
                 for line in reader:
-                    writer.writerow(line)
+                    try:
+                        writer.writerow(line)
+                    except:
+                        pass
 
 
 def getColumNames(file):
@@ -165,19 +130,14 @@ def getNewColumnNames(file):
 
 
 def merging():
-    csv_merger = FileMerger(download_data_feeds_directory_path)
     print("Begin merging")
     # os.system("rm "+ merged_data_feed_path)
     list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csv"))
     print("Merging - Changing column names: Begin")
-
-    #for file in list_files:
-     #   changeColumnName(file, column_mapping_merging_path)
-    csv_merger.change_column_names(list_files=list_files)
-
-    list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csvchange.csv"))
-
     set_col = set()
+    for file in list_files:
+        changeColumnName(file, column_mapping_merging_path)
+    list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csvchange.csv"))
     for file in list_files:
         for name in getColumNames(file):
             set_col.add(name)
@@ -188,7 +148,6 @@ def merging():
     print("Merging - Merging : Begin")
     list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csvchange.csv"))
     mergeCSV(list_files, newColumnNames, merged_data_feed_path)
-
     os.system("rm " + os.path.join(download_data_feeds_directory_path, "*.csvchange.csv"))
     print("Merging - Merging : Done")
     print("Merging - Changing ID to Name: Begin")
