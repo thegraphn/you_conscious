@@ -29,5 +29,9 @@ def getHeadersIndex(header, file=filtered_data_feed_path):
         return getMappingColumnIndex(file, "\t")["Title"]
     if header == "description":
         return getMappingColumnIndex(file, "\t")["description"]
+    if header == "merchant_product_id":
+        return getMappingColumnIndex(file,"\t")["merchant_product_id"]
+    if header=="colour":
+        return getMappingColumnIndex(file,"\t")["colour"]
     else:
         print("HEADER NOT IMPLEMENTED")

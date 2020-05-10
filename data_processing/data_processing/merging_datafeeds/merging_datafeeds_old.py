@@ -20,6 +20,7 @@ begin = datetime.datetime.now()
 print("Merging script: Started ", begin)
 enc = "utf-8"
 
+
 class FileMerger:
     def __init__(self, input_directory: str):
         self.input_directory: str = input_directory
@@ -56,8 +57,6 @@ class FileMerger:
         with Pool() as p:
             list(tqdm.tqdm(p.imap(self.change_column_name, list_files),
                            total=len(list_files)))
-
-
 
 
 def changeProgrammId2MerchentName(csv_file, shop_id_name_mapping_csv, ):
@@ -130,10 +129,7 @@ def mergeCSV(list_files, fieldnames, output_data):
             with open(filename, "r", newline="") as f_in:
                 reader = csv.DictReader(f_in, delimiter=",", quotechar='"')  # Uses the field names in this file
                 for line in reader:
-                    try:
-                        writer.writerow(line)
-                    except:
-                        pass
+                    writer.writerow(line)
 
 
 def getColumNames(file):

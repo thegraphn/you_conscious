@@ -16,7 +16,7 @@ from data_processing.data_processing.utils.utils import createMappingBetween2Col
 class Cleanser:
     def __init__(self):
         self.input_data_feed: str = file_paths["labeled_data_feed_path"]
-        self.feature_mapping = createMappingBetween2Columns(files_mapping_categories_path, 1, 2, ";")
+        self.feature_mapping = createMappingBetween2Columns(files_mapping_categories_path, 1, 2, ",")
         self.fashionSuitableFor_mapping = createMappingBetween2Columns(mapping_fashionSuitableFor, 2, 6, ";")
         self.categoryName_index = getHeadersIndex("category_name")
         self.fashionSuitableFor_index = getHeadersIndex("Fashion:suitable_for")
@@ -25,6 +25,8 @@ class Cleanser:
         self.search_price_index = getHeadersIndex("search_price", file=self.input_data_feed)
         self.merchantName_index = getHeadersIndex("merchant_name", file=self.input_data_feed)
         self.title_index = getHeadersIndex("Title", file=self.input_data_feed)
+        self.merchant_product_id_index = getHeadersIndex("merchant_product_id", file=self.input_data_feed)
+        self.colour_index = getHeadersIndex("colour", file=self.input_data_feed)
 
     def article_cleansing(self, article):
         """
@@ -150,16 +152,28 @@ class Cleanser:
         headers = input_list_articles[0]
         list_art = input_list_articles[1:]
         list_articles_merged = []
-        mapping_awImageUrl_sizes = defaultdict(list)
-        mapping_awImageUrl_article = {}
-        mapping_columnHeader = getMappingColumnIndex(self.input_data_feed, "\t")
+        mapping_identifier_sizes = defaultdict(list)
+        mapping_identifier_article = {}
+        mapping_column_header = getMappingColumnIndex(self.input_data_feed, "\t")
 
         for article in list_art:
-            size_content = article[mapping_columnHeader["Fashion:size"]]
+            size_content = article[mapping_column_header["Fashion:size"]]
             size_content = clean_size(size_content)
-            mapping_awImageUrl_sizes[article[mapping_columnHeader["aw_image_url"]]].append(
-                size_content)  # Mapping URL sizes
-            mapping_awImageUrl_article[article[mapping_columnHeader["aw_image_url"]]] = article  # Mapping URL article
+            if "Avocadostore" in article[self.merchantName_index]:
+                merchant_product_id = article[self.merchant_product_id_index]
+                splited_merchant_product_id_index = merchant_product_id.split("-")
+                colour:str = article[self.colour_index]
+                product_identifier: str = splited_merchant_product_id_index[0]
+                identifier:str= product_identifier+"-"+colour
+                mapping_identifier_sizes[identifier].append(
+                    size_content)  # Mapping URL sizes
+                mapping_identifier_article[identifier] = article  # Mapping URL article
+            else:
+                mapping_identifier_sizes[article[mapping_column_header["aw_image_url"]]].append(
+                    size_content)  # Mapping URL sizes
+                mapping_identifier_article[
+                    article[mapping_column_header["aw_image_url"]]] = article  # Mapping URL article
+
         # Add the sizes columns to the headers
         headers = [header.replace("Fashion:size", "Fashion:size0") for header in headers]
         for i in range(1, maxNumberFashionSizeColumns):  # Start at one because we already use Fashion:size0
@@ -167,17 +181,17 @@ class Cleanser:
 
         mapping_header_columnId = {header: columnId for columnId, header in enumerate(headers)}
         # Put the size into the size column
-        for url, sizes in mapping_awImageUrl_sizes.items():
+        for url, sizes in mapping_identifier_sizes.items():
             list_size: list = []
             for lt in sizes:
                 for size in lt:
                     list_size.append(size)
-            article = mapping_awImageUrl_article[url]
+            article = mapping_identifier_article[url]
             # Append empty rows for the new sizes column
             for i in range(maxNumberFashionSizeColumns):
                 article.append("")
             list_size = list_size[:maxNumberFashionSizeColumns]
-            list_size = list(set(list_size)) # remove dupiclates
+            list_size = list(set(list_size))  # remove dupiclates
             size_sorter: SizeSorter = SizeSorter(list_size)
             list_size: list = size_sorter.sorted_sizes
             for i, size in enumerate(list_size):

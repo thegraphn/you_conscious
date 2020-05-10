@@ -4,18 +4,19 @@ import tqdm
 
 from data_processing.data_processing.utils.file_paths import file_paths
 from data_processing.data_processing.utils.getHeaders import getHeadersIndex
-from data_processing.data_processing.utils.utils import get_lines_csv, getMappingColumnIndex, features_mapping_path, affiliateId, \
+from data_processing.data_processing.utils.utils import get_lines_csv, getMappingColumnIndex, features_mapping_path, \
+    affiliateId, \
     features_data_feed_path, write2File
 
 
 class FeaturesAdder:
     def __init__(self):
         self.input_file: str = file_paths["filtered_data_feed_path"]
-        self.features_list = get_lines_csv(features_mapping_path, ";")[1:]#be aware of the header
+        self.features_list = get_lines_csv(features_mapping_path, ";")[1:]  # be aware of the header
         self.mapping_columnHeader = getMappingColumnIndex(self.input_file, "\t")
         self.awDeepLink_index = getHeadersIndex("aw_deep_link", file=self.input_file)
 
-    def  add_features_article(self, article) -> list:
+    def add_features_article(self, article) -> list:
         """
         Iterate over "cell" in the article and search possible features.
         Add the features in the given column
@@ -27,16 +28,17 @@ class FeaturesAdder:
                 string2_find = string2Find_feature2Write_columnFeature[0]
                 feature2_write = string2Find_feature2Write_columnFeature[1]
                 column_feature = string2Find_feature2Write_columnFeature[2]
-                if re.match(string2_find, cell) is not None:
+                if string2_find in cell:
                     article[self.mapping_columnHeader[column_feature]] = feature2_write
                     break
-                elif string2_find in cell:
+                elif re.match(string2_find, cell) is not None:
                     article[self.mapping_columnHeader[column_feature]] = feature2_write
                     break
+
         return article
 
     def add_features_articles(self, list_articles) -> list:
-        with Pool() as p:
+        with Pool(processes=12) as p:
             result_featured_articles: list = list(tqdm.tqdm(p.imap(self.add_features_article, list_articles),
                                                             total=len(list_articles)))
         return result_featured_articles
@@ -53,14 +55,14 @@ class FeaturesAdder:
         return article
 
     def add_affiliate_id_articles(self, list_articles) -> list:
-        with Pool() as p:
+        with Pool(processes=12) as p:
             result_add_affiliate_ids: list = list(tqdm.tqdm(p.imap(self.add_affiliate_id_article, list_articles),
                                                             total=len(list_articles)))
         return result_add_affiliate_ids
 
 
 def add_features():
-    with Pool() as p:
+    with Pool(processes=12) as p:
         ft_adder: FeaturesAdder = FeaturesAdder()
         print("Begin adding features")
 
