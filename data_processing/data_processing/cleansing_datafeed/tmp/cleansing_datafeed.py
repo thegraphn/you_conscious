@@ -9,7 +9,7 @@ from data_processing.data_processing.cleansing_datafeed.tmp.utils import clean_c
 from data_processing.data_processing.utils.file_paths import file_paths
 from data_processing.data_processing.utils import getHeadersIndex
 from data_processing.data_processing.utils.utils import createMappingBetween2Columns, files_mapping_categories_path, \
-    mapping_fashionSuitableFor, synonym_female, synonym_male, synonym_euro, getMappingColumnIndex, \
+    mapping_fashionSuitableFor, synonym_female, synonym_male, synonym_euro, get_mapping_column_index, \
     maxNumberFashionSizeColumns, get_lines_csv, write2File, cleansed_categories_data_feed_path
 
 
@@ -153,7 +153,7 @@ class Cleanser:
         list_articles_merged = []
         mapping_awImageUrl_sizes = defaultdict(list)
         mapping_awImageUrl_article = {}
-        mapping_columnHeader = getMappingColumnIndex(self.input_data_feed, "\t")
+        mapping_columnHeader = get_mapping_column_index(self.input_data_feed, "\t")
 
         for article in list_art:
             size_content = article[mapping_columnHeader["Fashion:size"]]
