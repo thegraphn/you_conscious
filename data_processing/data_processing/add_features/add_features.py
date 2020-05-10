@@ -11,11 +11,11 @@ from data_processing.data_processing.utils.utils import get_lines_csv, getMappin
 class FeaturesAdder:
     def __init__(self):
         self.input_file: str = file_paths["filtered_data_feed_path"]
-        self.features_list = get_lines_csv(features_mapping_path, ";")[1:]
+        self.features_list = get_lines_csv(features_mapping_path, ";")[1:]#be aware of the header
         self.mapping_columnHeader = getMappingColumnIndex(self.input_file, "\t")
         self.awDeepLink_index = getHeadersIndex("aw_deep_link", file=self.input_file)
 
-    def add_features_article(self, article) -> list:
+    def  add_features_article(self, article) -> list:
         """
         Iterate over "cell" in the article and search possible features.
         Add the features in the given column
