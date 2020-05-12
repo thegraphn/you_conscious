@@ -12,6 +12,7 @@ class SizeSorter:
         self.sorting_type: str = self.sorting_type_finder()
         self.sorted_sizes = self.sort_list()
 
+
     def sorting_type_finder(self) -> str:
         """
         Get the kind of size which are in the given list (e.g. number: 38,40 or letter: XL,S)
@@ -39,6 +40,7 @@ class SizeSorter:
                 average_number = number_counter / character_counter
             if average_letter > average_number:
                 return "letter"
+
             else:
                 return "number"
 

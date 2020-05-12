@@ -3,7 +3,7 @@ from multiprocessing import Pool
 
 import tqdm
 
-from data_processing.data_processing.cleansing_datafeed.size import SizeFinder
+from data_processing.data_processing.cleansing_datafeed.size_finder import SizeFinder
 from data_processing.data_processing.cleansing_datafeed.size_sorter import SizeSorter
 from data_processing.data_processing.cleansing_datafeed.utils import clean_category_sex, clean_size
 from data_processing.data_processing.utils.file_paths import file_paths
@@ -67,6 +67,11 @@ class Cleanser:
                 if "Damen" == article[self.categoryName_index]:
                     article[self.categoryName_index]: str = article[self.categoryName_index].replace("Damen", "Herren")
 
+        #Clean fashion_suitable_:for
+        if "Female" == article[self.fashionSuitableFor_index]:
+            article[self.fashionSuitableFor_index] = "Damen"
+        if "Male" == article[self.fashionSuitableFor_index]:
+            article[self.fashionSuitableFor_index] = "Herren"
         # merchant_name cleansing
         article[self.merchantName_index] = article[self.merchantName_index].replace(" DE", "")
 
@@ -142,6 +147,22 @@ class Cleanser:
         p = Pool()
         cleaned_prices_articles = p.map(self.cleanPrice, list_articles)
         return cleaned_prices_articles
+
+    def get_article_identifier(self, article: list) -> str:
+        """
+        Get an article identifier in order to merge articles by their sizes
+        :return: identifier
+        """
+
+        if "Avocadostore" in article[self.merchantName_index]:
+            merchant_product_id = article[self.merchant_product_id_index]
+            splited_merchant_product_id_index = merchant_product_id.split("-")
+            colour: str = article[self.colour_index]
+            product_identifier: str = splited_merchant_product_id_index[0]
+            identifier: str = product_identifier + "-" + colour
+        else:
+            identifier: str = "aw_image_url"
+        return identifier
 
     def mergedProductBySize(self, input_list_articles):
         """

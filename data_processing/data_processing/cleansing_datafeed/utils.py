@@ -6,7 +6,7 @@ from data_processing.data_processing.utils.getHeaders import getHeadersIndex
 from data_processing.data_processing.utils.utils import mapping_cleaning_fashionSuitableFor
 
 
-def clean_size(size):
+def clean_size(size) -> list:
     '''
     clean size, try to split with different separator.
     delete unnecessary strings etc...
@@ -16,16 +16,21 @@ def clean_size(size):
     regex = r"(\(\d{2}(\/\d{2})*\))"
     if "(" and ")" in size:
         size = re.sub(regex, "", size)
-    size = size.replace("EU", "")
-    size = size.replace(" ", "")
-    size = size.replace(";", ",")
-    size = size.replace("-", ",")
-    size = size.replace("|", ",")
-    size = size.replace("/", ",")
-    size = size.replace(".0", "")  # sometimes there is a 0 after the number
-    size = size.split(",")
+    if size.isdigit() and len(size) == 4:  # This is socks
+        n = 2  # split every 2 character
+        size: list = [size[i:i + n] for i in range(0, len(size), n)]
+        size = ["-".join(size)]
+    else:
+        size = size.replace("EU", "")
+        size = size.replace(" ", "")
+        size = size.replace(";", ",")
+        size = size.replace("-", ",")
+        size = size.replace("|", ",")
+        size = size.replace("/", ",")
+        size = size.replace(".0", "")  # sometimes there is a 0 after the number
+        size = size.split(",")
 
-    size = list(set(size))
+        size = list(set(size))
     return size
 
 
