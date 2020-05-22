@@ -1,4 +1,3 @@
-import csv
 from random import shuffle
 
 from data_processing.data_processing.utils.utils import get_lines_csv, write2File
