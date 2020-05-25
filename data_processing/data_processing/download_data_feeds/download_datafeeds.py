@@ -11,8 +11,9 @@ import sys
 
 import tqdm
 
-from data_processing.data_processing.utils.utils import download_data_feeds_directory_path, createMappingBetween2Columns, \
-    file_url_shop_path
+from data_processing.data_processing.utils.file_paths import file_paths
+from data_processing.data_processing.utils.utils import download_data_feeds_directory_path, \
+    createMappingBetween2Columns, change_delimiter_csv
 
 folder = os.path.dirname(os.path.realpath(__file__))
 folder = folder.replace("/data_processing/download_data_feeds", "")
@@ -23,147 +24,181 @@ import urllib.request
 import datetime
 from multiprocessing import Pool
 
-path = "/mnt/c/Users/graphn/PycharmProjects/you_conscious/data_processing/data_working_directory/download"
-# path = sys.argv[1]
-begin = datetime.datetime.now()
-print("Downloading begin: ", begin)
 
+class Downloader:
 
-def readDatafeedUrlFile(file: str) -> dict:
-    '''
-    :param file: file containing the mapping of Shops and URLS
-    :return: dictionary. key:name of shop, value: url
-    '''
-    datafeed_url_links: dict = {}
+    def __init__(self):
+        self.datafeed_infos: list = self.get_datafeed_infos()
+        print(self.datafeed_infos)
 
-    with open(file) as f:
-        csv_reader = csv.reader(f, delimiter=";")
-        for row in csv_reader:
-            name_shop: str = row[0]
-            url: str = row[1]
-            if name_shop != "Advertiser Name" and url != "URL":
-                datafeed_url_links[name_shop] = url
-    return datafeed_url_links
-
-
-def addMerchantName(in_file: str, name: str):
-    '''
-    Only for SORBRAS
-    :param in_file: datafeed file
-    :param name: name to add into the data feed
-    '''
-    headers: list = []
-    with open(in_file, encoding="utf-8") as file:
-        with open(os.path.join(path, "datafeeds_preprocessing\downloaded_datafeeds/SORBAS_with_merchant_name.csv"), 'w',
-                  encoding="utf-8") as o:
-            csv_reader: csv.reader = csv.reader(file)
-            csv_writer: csv.writer = csv.writer(o)
+    @staticmethod
+    def get_datafeed_infos() -> list:
+        """
+        Get the info in order to download the datafeeds properly: URL and csv_file delimiter
+        :return: list [Shop_name,URL,delimiter],
+                        ....
+                        }
+        """
+        datafeed_info: list = []
+        with open(file_paths["file_datafeed_location"], "r", encoding="utf-8") as input_file:
+            csv_reader = csv.reader(input_file, delimiter=";")
+            next(csv_reader)
             for row in csv_reader:
-                headers = row
-                break
-            headers = headers + ["merchant_name"]
-            csv_writer.writerow(headers)
+                datafeed_name: str = row[0]
+                datafeed_url: str = row[1]
+                datafeed_delimiter: str = row[2]
+                datafeed_info.append([datafeed_name, datafeed_url, datafeed_delimiter])
+        return datafeed_info
+
+    @staticmethod
+    def read_datafeed_url_file(file: str) -> dict:
+        """
+        :param file: file containing the mapping of Shops and URLS
+        :return: dictionary. key:name of shop, value: url
+        """
+        datafeed_url_links: dict = {}
+
+        with open(file) as f:
+            csv_reader = csv.reader(f, delimiter=";")
             for row in csv_reader:
-                row = row + [name]
-                csv_writer.writerow(row)
-    os.system("rm " + in_file)
+                name_shop: str = row[0]
+                url: str = row[1]
+                if name_shop != "Advertiser Name" and url != "URL":
+                    datafeed_url_links[name_shop] = url
+            return datafeed_url_links
 
+    @staticmethod
+    def add_merchant_name(in_file: str, name: str):
+        """
+        Only for SORBRAS
+        :param in_file: datafeed file
+        :param name: name to add into the data feed
+        """
+        headers: list = []
+        with open(in_file, encoding="utf-8") as file:
+            with open(os.path.join(file_paths["file_datafeed_location"],
+                                   "datafeeds_preprocessing\downloaded_datafeeds/SORBAS_with_merchant_name.csv"),
+                      'w',
+                      encoding="utf-8") as o:
+                csv_reader: csv.reader = csv.reader(file)
+                csv_writer: csv.writer = csv.writer(o)
+                for row in csv_reader:
+                    headers = row
+                    break
+                headers = headers + ["merchant_name"]
+                csv_writer.writerow(headers)
+                for row in csv_reader:
+                    row = row + [name]
+                    csv_writer.writerow(row)
+        os.system("rm " + in_file)
 
-def downloadDatafeeds(list_tuples_shops_urls: list):
-    """
-    This function uses Pool and call the sub-function  downloadDatafeed.
-    The number of processes is set to 2 because of the internet connection.
-    :param list_tuples_shops_urls: List of tuples (shop name, link)
-    """
-    with Pool(processes=2)as p:
-        list(tqdm.tqdm(p.imap(downloadDatafeed, list_tuples_shops_urls), total=len(list_tuples_shops_urls)))
+    def download_datafeeds(self, list_tuples_shops_urls: list):
+        """
+        This function uses Pool and call the sub-function  downloadDatafeed.
+        The number of processes is set to 2 because of the internet connection.
+        :param list_tuples_shops_urls: List of tuples (shop name, link)
+        """
+        with Pool(processes=2)as p:
+            list(tqdm.tqdm(p.imap(self.download_datafeed, list_tuples_shops_urls), total=len(list_tuples_shops_urls)))
 
+    @staticmethod
+    def download_datafeed(tuple_shop_url: tuple):
+        """
+        Download a data feed. If the file is LOVECO, the extension of the file is immediately changed into csv
+        :param tuple_shop_url: tuple containing (shop_name,url)
+        """
+        shop_name: str = tuple_shop_url[0]
+        link: str = tuple_shop_url[1]
+        shop_name = shop_name.replace(" ", "_")
+        format_file: str = ""
+        if "LOVECO" == shop_name:
+            format_file = ".csv"
+            path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
+                                          datetime.datetime.now().strftime("%y-%m-%d") + format_file)
+            urllib.request.urlretrieve(link, path_file)
 
-def downloadDatafeed(tuple_shop_url: tuple):
-    """
-    Download a data feed. If the file is LOVECO, the extension of the file is immediately changed into csv
-    :param tuple_shop_url: tuple containing (shop_name,url)
-    """
-    shop_name: str = tuple_shop_url[0]
-    link: str = tuple_shop_url[1]
-    shop_name = shop_name.replace(" ", "_")
-    format_file: str = ""
-    if "LOVECO" == shop_name:
-        format_file = ".csv"
-        path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
-                                      datetime.datetime.now().strftime("%y-%m-%d") + format_file)
-        urllib.request.urlretrieve(link, path_file)
+        if "SORBAS" == shop_name:
+            format_file = ".csv"
+            path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
+                                          datetime.datetime.now().strftime("%y-%m-%d") + format_file)
+            urllib.request.urlretrieve(link, path_file)
+        if "Uli_Schott" in shop_name:
+            format_file = ".csv"
+            path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
+                                          datetime.datetime.now().strftime("%y-%m-%d") + format_file)
+            urllib.request.urlretrieve(link, path_file)
 
-    if "SORBAS" == shop_name:
-        format_file = ".csv"
-        path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
-                                      datetime.datetime.now().strftime("%y-%m-%d") + format_file)
-        urllib.request.urlretrieve(link, path_file)
-    else:
-        format_file = ".gz"
-        path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
-                                      datetime.datetime.now().strftime("%y-%m-%d") + format_file)
-        urllib.request.urlretrieve(link, path_file)
+        else:
+            format_file = ".gz"
+            path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
+                                          datetime.datetime.now().strftime("%y-%m-%d") + format_file)
+            urllib.request.urlretrieve(link, path_file)
 
+    def unzip_files(self, list_files: list):
+        """
+        This function uses Pool and call the sub-function unzipFile
+            :param list_files: List of the files to try to unzip
+        """
+        with Pool(processes=2)as p:
+            list(tqdm.tqdm(p.imap(self.unzip_file, list_files), total=len(list_files)))
 
+    @staticmethod
+    def unzip_file(file: str):
+        """
+        Try to unzip a given file. If the datafeed is LOVECO the file is not zipped. It is
+        just required to change the file's extension
+        :param file: file to unzip
+        """
+        if ".csv" in file:
+            pass
+        if "LOVECO" in file:
+            pass
 
-def unzip_files(list_files: list):
-    """
-     This function uses Pool and call the sub-function unzipFile
-    :param list_files: List of the files to try to unzip
-    """
+        if "gz" in file and not "LOVECO" in file:
+            length_to_delete: int = -3
+            os.system("gunzip -kc " + str(file) + " > " + str(file[:length_to_delete]) + ".csv")
 
-    with Pool(processes=2)as p:
-        list(tqdm.tqdm(p.imap(unzipFile, list_files), total=len(list_files)))
+    @staticmethod
+    def delete_non_csv_datafeeds(directory: str):
+        """
+        Delete all file in a directory except py and csv files
+        :param directory: Directory where the files will be deleted
+        """
+        list_files: list = glob.glob(os.path.join(directory, "*"))
+        for file in list_files:
+            if not file.endswith("csv") and not file.endswith(".py"):
+                os.system("rm " + file)
 
+    def change_delimiters(self, list_files: list):
+        with Pool()as p:
+            list(tqdm.tqdm(p.imap(self.change_delimiter, list_files), total=len(list_files)))
 
-def unzipFile(file: str):
-    """
-    Try to unzip a given file. If the datafeed is LOVECO the file is not zipped. It is
-    just required to change the file's extension
-    :param file: file to unzip
-    """
-    if ".csv" in file:
-        pass
-    if "LOVECO" in file:
-        pass
-
-    if "gz" in file and not "LOVECO" in file:
-        length_to_delete: int = -3
-        os.system("gunzip -kc " + str(file) + " > " + str(file[:length_to_delete]) + ".csv")
-
-
-def delete_non_csv_datafeeds(directory: str):
-    """
-    Delete all file in a directory except py and csv files
-    :param directory: Directory where the files will be deleted
-    """
-    list_files: list = glob.glob(os.path.join(directory, "*"))
-    for file in list_files:
-        if not file.endswith("csv") and not file.endswith(".py"):
-            os.system("rm " + file)
-
-
-def delete_all_csv_file(directory: str = download_data_feeds_directory_path):
-    """
-    Delete all csv files in a given directory
-    :param directory: Directory where the csv files are
-    """
-    for file in glob.glob(os.path.join(directory, "*.csv")):
-        os.system("rm " + file)
+    def change_delimiter(self, csv_file_path: str):
+        """
+        Uniform the delimiter in the csv files
+        :param csv_file_path: csv file in which the delimiter may change
+        :return:
+        """
+        for info in self.datafeed_infos:
+            shop_name: str = info[0].replace(" ", "_")
+            _: str = info[1]
+            delimiter: str = info[2]
+            if shop_name in csv_file_path and delimiter != ",":
+                change_delimiter_csv(csv_input=csv_file_path, csv_output=csv_file_path, delimiter_input=delimiter,
+                                     delimiter_output=",")
 
 
 def downloading():
-    delete_all_csv_file()
-    mapping_url_shop = createMappingBetween2Columns(file_url_shop_path, 0, 1, ";")
-    list_tpl_shops_urls = [(shop, url) for shop, url in mapping_url_shop.items()]
-    print(list_tpl_shops_urls)
-    list_tpl_shops_urls = list_tpl_shops_urls[1:]  # remove the headers
+    downloader: Downloader = Downloader()
+    downloader.delete_non_csv_datafeeds(download_data_feeds_directory_path)
     print("Downloading - Downloading data feeds: Begin")
-    downloadDatafeeds(list_tpl_shops_urls)
+    downloader.download_datafeeds(list_tuples_shops_urls=downloader.datafeed_infos)
     print("Downloading - Downloading data feeds: End")
     list_downloaded_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*"))
     print("Downloading - Unzipping data feeds: Begin")
-    unzip_files(list_downloaded_files)
+    downloader.unzip_files(list_files=list_downloaded_files)
+    print("Downloading - Change csv file delimiter: Begin")
+    downloader.change_delimiters(list_files=glob.glob(os.path.join(download_data_feeds_directory_path, "*.csv")))
+    print("Downloading - Change csv file delimiter: End")
     print("Downloading - Unzipping data feeds: Begin")
-    delete_non_csv_datafeeds(download_data_feeds_directory_path)
+    downloader.delete_non_csv_datafeeds(download_data_feeds_directory_path)
