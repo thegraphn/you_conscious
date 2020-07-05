@@ -5,7 +5,6 @@ generated.
 """
 import os
 import sys
-import time
 
 folder = os.path.dirname(os.path.realpath(__file__))
 folder = folder.replace("/data_processing/main", "")
@@ -18,7 +17,6 @@ from data_processing.data_processing.download_data_feeds.download_datafeeds impo
 from data_processing.data_processing.filter_datafeed.filter_data_feed import filter_data_feed, getArticlesWithLabel, \
     delete_non_matching_categories
 from data_processing.data_processing.merging_datafeeds.merging_datafeeds_old import merging
-
 import datetime
 
 
@@ -27,18 +25,20 @@ def main_app():
     print("Begin data processing", begin)
     processes: dict = {"downloading": False,
                        "merging": False,
-                       "filtering": False,
+                       "filtering": True,
                        "adding_features": False,
                        "filtering_without_label": False,
-                       "cleansing": True,
-                       "filtering_only_matching_category": True}
+                       "cleansing": False,
+                       "filtering_only_matching_category": False}
 
+    # todo mainlich weblich in category
+    # todo bag affair is in avocado,merged and not in filtered_datafeed.csv
+    # 67062
     for process, todo in processes.items():
         print(process, todo)
         if process == "downloading":
             if todo:
                 downloading()
-
         if process == "merging":
             if todo:
                 merging()

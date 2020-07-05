@@ -94,6 +94,10 @@ column_ord: list = [
     'description2',
     'aw_product_id',
     'custom_9', 'size_stock_amount', 'average_rating', 'Fashion:category', 'product_model', 'number_available',
-    'reviews', 'delivery_weight', 'is_for_sale', 'upc', 'size_stock_status', 'product_GTIN'
+    'reviews', 'delivery_weight', 'is_for_sale', 'upc', 'size_stock_status', 'product_GTIN', 'ext_size',
+    'Versandkosten Sofortüberweisung', 'Währung', 'Versandkosten Lastschrift', 'Hersteller Artikelnummer HAN',
+    'ext_pzn', 'Anbieter Artikelnummer AAN', 'Preis (Netto)', 'Versandkosten PayPal', 'europäische Artikelnummer EAN',
+    'Versandkosten Vorkasse', 'Vorschaubild-URL', 'Produktbeschreibung lang', 'Versandkosten Rechnung',
+    'Versandkosten Kreditkarte', 'Versandkosten Nachnahme', 'ext_ppu', 'ext_mpnr'
 
 ]

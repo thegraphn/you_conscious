@@ -20,6 +20,11 @@ def clean_size(size) -> list:
         n = 2  # split every 2 character
         size: list = [size[i:i + n] for i in range(0, len(size), n)]
         size = ["-".join(size)]
+        return size
+    if "er pack" in size:
+        size = size.replace(size[0], "")
+        size = size.replace("er pack", "")
+        return size
     else:
         size = size.replace("EU", "")
         size = size.replace(" ", "")

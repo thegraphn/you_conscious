@@ -16,7 +16,7 @@ class FeaturesAdder:
         self.mapping_columnHeader = getMappingColumnIndex(self.input_file, "\t")
         self.awDeepLink_index = getHeadersIndex("aw_deep_link", file=self.input_file)
 
-    def add_features_article(self, article) -> list:
+    def add_features_article(self, article: list) -> list:
         """
         Iterate over "cell" in the article and search possible features.
         Add the features in the given column
@@ -37,11 +37,13 @@ class FeaturesAdder:
 
         return article
 
+    """
     def add_features_articles(self, list_articles) -> list:
         with Pool(processes=12) as p:
             result_featured_articles: list = list(tqdm.tqdm(p.imap(self.add_features_article, list_articles),
                                                             total=len(list_articles)))
         return result_featured_articles
+    """
 
     def add_affiliate_id_article(self, article) -> list:
         content_aw_deep_link_index: str = article[self.awDeepLink_index]
@@ -55,15 +57,16 @@ class FeaturesAdder:
         return article
 
     def add_affiliate_id_articles(self, list_articles) -> list:
-        with Pool(processes=12) as p:
+        with Pool(processes=8) as p:
             result_add_affiliate_ids: list = list(tqdm.tqdm(p.imap(self.add_affiliate_id_article, list_articles),
                                                             total=len(list_articles)))
         return result_add_affiliate_ids
 
 
 def add_features():
-    with Pool(processes=12) as p:
-        ft_adder: FeaturesAdder = FeaturesAdder()
+    ft_adder: FeaturesAdder = FeaturesAdder()
+
+    with Pool(processes=8) as p:
         print("Begin adding features")
 
         list_articles: list = get_lines_csv(ft_adder.input_file, "\t")
@@ -78,10 +81,12 @@ def add_features():
         write2File(list_articles_with_features, features_data_feed_path)
         print("Adding Features - add features: Done")
 
+    with Pool(processes=8) as p:
         list_articles: list = get_lines_csv(features_data_feed_path, "\t")
         headers: list = list_articles[0]
         list_articles: list = list_articles[1:]
         print("Adding Features - add affiliate ids: Begin")
+
         list_articles_with_affiliate_ids: list = list(
             tqdm.tqdm(p.imap(ft_adder.add_affiliate_id_article, list_articles),
                       total=len(

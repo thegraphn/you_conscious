@@ -10,12 +10,14 @@ from data_processing.data_processing.utils.file_paths import file_paths
 from data_processing.data_processing.utils.getHeaders import getHeadersIndex
 from data_processing.data_processing.utils.utils import createMappingBetween2Columns, files_mapping_categories_path, \
     mapping_fashionSuitableFor, synonym_female, synonym_male, synonym_euro, getMappingColumnIndex, \
-    maxNumberFashionSizeColumns, get_lines_csv, write2File, cleansed_categories_data_feed_path
+    maxNumberFashionSizeColumns, get_lines_csv, write2File, cleansed_categories_data_feed_path, get_tokens
 
 
 class Cleanser:
     def __init__(self):
         self.input_data_feed: str = file_paths["labeled_data_feed_path"]
+        self.category_name_cleansing: str = file_paths["category_name_cleansing"]
+        self.category_name_cleansing_conditions: list = get_lines_csv(self.category_name_cleansing, ",")[1:]
         self.feature_mapping = createMappingBetween2Columns(files_mapping_categories_path, 1, 2, ",")
         self.fashionSuitableFor_mapping = createMappingBetween2Columns(mapping_fashionSuitableFor, 2, 6, ";")
         self.categoryName_index = getHeadersIndex("category_name")
@@ -28,10 +30,10 @@ class Cleanser:
         self.merchant_product_id_index = getHeadersIndex("merchant_product_id", file=self.input_data_feed)
         self.colour_index = getHeadersIndex("colour", file=self.input_data_feed)
 
-    def article_cleansing(self, article):
+    # todo refactor !
+    def article_cleansing(self, article: list) -> list:
         """
-        First cleansing of the category_name
-        After we cleanse the merchant_name
+        Cleansing of the category_name, merchant_name, fashion suitable for
         The content in title will also be cleansed. The size, which can be in the title, must be deleted.
         :param article: Article will be cleansed
         :return:
@@ -39,35 +41,42 @@ class Cleanser:
 
         # category_name cleansing
         content_category_name = article[self.categoryName_index]
+        content_category_tokens: list = get_tokens(content_category_name)
         for string2find, new_category in self.feature_mapping.items():
             if string2find in content_category_name:
                 article[self.categoryName_index] = new_category
         article[self.categoryName_index] = clean_category_sex(article)
+
         # Change the content within Topman category to man
         if "Topman" in article[self.merchantName_index]:
             article[self.categoryName_index]: str = article[self.categoryName_index].replace("Damen", "Herren")
 
-        # The content in title in stronger than in fashion_suitable:for and fsf in stronger than category_name
+        # The content in title is stronger than in fashion_suitable:for and fsf in stronger than category_name
         # Title > fashion_suitable:for > category_name
+        title_content: str = article[self.title_index]
+        title_tokens: list = get_tokens(title_content)
+        fashion_suitable_for_content = article[self.fashionSuitableFor_index]
+        fashion_suitable_for_tokens: list = get_tokens(fashion_suitable_for_content)
+
         for female_token in synonym_female:
-            if female_token in article[self.title_index]:
+            if female_token in title_tokens:
                 article[self.categoryName_index]: str = article[self.categoryName_index].replace("Herren", "Damen")
                 article[self.fashionSuitableFor_index] = "Damen"
                 break
-            if female_token in article[self.fashionSuitableFor_index]:
-                if "Herren" == article[self.categoryName_index]:
+            if female_token in fashion_suitable_for_tokens:
+                if "Herren" in article[self.categoryName_index]:
                     article[self.categoryName_index]: str = article[self.categoryName_index].replace("Herren", "Damen")
 
         for male_token in synonym_male:
-            if male_token in article[self.title_index]:
+            if male_token in title_tokens:
                 article[self.categoryName_index]: str = article[self.categoryName_index].replace("Damen", "Herren")
                 article[self.fashionSuitableFor_index] = "Herren"
                 break
-            if male_token in article[self.fashionSuitableFor_index]:
-                if "Damen" == article[self.categoryName_index]:
+            if male_token in fashion_suitable_for_tokens:
+                if "Damen" in article[self.categoryName_index]:
                     article[self.categoryName_index]: str = article[self.categoryName_index].replace("Damen", "Herren")
 
-        #Clean fashion_suitable_:for
+        # Clean fashion_suitable_:for
         if "Female" == article[self.fashionSuitableFor_index]:
             article[self.fashionSuitableFor_index] = "Damen"
         if "Male" == article[self.fashionSuitableFor_index]:
@@ -78,7 +87,16 @@ class Cleanser:
         # title cleansing
         article = self.cleansing_title(article)
 
+        # category name cleansing
+        article = self.cleansing_category_names(article, content_category_tokens)
+
         return article
+
+    def cleansing_articles(self, list_vegan_articles):
+        with Pool() as p:
+            result_renamed = list(tqdm.tqdm(p.imap(self.article_cleansing, list_vegan_articles),
+                                            total=len(list_vegan_articles)))
+        return result_renamed
 
     def cleansing_title(self, article) -> list:
         """
@@ -92,13 +110,21 @@ class Cleanser:
         article[self.title_index] = size_position
         return article
 
-    def cleansing_articles(self, list_vegan_articles):
-        with Pool() as p:
-            result_renamed = list(tqdm.tqdm(p.imap(self.article_cleansing, list_vegan_articles),
-                                            total=len(list_vegan_articles)))
-        return result_renamed
+    def cleansing_category_names(self, article: list, content_category_tokens: list) -> list:
 
-    def renamingFashionSuitableFor(self, article):
+        for condition in self.category_name_cleansing_conditions:
+            frm = condition[0]
+            from_category_name_condition = condition[1]
+            to = condition[2]
+            if frm in content_category_tokens and from_category_name_condition in content_category_tokens:
+                content_category_content:str = " ".join(content_category_tokens)
+                content_category_content = content_category_content.replace(frm,"")
+                content_category_content = content_category_content.replace("&", "")
+                article[self.categoryName_index] = content_category_content.replace(frm, to)
+                break
+        return article
+
+    def renamingFashionSuitableFor(self, article)->list:
         content_categoryName = article[self.categoryName_index]
         content_fashionSuitableFor = article[self.fashionSuitableFor_index]
         sex = content_categoryName.split(" > ")
@@ -183,12 +209,13 @@ class Cleanser:
             if "Avocadostore" in article[self.merchantName_index]:
                 merchant_product_id = article[self.merchant_product_id_index]
                 splited_merchant_product_id_index = merchant_product_id.split("-")
-                colour:str = article[self.colour_index]
+                colour: str = article[self.colour_index]
                 product_identifier: str = splited_merchant_product_id_index[0]
-                identifier:str= product_identifier+"-"+colour
+                identifier: str = product_identifier + "-" + colour
                 mapping_identifier_sizes[identifier].append(
                     size_content)  # Mapping URL sizes
                 mapping_identifier_article[identifier] = article  # Mapping URL article
+
             else:
                 mapping_identifier_sizes[article[mapping_column_header["aw_image_url"]]].append(
                     size_content)  # Mapping URL sizes
@@ -233,6 +260,7 @@ def cleansing():
         headers = list_articles[0]
         list_articles = list_articles[1:]
         print("Cleansing - Renaming Categories: Begin")
+        # renaming article's category and fashion suitable for
         renamed_category_articles = list(tqdm.tqdm(p.imap(clnsr.article_cleansing, list_articles),
                                                    total=len(list_articles)))  # clnsr.cleansing_articles(list_articles)
         renamed_category_articles = [headers] + renamed_category_articles
@@ -248,8 +276,5 @@ def cleansing():
         cleansed_prices = p.map(clnsr.cleanPrice,
                                 cleansed_fashion_suitable_for)  # clnsr.cleanPrices(cleansed_fashion_suitable_for)
         print("Cleansing - Sexes and Prices: Done")
-        cleansed_articles = [headers] + cleansed_prices
-        write2File(cleansed_articles, file_paths["cleansed_sex_data_feed_path"])
-
-# print(cleanPrice(getLinesCSV(filtered_data_feed_path, "\t")[1]))
-# print(renameCategory(getLinesCSV(filtered_data_feed_path, "\t")[1]))
+    cleansed_articles = [headers] + cleansed_prices
+    write2File(cleansed_articles, file_paths["cleansed_sex_data_feed_path"])

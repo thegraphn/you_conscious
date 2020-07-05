@@ -1,6 +1,6 @@
 import csv
 import os
-
+from tokenizer import tokenize
 import tqdm
 from progressbar import *
 
@@ -10,10 +10,15 @@ root_folder = root_folder.replace(r"\data_processing\data_processing\utils", "")
 root_folder = root_folder.replace(r"data_processing/data_processing/utils", "")
 print(root_folder)
 
-filters_file_path = os.path.join(root_folder, "data_processing")
-filters_file_path = os.path.join(filters_file_path, "utils")
-filters_file_path = os.path.join(filters_file_path, "data_dependencies")
-filters_file_path = os.path.join(filters_file_path, "blacklist.csv")
+filters_black_file_path = os.path.join(root_folder, "data_processing")
+filters_black_file_path = os.path.join(filters_black_file_path, "utils")
+filters_black_file_path = os.path.join(filters_black_file_path, "data_dependencies")
+filters_black_file_path = os.path.join(filters_black_file_path, "blacklist.csv")
+
+filters_white_file_path = os.path.join(root_folder, "data_processing")
+filters_white_file_path = os.path.join(filters_white_file_path, "utils")
+filters_white_file_path = os.path.join(filters_white_file_path, "data_dependencies")
+filters_white_file_path = os.path.join(filters_white_file_path, "whitelist.csv")
 
 files_mapping_categories_path = os.path.join(root_folder, "data_processing")
 files_mapping_categories_path = os.path.join(files_mapping_categories_path, "utils")
@@ -21,10 +26,7 @@ files_mapping_categories_path = os.path.join(files_mapping_categories_path, "dat
 files_mapping_categories_path = os.path.join(files_mapping_categories_path, "categories_mapping.csv")
 
 
-file_url_shop_path = os.path.join(root_folder, "data_processing")
-file_url_shop_path = os.path.join(file_url_shop_path, "utils")
-file_url_shop_path = os.path.join(file_url_shop_path, "data_dependencies")
-file_url_shop_path = os.path.join(file_url_shop_path, "datafeed-locations.csv")
+
 
 
 mapping_fashionSuitableFor = os.path.join(root_folder, "data_processing")
@@ -152,7 +154,7 @@ def write2File(list_articles, output_file,delimiter:str="\t"):
                 csv_writer.writerow(element)
 
 
-def changeDelimiterCsv(csv_input: str, csv_output: str, delimiter_input: str, delimiter_output: str):
+def change_delimiter_csv(csv_input: str, csv_output: str, delimiter_input: str, delimiter_output: str):
     """
     Change the format of the csv file 
     """
@@ -167,6 +169,13 @@ def changeDelimiterCsv(csv_input: str, csv_output: str, delimiter_input: str, de
             csv_writer.writerow(element)
 
 
+def get_tokens(text:str)->list:
+    list_tokens =[]
+    for token in tokenize(text):
+        _,tkn,_= token
+        if tkn is not None:
+            list_tokens.append(tkn)
+    return list_tokens
 number_processes = os.cpu_count()
 
 mapping_cleaning_fashionSuitableFor = createMappingBetween2Columns(cleaning_categories_fashionSuitableFor_path, 2, 6,

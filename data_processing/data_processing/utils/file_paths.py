@@ -16,7 +16,8 @@ filtered_data_feed_path = os.path.join(filtered_data_feed_path, "filtered")
 filtered_data_feed_path = os.path.join(filtered_data_feed_path, "filtered_datafeed.csv")
 
 filtered_only_matching_categories_datafeed = os.path.join(root_folder, "data_processing")
-filtered_only_matching_categories_datafeed = os.path.join(filtered_only_matching_categories_datafeed, "data_working_directory")
+filtered_only_matching_categories_datafeed = os.path.join(filtered_only_matching_categories_datafeed,
+                                                          "data_working_directory")
 filtered_only_matching_categories_datafeed = os.path.join(filtered_only_matching_categories_datafeed, "filtered")
 filtered_only_matching_categories_datafeed = os.path.join(filtered_only_matching_categories_datafeed,
                                                           "filtered_only_matching_categories_datafeed.csv")
@@ -32,10 +33,22 @@ cleansed_sex_data_feed_path = os.path.join(cleansed_sex_data_feed_path, "data_wo
 cleansed_sex_data_feed_path = os.path.join(cleansed_sex_data_feed_path, "cleansed")
 cleansed_sex_data_feed_path = os.path.join(cleansed_sex_data_feed_path, "cleansedSexes_datafeed.csv")
 
+file_datafeed_location = os.path.join(root_folder, "data_processing")
+file_datafeed_location = os.path.join(file_datafeed_location, "utils")
+file_datafeed_location = os.path.join(file_datafeed_location, "data_dependencies")
+file_datafeed_location = os.path.join(file_datafeed_location, "datafeed-locations.csv")
+
+category_name_cleansing = os.path.join(root_folder, "data_processing")
+category_name_cleansing = os.path.join(category_name_cleansing, "utils")
+category_name_cleansing = os.path.join(category_name_cleansing, "data_dependencies")
+category_name_cleansing = os.path.join(category_name_cleansing, "category_name_cleaning.csv")
+
 file_paths = {"labeled_data_feed_path": labeled_data_feed_path,
               "filtered_data_feed_path": filtered_data_feed_path,
               "featured_affiliateIds_datafeed_path": features_affiliateId_data_feed_path,
               "cleansed_sex_data_feed_path": cleansed_sex_data_feed_path,
-              "filtered_only_matching_categories_datafeed": filtered_only_matching_categories_datafeed
+              "filtered_only_matching_categories_datafeed": filtered_only_matching_categories_datafeed,
+              "file_datafeed_location": file_datafeed_location,
+              "category_name_cleansing": category_name_cleansing
 
               }

@@ -98,8 +98,10 @@ class Downloader:
         The number of processes is set to 2 because of the internet connection.
         :param list_tuples_shops_urls: List of tuples (shop name, link)
         """
-        with Pool(processes=2)as p:
-            list(tqdm.tqdm(p.imap(self.download_datafeed, list_tuples_shops_urls), total=len(list_tuples_shops_urls)))
+        for element in list_tuples_shops_urls:
+            self.download_datafeed(element)
+        #with Pool() as p:
+         #   list(tqdm.tqdm(p.imap(self.download_datafeed, list_tuples_shops_urls), total=len(list_tuples_shops_urls)))
 
     @staticmethod
     def download_datafeed(tuple_shop_url: tuple):
@@ -111,28 +113,31 @@ class Downloader:
         link: str = tuple_shop_url[1]
         shop_name = shop_name.replace(" ", "_")
         format_file: str = ""
-        if "LOVECO" == shop_name:
-            format_file = ".csv"
-            path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
-                                          datetime.datetime.now().strftime("%y-%m-%d") + format_file)
-            urllib.request.urlretrieve(link, path_file)
+        try:
+            if "LOVECO" == shop_name:
+                format_file = ".csv"
+                path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
+                                              datetime.datetime.now().strftime("%y-%m-%d") + format_file)
+                urllib.request.urlretrieve(link, path_file)
 
-        if "SORBAS" == shop_name:
-            format_file = ".csv"
-            path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
-                                          datetime.datetime.now().strftime("%y-%m-%d") + format_file)
-            urllib.request.urlretrieve(link, path_file)
-        if "Uli_Schott" in shop_name:
-            format_file = ".csv"
-            path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
-                                          datetime.datetime.now().strftime("%y-%m-%d") + format_file)
-            urllib.request.urlretrieve(link, path_file)
+            if "SORBAS" == shop_name:
+                format_file = ".csv"
+                path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
+                                              datetime.datetime.now().strftime("%y-%m-%d") + format_file)
+                urllib.request.urlretrieve(link, path_file)
+            if "Uli_Schott" in shop_name:
+                format_file = ".csv"
+                path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
+                                              datetime.datetime.now().strftime("%y-%m-%d") + format_file)
+                urllib.request.urlretrieve(link, path_file)
 
-        else:
-            format_file = ".gz"
-            path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
-                                          datetime.datetime.now().strftime("%y-%m-%d") + format_file)
-            urllib.request.urlretrieve(link, path_file)
+            else:
+                format_file = ".gz"
+                path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
+                                              datetime.datetime.now().strftime("%y-%m-%d") + format_file)
+                urllib.request.urlretrieve(link, path_file)
+        except:
+            print(" did not worked",link )
 
     def unzip_files(self, list_files: list):
         """
@@ -150,11 +155,12 @@ class Downloader:
         :param file: file to unzip
         """
         if ".csv" in file:
-            pass
+            return 1
         if "LOVECO" in file:
-            pass
-
-        if "gz" in file and not "LOVECO" in file:
+            return 1
+        if "SORBAS" in file:
+            return 1
+        if "gz" in file:
             length_to_delete: int = -3
             os.system("gunzip -kc " + str(file) + " > " + str(file[:length_to_delete]) + ".csv")
 

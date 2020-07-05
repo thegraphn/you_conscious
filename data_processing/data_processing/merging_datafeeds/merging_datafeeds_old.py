@@ -1,4 +1,5 @@
 import csv
+csv.field_size_limit(100000000)
 import glob
 import os
 import datetime

@@ -11,7 +11,8 @@ class SizeFinder:
                             "(Grosse.?)\s{0,3}\d\d?",
                             "(Grösse.?)\s{0,3}\d\d?",
                             "(Größe.?)\s{0,3}\d\d?",
-                            "\w?\d?\d?\/\w?\d\d"
+                            "\w?\d?\d?\/\w?\d\d",
+                            "größe \w{0,4}, "
 
                             ]
         return list_regex
