@@ -1,0 +1,15 @@
+artifact_uri: file:///home/graphn/repositories/you_conscious/dl_xp/predict/mlruns/0/91b9c90ecfa64179bfb2b903bd807637/artifacts
+end_time: 1593698116558
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+name: ''
+run_id: 91b9c90ecfa64179bfb2b903bd807637
+run_uuid: 91b9c90ecfa64179bfb2b903bd807637
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1593698109682
+status: 3
+tags: []
+user_id: graphn
