@@ -100,8 +100,8 @@ class Downloader:
         """
         for element in list_tuples_shops_urls:
             self.download_datafeed(element)
-        #with Pool() as p:
-         #   list(tqdm.tqdm(p.imap(self.download_datafeed, list_tuples_shops_urls), total=len(list_tuples_shops_urls)))
+        # with Pool() as p:
+        #   list(tqdm.tqdm(p.imap(self.download_datafeed, list_tuples_shops_urls), total=len(list_tuples_shops_urls)))
 
     @staticmethod
     def download_datafeed(tuple_shop_url: tuple):
@@ -137,7 +137,7 @@ class Downloader:
                                               datetime.datetime.now().strftime("%y-%m-%d") + format_file)
                 urllib.request.urlretrieve(link, path_file)
         except:
-            print(" did not worked",link )
+            print(" did not worked", shop_name, link)
 
     def unzip_files(self, list_files: list):
         """

@@ -16,7 +16,7 @@ with open(
 save_dir = "/home/graphn/repositories/you_conscious/dl_xp/trained_model/relevancy"
 
 model = Inferencer.load(save_dir,
-batch_size=2
+batch_size=2,
                         gpu=True,
                         )
 result = model.inference_from_dicts(dicts=texts)
@@ -24,6 +24,7 @@ result = model.inference_from_dicts(dicts=texts)
 y_counter = 0
 n_counter = 0
 for prediction in result:
+    print(prediction)
     p = prediction["predictions"]
     for pp in p:
         p = pp["label"]

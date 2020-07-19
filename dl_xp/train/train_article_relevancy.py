@@ -21,15 +21,15 @@ def doc_classifcation():
         level=logging.INFO)
 
     ml_logger = MLFlowLogger(tracking_uri="https://public-mlflow.deepset.ai/")
-    ml_logger.init_experiment(experiment_name="article_filtering", run_name="first_trial")
+    ml_logger.init_experiment(experiment_name="article_filtering", run_name="1")
 
     ##########################
     ########## Settings
     ##########################
     set_all_seeds(seed=42)
     n_epochs = 2
-    batch_size = 48
-    evaluate_every = 1057
+    batch_size = 36
+    evaluate_every = 100
     lang_model = "bert-base-german-cased"
     do_lower_case = False
     # or a local path:
@@ -50,7 +50,8 @@ def doc_classifcation():
 
     processor = TextClassificationProcessor(tokenizer=tokenizer,
                                             max_seq_len=128,
-                                            data_dir=Path("/home/graphn/repositories/you_conscious/dl_xp/data/relevancy"),
+                                            data_dir=Path(
+                                                "/home/graphn/repositories/you_conscious/dl_xp/data/relevancy"),
                                             label_list=label_list,
                                             metric=metric,
                                             label_column_name="coarse_label"

@@ -15,14 +15,14 @@ from data_processing.data_processing.utils.utils import filters_black_file_path,
 
 class Filter:
 
-    def __init__(self):
+    def __init__(self, relevancy_filter: bool):
         self.vegan_black_filters = getFilters(filters_black_file_path)
         self.vegan_black_filters.sort()
         self.vegan_white_filters = getFilters(filters_white_file_path)
         self.vegan_white_filters.sort()
-        self.save_dir = "/home/graphn/repositories/you_conscious/dl_xp/trained_model/relevancy"
-
-        self.model = Inferencer.load(self.save_dir, gpu=True, )
+        if relevancy_filter:
+            self.save_dir = "/home/graphn/repositories/you_conscious/dl_xp/trained_model/relevancy"
+            self.model = Inferencer.load(self.save_dir, gpu=True)
         try:
 
             self.label_index_feature_datafeed = getHeadersIndex("Labels",
@@ -52,7 +52,6 @@ class Filter:
         article_words = sorted(set(article_words))
         article_words = list(article_words)
         vegan = bool
-
         """
         # White Filters
         for filter_veg in self.vegan_white_filters:
@@ -92,21 +91,24 @@ class Filter:
         if not vegan:
             return tmp_article
 
-    def get_list_vegan_articles(self, list_articles):
+    def get_list_vegan_articles(self, list_articles) -> list:
         """
         Iteration over all article in the list and create list of vegan article filtered with the filters
         :param list_articles: list of all articles
-        :param vegan_filters: filtered vegan articles
         """
-        # with Pool(processes=8) as p:
-        #   result_vegan = list(tqdm.tqdm(p.imap(self.is_article_vegan, list_articles), total=len(list_articles)))
 
+        with Pool(processes=16) as p:
+            result_vegan = list(tqdm.tqdm(p.imap(self.is_article_vegan, list_articles), total=len(list_articles)))
+        """
+
+        list_articles = list_articles[0:5000]
         texts = []
         result_vegan = []
         for article in list_articles:
-            texts.append({"text": " ".join(article)})
-        texts = texts[0:100]
-        n = 10
+            print(article[11] + article[12] + article[13] + article[31])
+            texts.append({"text": article[11] + article[12] + article[13] + article[31]})
+        # texts = texts[0:100]
+        n = 5000
         texts_chunks = [texts[i * n:(i + 1) * n] for i in range((len(texts) + n - 1) // n)]
         results = []
         for text_chunk in texts_chunks:
@@ -115,12 +117,13 @@ class Filter:
         for result in results:
             for i, prediction in enumerate(result):
                 p = prediction["predictions"]
+                print(p)
                 for pp in p:
 
                     predicted_label = pp["label"]
                     if predicted_label == "RELEVANT":
                         result_vegan.append(list_articles[i])
-
+        """
         return result_vegan
 
     def remove_article_with_no_label(self, article: list) -> list:
@@ -140,7 +143,7 @@ class Filter:
 
         return list_articles_with_label
 
-    def delete_non_matching_category(self, article):
+    def delete_non_matching_category(self, article: list) -> list:
         """
         Does not return an article if Damen or Herren is not in the category_name
         :param article: Article to be processed
@@ -169,7 +172,7 @@ class Filter:
 
 
 def filter_data_feed():
-    fltr = Filter()
+    fltr = Filter(relevancy_filter=False)
     print("Filtering script has begun ")
     print("List filters has been created.")
     list_articles = get_lines_csv(merged_data_feed_path, ",")
@@ -186,7 +189,7 @@ def filter_data_feed():
 
 
 def getArticlesWithLabel():
-    fltr = Filter()
+    fltr = Filter(relevancy_filter=False)
     list_articles = get_lines_csv(file_paths["featured_affiliateIds_datafeed_path"], "\t")
     headers = list_articles[0]
     list_articles = list_articles[1:]
@@ -199,7 +202,7 @@ def getArticlesWithLabel():
 
 
 def delete_non_matching_categories():
-    flt = Filter()
+    flt = Filter(relevancy_filter=False)
     print("Delete non matching categories : Begin")
     list_articles = get_lines_csv(file_paths["cleansed_sex_data_feed_path"], "\t")
     headers = list_articles[0]

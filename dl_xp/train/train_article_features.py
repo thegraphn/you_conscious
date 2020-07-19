@@ -8,57 +8,64 @@ from farm.modeling.optimization import initialize_optimizer
 from farm.infer import Inferencer
 from farm.modeling.adaptive_model import AdaptiveModel
 from farm.modeling.language_model import LanguageModel
-from farm.modeling.prediction_head import TextClassificationHead, MultiLabelTextClassificationHead
+from farm.modeling.prediction_head import MultiLabelTextClassificationHead
 from farm.modeling.tokenization import Tokenizer
 from farm.train import Trainer
 from farm.utils import set_all_seeds, MLFlowLogger, initialize_device_settings
 
-
-def doc_classifcation():
+def doc_classification_multilabel():
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
         datefmt="%m/%d/%Y %H:%M:%S",
         level=logging.INFO)
 
     ml_logger = MLFlowLogger(tracking_uri="https://public-mlflow.deepset.ai/")
-    ml_logger.init_experiment(experiment_name="article_filtering", run_name="first_trial")
+    ml_logger.init_experiment(experiment_name="Public_FARM", run_name="Run_doc_classification")
 
     ##########################
     ########## Settings
     ##########################
     set_all_seeds(seed=42)
-    n_epochs = 2
-    batch_size = 48
-    evaluate_every = 1057
+    device, n_gpu = initialize_device_settings(use_cuda=True)
+    n_epochs = 1
+    batch_size = 32
+
+    evaluate_every = 500
     lang_model = "bert-base-german-cased"
     do_lower_case = False
-    # or a local path:
-    # lang_model = Path("../saved_models/farm-bert-base-cased")
-    use_amp = None
-
-    device, n_gpu = initialize_device_settings(use_cuda=True, use_amp=use_amp)
 
     # 1.Create a tokenizer
-    tokenizer = Tokenizer.load(pretrained_model_name_or_path=lang_model, do_lower_case=do_lower_case)
+    tokenizer = Tokenizer.load(
+        pretrained_model_name_or_path=lang_model,
+        do_lower_case=do_lower_case)
 
     # 2. Create a DataProcessor that handles all the conversion from raw text into a pytorch Dataset
-    # Here we load GermEval 2018 Data automaticaly if it is not available.
-    # GermEval 2018 only has train.tsv and test.tsv dataset - no dev.tsv
+    # Here we load Toxic Comments Data automaticaly if it is not available.
 
-    label_list = ['', 'Aus fairer Produktion', 'Bambus', 'Satin', 'Polyurethan', 'VERIFIED BY YOU|CONSCIOUS', 'Synthetik', 'Kork', 'Leinen', 'ASOS Curve', 'Nylon', 'Bio-Denim', 'Eukalyptus', 'Baumwolle', 'Bluesign', 'Zero Waste', 'Recycled', 'Acryl', 'PETA-Approved Vegan', 'Aus nachhaltiger Produktion', 'Kunstleder', 'Ulla Popken', 'Recycelbar', 'Tencel', 'Angel of Style', 'Fair Wear Foundation', 'Cupro', 'Janet & Joyce', 'Textil', 'Oeko-Tex Standard', 'Polyester', 'Bio-Baumwolle', 'SAMOON', 'Polyacryl', 'Vegan', 'Pflanzenfärbung', 'Global Organic Textile Standard', 'OEKO-TEX 100', 'Lyocell', 'sheego', 'Polyamid', 'Help Refugees', 'Viskose', 'Fair-Trade', 'PVC', 'ASOS DESIGN Plus']
+    label_list = ['', 'Satin', 'Lyocell', 'Fair Wear Foundation', 'Textil', 'Recycelbar', 'sheego', 'Leinen',
+                  'Janet & Joyce', 'Polyamid', 'Polyacryl', 'Fair-Trade', 'Bluesign', 'Baumwolle', 'Viskose',
+                  'Pflanzenfärbung', 'Oeko-Tex Standard', 'Kork', 'Acryl', 'Polyester', 'Recycled', 'Nylon', 'Bambus',
+                  'Tencel', 'PETA-Approved Vegan', 'SAMOON', 'Synthetik', 'Global Organic Textile Standard',
+                  'Ulla Popken', 'Aus nachhaltiger Produktion', 'OEKO-TEX 100', 'ASOS Curve', 'Eukalyptus',
+                  'Zero Waste', 'Help Refugees', 'Bio-Baumwolle', 'Aus fairer Produktion', 'VERIFIED BY YOU|CONSCIOUS',
+                  'Cupro', 'Kunstleder', 'PVC', 'Angel of Style', 'Vegan', 'Bio-Denim', 'Polyurethan']
 
-    metric = "f1_macro"
+    metric = "f1"
 
     processor = TextClassificationProcessor(tokenizer=tokenizer,
                                             max_seq_len=128,
                                             data_dir=Path("/home/graphn/repositories/you_conscious/dl_xp/data/features"),
                                             label_list=label_list,
                                             metric=metric,
+                                            quote_char='"',
                                             multilabel=True,
+                                            train_filename="train.tsv",
+                                            dev_filename="dev.tsv",
+                                            test_filename="test.tsv",
+                                            dev_split=0,
                                             )
 
-    # 3. Create a DataSilo that loads several datasets (train/dev/test), provides DataLoaders for them and calculates a
-    #    few descriptive statistics of our datasets
+    # 3. Create a DataSilo that loads several datasets (train/dev/test), provides DataLoaders for them and calculates a few descriptive statistics of our datasets
     data_silo = DataSilo(
         processor=processor,
         batch_size=batch_size)
@@ -67,9 +74,7 @@ def doc_classifcation():
     # a) which consists of a pretrained language model as a basis
     language_model = LanguageModel.load(lang_model)
     # b) and a prediction head on top that is suited for our task => Text classification
-    prediction_head = MultiLabelTextClassificationHead(
-        # class_weights=data_silo.calculate_class_weights(task_name="text_classification"),
-        num_labels=len(label_list))
+    prediction_head = MultiLabelTextClassificationHead(num_labels=len(label_list))
 
     model = AdaptiveModel(
         language_model=language_model,
@@ -84,11 +89,9 @@ def doc_classifcation():
         learning_rate=3e-5,
         device=device,
         n_batches=len(data_silo.loaders["train"]),
-        n_epochs=n_epochs,
-        use_amp=use_amp)
+        n_epochs=n_epochs)
 
-    # 6. Feed everything to the Trainer, which keeps care of growing our model into powerful plant and evaluates it
-    # from time to time
+    # 6. Feed everything to the Trainer, which keeps care of growing our model into powerful plant and evaluates it from time to time
     trainer = Trainer(
         model=model,
         optimizer=optimizer,
@@ -103,12 +106,21 @@ def doc_classifcation():
     trainer.train()
 
     # 8. Hooray! You have a model. Store it:
-    save_dir = Path("/home/graphn/repositories/you_conscious/dl_xp/trained_model/relevancy")
+    save_dir = Path("../saved_models/bert-german-multi-doc-tutorial")
     model.save(save_dir)
     processor.save(save_dir)
 
+    # 9. Load it & harvest your fruits (Inference)
+    basic_texts = [
+        {"text": "You fucking bastards"},
+        {"text": "What a lovely world"},
+    ]
+    model = Inferencer.load(save_dir)
+    result = model.inference_from_dicts(dicts=basic_texts)
+    print(result)
+
 
 if __name__ == "__main__":
-    doc_classifcation()
+    doc_classification_multilabel()
 
 # fmt: on

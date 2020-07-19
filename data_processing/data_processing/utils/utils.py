@@ -119,6 +119,7 @@ def get_lines_csv(file, delimiter) -> list:
     lines = []
     with open(file, "r", encoding="utf-8") as f:
         csv_reader = csv.reader(f, delimiter=delimiter)
+        csv.field_size_limit(1000000)
         for j, row in enumerate(csv_reader):
             lines.append(row)
     return lines
