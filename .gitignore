@@ -6,3 +6,12 @@
 /dl_xp/data/
 /data_processing/data_working_directory/
 /data_processing/data_analysis/
+/data_processing/data_working_directory/
+/data_processing/data_working_directory/cleansed/
+/data_processing/data_working_directory/download/
+/data_processing/data_working_directory/featured/
+/data_processing/data_working_directory/filtered/
+/data_processing/data_working_directory/merged/
+data_processing/utils/ref.csv
+/dl_xp/data/
+/dl_xp/trained_model/
