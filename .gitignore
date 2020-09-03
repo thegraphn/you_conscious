@@ -15,3 +15,4 @@
 data_processing/utils/ref.csv
 /dl_xp/data/
 /dl_xp/trained_model/
+*__pycache__*
