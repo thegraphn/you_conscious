@@ -1,7 +1,7 @@
 # fmt: off
 import logging
 from pathlib import Path
-
+import farm
 from farm.data_handler.data_silo import DataSilo
 from farm.data_handler.processor import TextClassificationProcessor
 from farm.modeling.optimization import initialize_optimizer
@@ -12,6 +12,7 @@ from farm.modeling.prediction_head import MultiLabelTextClassificationHead
 from farm.modeling.tokenization import Tokenizer
 from farm.train import Trainer
 from farm.utils import set_all_seeds, MLFlowLogger, initialize_device_settings
+
 
 def doc_classification_multilabel():
     logging.basicConfig(
@@ -54,13 +55,14 @@ def doc_classification_multilabel():
 
     processor = TextClassificationProcessor(tokenizer=tokenizer,
                                             max_seq_len=128,
-                                            data_dir=Path("/home/graphn/repositories/you_conscious/dl_xp/data/features"),
+                                            data_dir=Path(
+                                                "/mnt/c/Users/aurel/Documents/GitHub/you_conscious/dl_xp/data"),
                                             label_list=label_list,
                                             metric=metric,
                                             quote_char='"',
                                             multilabel=True,
                                             train_filename="train.tsv",
-                                            dev_filename="dev.tsv",
+                                            dev_filename="val.tsv",
                                             test_filename="test.tsv",
                                             dev_split=0,
                                             )
@@ -106,7 +108,7 @@ def doc_classification_multilabel():
     trainer.train()
 
     # 8. Hooray! You have a model. Store it:
-    save_dir = Path("../saved_models/bert-german-multi-doc-tutorial")
+    save_dir = Path("../trained_models/feature")
     model.save(save_dir)
     processor.save(save_dir)
 
