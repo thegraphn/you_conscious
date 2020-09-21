@@ -181,8 +181,6 @@ def merging():
     for file in list_files:
         for name in getColumNames(file):
             set_col.add(name)
-    set_col = list(set_col)
-    # newColumnNames = getNewColumnNames(merging_features_path) + set_col
     newColumnNames = column_ord
     print("Merging - Changing column names: Done")
     print("Merging - Merging : Begin")

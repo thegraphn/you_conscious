@@ -1,7 +1,11 @@
 column_ord: list = [
 
     'plus_sizes',
-    'Labels',
+    'label_0_vegan',
+    'label_1_peta_approved_vegan',
+    'label_2',
+    'label_3',
+    'label_4'
     'specials',
     'verified',
     'Material',

@@ -23,17 +23,14 @@ import datetime
 def main_app():
     begin = datetime.datetime.now()
     print("Begin data processing", begin)
-    processes: dict = {"downloading": True,
-                       "merging": True,
+    processes: dict = {"downloading": False,
+                       "merging": False,
                        "filtering": True,
                        "adding_features": True,
                        "filtering_without_label": True,
                        "cleansing": True,
                        "filtering_only_matching_category": True}
 
-    # todo mainlich weblich in category
-    # todo bag affair is in avocado,merged and not in filtered_datafeed.csv
-    # 66226
     for process, todo in processes.items():
         print(process, todo)
         if process == "downloading":

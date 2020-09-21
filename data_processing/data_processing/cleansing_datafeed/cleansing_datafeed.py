@@ -2,6 +2,7 @@ from collections import defaultdict
 from multiprocessing import Pool
 
 import tqdm
+from farm.infer import Inferencer
 
 from data_processing.data_processing.cleansing_datafeed.size_finder import SizeFinder
 from data_processing.data_processing.cleansing_datafeed.size_sorter import SizeSorter
@@ -29,6 +30,9 @@ class Cleanser:
         self.title_index = getHeadersIndex("Title", file=self.input_data_feed)
         self.merchant_product_id_index = getHeadersIndex("merchant_product_id", file=self.input_data_feed)
         self.colour_index = getHeadersIndex("colour", file=self.input_data_feed)
+
+        self.path_category_model = ""
+        self.path_column_features = "dl_xp/data/category/column_features.csv"
 
     # todo refactor !
     def article_cleansing(self, article: list) -> list:
@@ -117,14 +121,14 @@ class Cleanser:
             from_category_name_condition = condition[1]
             to = condition[2]
             if frm in content_category_tokens and from_category_name_condition in content_category_tokens:
-                content_category_content:str = " ".join(content_category_tokens)
-                content_category_content = content_category_content.replace(frm,"")
+                content_category_content: str = " ".join(content_category_tokens)
+                content_category_content = content_category_content.replace(frm, "")
                 content_category_content = content_category_content.replace("&", "")
                 article[self.categoryName_index] = content_category_content.replace(frm, to)
                 break
         return article
 
-    def renamingFashionSuitableFor(self, article)->list:
+    def renamingFashionSuitableFor(self, article) -> list:
         content_categoryName = article[self.categoryName_index]
         content_fashionSuitableFor = article[self.fashionSuitableFor_index]
         sex = content_categoryName.split(" > ")
@@ -247,6 +251,34 @@ class Cleanser:
             list_articles_merged.append(article)
 
         return [headers] + list_articles_merged
+
+    def predict_categories(self, list_articles: list) -> list:
+        """
+        With a farm model we predict the categories of the articles based on relevant columns
+        :param list_categories:
+        :return: list_categories with a predicted category_name
+        """
+        list_column_features = get_lines_csv(self.path_column_features, delimiter=";")
+        list_column_features = [column[0] for column in list_column_features]
+        headers = get_lines_csv(self.input_data_feed, "\t")
+        headers = list_articles[0]
+        data = []
+        interesting_data = []
+        list_index_interesting_data = []
+        for i, header in enumerate(headers):
+            if header in list_column_features:
+                list_index_interesting_data.append(i)
+        for article in list_articles:
+            article_data = []
+            for position in list_index_interesting_data:
+                article_data.append(article[position])
+            article_data = " <SEP> ".join(article_data)
+
+            interesting_data.append({"text": article_data})
+    # model = Inferencer.load(self.path_category_model)
+    # result = model.inference_from_dicts(dicts=interesting_data)
+    # for r in result:
+    #   print(r)
 
 
 def cleansing():
