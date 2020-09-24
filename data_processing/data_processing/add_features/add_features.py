@@ -23,17 +23,18 @@ class FeaturesAdder:
         :param article: Article
         :return: Article
         """
-        for cell in article:
-            for string2Find_feature2Write_columnFeature in self.features_list:
-                string2_find = string2Find_feature2Write_columnFeature[0]
-                feature2_write = string2Find_feature2Write_columnFeature[1]
-                column_feature = string2Find_feature2Write_columnFeature[2]
-                if string2_find in cell:
-                    article[self.mapping_columnHeader[column_feature]] = feature2_write
-                    #return article
-                elif re.match(string2_find, cell) is not None:
-                    article[self.mapping_columnHeader[column_feature]] = feature2_write
-                    #return article
+        #for cell in article:
+        txt_article = " ".join(article)
+        for string2Find_feature2Write_columnFeature in self.features_list:
+            string2_find = string2Find_feature2Write_columnFeature[0]
+            feature2_write = string2Find_feature2Write_columnFeature[1]
+            column_feature = string2Find_feature2Write_columnFeature[2]
+            if string2_find in txt_article:
+                article[self.mapping_columnHeader[column_feature]] = feature2_write
+                #return article
+            elif re.match(string2_find, txt_article) is not None:
+                article[self.mapping_columnHeader[column_feature]] = feature2_write
+                #return article
 
         return article
 
@@ -68,7 +69,7 @@ class FeaturesAdder:
 def add_features():
     ft_adder: FeaturesAdder = FeaturesAdder()
 
-    with Pool(processes=16) as p:
+    with Pool(processes=10) as p:
         print("Begin adding features")
 
         list_articles: list = get_lines_csv(ft_adder.input_file, "\t")
@@ -83,7 +84,7 @@ def add_features():
         write2File(list_articles_with_features, features_data_feed_path)
         print("Adding Features - add features: Done")
 
-    with Pool(processes=16) as p:
+    with Pool(processes=10) as p:
         list_articles: list = get_lines_csv(features_data_feed_path, "\t")
         headers: list = list_articles[0]
         list_articles: list = list_articles[1:]

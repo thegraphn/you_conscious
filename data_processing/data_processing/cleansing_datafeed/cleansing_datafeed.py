@@ -30,9 +30,10 @@ class Cleanser:
         self.title_index = getHeadersIndex("Title", file=self.input_data_feed)
         self.merchant_product_id_index = getHeadersIndex("merchant_product_id", file=self.input_data_feed)
         self.colour_index = getHeadersIndex("colour", file=self.input_data_feed)
-
-        self.path_category_model = ""
-        self.path_column_features = "dl_xp/data/category/column_features.csv"
+        self.aw_deep_link_index = getHeadersIndex("aw_deep_link",file=self.input_data_feed)
+        self.item_id_index = getHeadersIndex("item_id",file=self.input_data_feed)
+        self.model_path = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/category"
+        self.path_column_features = "/home/graphn/repositories/you_conscious/dl_xp/data/category/column_features.csv"
 
     # todo refactor !
     def article_cleansing(self, article: list) -> list:
@@ -115,7 +116,6 @@ class Cleanser:
         return article
 
     def cleansing_category_names(self, article: list, content_category_tokens: list) -> list:
-
         for condition in self.category_name_cleansing_conditions:
             frm = condition[0]
             from_category_name_condition = condition[1]
@@ -128,7 +128,7 @@ class Cleanser:
                 break
         return article
 
-    def renamingFashionSuitableFor(self, article) -> list:
+    def renaming_fashion_suitable_for(self, article) -> list:
         content_categoryName = article[self.categoryName_index]
         content_fashionSuitableFor = article[self.fashionSuitableFor_index]
         sex = content_categoryName.split(" > ")
@@ -141,7 +141,7 @@ class Cleanser:
 
     def renamingFashionSuitableForColumns(self, list_articles):
         with Pool() as p:
-            result_fashionSuitableFor_renamed = list(tqdm.tqdm(p.imap(self.renamingFashionSuitableFor, list_articles)
+            result_fashionSuitableFor_renamed = list(tqdm.tqdm(p.imap(self.renaming_fashion_suitable_for, list_articles)
                                                                , total=(len(list_articles))))
         return result_fashionSuitableFor_renamed
 
@@ -194,7 +194,7 @@ class Cleanser:
             identifier: str = "aw_image_url"
         return identifier
 
-    def mergedProductBySize(self, input_list_articles):
+    def merged_product_by_size(self, input_list_articles):
         """
         Merge product by size, based on "unique" the aw_image_url.
         :param input_list_articles: List of all articles with "duplicates" by size
@@ -231,7 +231,7 @@ class Cleanser:
         for i in range(1, maxNumberFashionSizeColumns):  # Start at one because we already use Fashion:size0
             headers.append("Fashion:size" + str(i))
 
-        mapping_header_columnId = {header: columnId for columnId, header in enumerate(headers)}
+        mapping_header_column_id = {header: columnId for columnId, header in enumerate(headers)}
         # Put the size into the size column
         for url, sizes in mapping_identifier_sizes.items():
             list_size: list = []
@@ -247,17 +247,19 @@ class Cleanser:
             size_sorter: SizeSorter = SizeSorter(list_size)
             list_size: list = size_sorter.sorted_sizes
             for i, size in enumerate(list_size):
-                article[mapping_header_columnId["Fashion:size" + str(i)]] = size
+                article[mapping_header_column_id["Fashion:size" + str(i)]] = size
             list_articles_merged.append(article)
 
         return [headers] + list_articles_merged
 
-    def predict_categories(self, list_articles: list) -> list:
+    def predict_categories(self, list_articles: list, ) -> list:
         """
         With a farm model we predict the categories of the articles based on relevant columns
+        :param list_articles: 
         :param list_categories:
         :return: list_categories with a predicted category_name
         """
+
         list_column_features = get_lines_csv(self.path_column_features, delimiter=";")
         list_column_features = [column[0] for column in list_column_features]
         headers = get_lines_csv(self.input_data_feed, "\t")
@@ -275,10 +277,22 @@ class Cleanser:
             article_data = " <SEP> ".join(article_data)
 
             interesting_data.append({"text": article_data})
-    # model = Inferencer.load(self.path_category_model)
-    # result = model.inference_from_dicts(dicts=interesting_data)
-    # for r in result:
-    #   print(r)
+
+        interesting_data = interesting_data[1:]  # skip headers
+        model = Inferencer.load(self.model_path, batch_size=12, gpu=True)
+        result = model.inference_from_dicts(dicts=interesting_data)
+        for prediction, article in zip(result, list_articles):
+            label = prediction["predictions"][0]["label"]
+            article[self.categoryName_index] = label
+        return list_articles
+
+    def add_item_id(self, article: list):
+        """
+        Generate and add to the item_id column an item_id for every article
+        :param article:
+        :return: article
+        """
+        article[self.item_id_index] = self.aw_deep_link_index
 
 
 def cleansing():
@@ -287,11 +301,14 @@ def cleansing():
         print("Begin cleansing")
         list_articles = get_lines_csv(clnsr.input_data_feed, "\t")
         print("Cleansing - Merging by size: Begin")
-        list_articles = clnsr.mergedProductBySize(list_articles)
+        list_articles = clnsr.merged_product_by_size(list_articles)
         print("Cleansing - Merging by size: Done")
         headers = list_articles[0]
         list_articles = list_articles[1:]
         print("Cleansing - Renaming Categories: Begin")
+        list_articles = clnsr.predict_categories([headers] + list_articles)
+        headers = list_articles[0]
+        list_articles = list_articles[1:]
         # renaming article's category and fashion suitable for
         renamed_category_articles = list(tqdm.tqdm(p.imap(clnsr.article_cleansing, list_articles),
                                                    total=len(list_articles)))  # clnsr.cleansing_articles(list_articles)
@@ -302,11 +319,12 @@ def cleansing():
         renamed_category_articles = renamed_category_articles[1:]
         print("Cleansing - Sexes and Prices: Begin")
         cleansed_fashion_suitable_for = list(
-            tqdm.tqdm(p.imap(clnsr.renamingFashionSuitableFor, renamed_category_articles)
+            tqdm.tqdm(p.imap(clnsr.renaming_fashion_suitable_for, renamed_category_articles)
                       , total=(len(
                     renamed_category_articles))))  # clnsr.renamingFashionSuitableForColumns(renamed_category_articles)
         cleansed_prices = p.map(clnsr.cleanPrice,
                                 cleansed_fashion_suitable_for)  # clnsr.cleanPrices(cleansed_fashion_suitable_for)
+        cleansed_with_item_id = p.map(clnsr.add_item_id,cleansed_prices)
         print("Cleansing - Sexes and Prices: Done")
-    cleansed_articles = [headers] + cleansed_prices
+    cleansed_articles = [headers] + cleansed_with_item_id
     write2File(cleansed_articles, file_paths["cleansed_sex_data_feed_path"])

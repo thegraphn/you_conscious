@@ -22,7 +22,7 @@ print("Merging script: Started ", begin)
 enc = "utf-8"
 
 
-class FileMerger:
+class FilesAggregator:
     def __init__(self, input_directory: str):
         self.input_directory: str = input_directory
         self.mapping_column_names: dict = createMappingBetween2Columns(column_mapping_merging_path, 0, 1, ";")
@@ -169,18 +169,14 @@ def getNewColumnNames(file):
 
 
 def merging():
-    csv_merger = FileMerger(download_data_feeds_directory_path)
+    file_aggregator = FilesAggregator(download_data_feeds_directory_path)
     print("Begin merging")
-    # os.system("rm "+ merged_data_feed_path)
     list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csv"))
     print("Merging - Changing column names: Begin")
     set_col = set()
     for file in list_files:
         changeColumnName(file, column_mapping_merging_path)
     list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csvchange.csv"))
-    for file in list_files:
-        for name in getColumNames(file):
-            set_col.add(name)
     newColumnNames = column_ord
     print("Merging - Changing column names: Done")
     print("Merging - Merging : Begin")
@@ -192,7 +188,5 @@ def merging():
     changeProgrammId2MerchentName(merged_data_feed_path, shops_ids_names_path)
     print("Merging - Changing ID to Name: Done")
     os.system("rm " + merged_data_feed_path)
-
     os.rename(merged_data_feed_with_IdNames_path, merged_data_feed_path)
-    # os.system("mv " + merged_data_feed_with_IdNames_path + "  " + merged_data_feed_path)
     print("Merging: Done ", datetime.datetime.now())

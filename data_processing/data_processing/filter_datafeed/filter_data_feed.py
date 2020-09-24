@@ -10,7 +10,7 @@ from data_processing.data_processing.filter_datafeed.utils import getFilters
 from data_processing.data_processing.utils.file_paths import file_paths
 from data_processing.data_processing.utils.getHeaders import getHeadersIndex
 from data_processing.data_processing.utils.utils import filters_black_file_path, get_lines_csv, merged_data_feed_path, \
-    write2File, filters_white_file_path
+    write2File, filters_white_file_path, get_tokens
 
 
 class Filter:
@@ -52,16 +52,15 @@ class Filter:
         article_words = sorted(set(article_words))
         article_words = list(article_words)
         vegan = bool
-        """
+
         # White Filters
         for filter_veg in self.vegan_white_filters:
             filter_veg = filter_veg.split(" ")
             if len(set(filter_veg).intersection(article_words)) == len(filter_veg):
                 vegan = True
                 break
-        if vegan:
-            return tmp_article
-        """
+
+
         # Black Filters
         for filter_veg in self.vegan_black_filters:
             filter_veg = filter_veg.split(" ")
@@ -152,7 +151,7 @@ class Filter:
         category_name_index = getHeadersIndex("category_name", file_paths["cleansed_sex_data_feed_path"])
 
         category_name_content: str = article[category_name_index]
-        category_name_content_tokens: list = word_tokenize(category_name_content)
+        category_name_content_tokens: list = get_tokens(category_name_content)
         to_return: bool = False
 
         if "Herren" in category_name_content_tokens:
