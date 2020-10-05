@@ -187,7 +187,7 @@ def filter_data_feed():
     print("Filtering: Done")
 
 
-def getArticlesWithLabel():
+def get_articles_with_label():
     fltr = Filter(relevancy_filter=False)
     list_articles = get_lines_csv(file_paths["featured_affiliateIds_datafeed_path"], "\t")
     headers = list_articles[0]

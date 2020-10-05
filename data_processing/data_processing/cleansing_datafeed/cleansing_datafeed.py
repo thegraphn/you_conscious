@@ -30,8 +30,8 @@ class Cleanser:
         self.title_index = getHeadersIndex("Title", file=self.input_data_feed)
         self.merchant_product_id_index = getHeadersIndex("merchant_product_id", file=self.input_data_feed)
         self.colour_index = getHeadersIndex("colour", file=self.input_data_feed)
-        self.aw_deep_link_index = getHeadersIndex("aw_deep_link",file=self.input_data_feed)
-        self.item_id_index = getHeadersIndex("item_id",file=self.input_data_feed)
+        self.aw_deep_link_index = getHeadersIndex("aw_deep_link", file=self.input_data_feed)
+        self.item_id_index = getHeadersIndex("item_id", file=self.input_data_feed)
         self.model_path = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/category"
         self.path_column_features = "/home/graphn/repositories/you_conscious/dl_xp/data/category/column_features.csv"
 
@@ -129,27 +129,28 @@ class Cleanser:
         return article
 
     def renaming_fashion_suitable_for(self, article) -> list:
-        content_categoryName = article[self.categoryName_index]
-        content_fashionSuitableFor = article[self.fashionSuitableFor_index]
-        sex = content_categoryName.split(" > ")
+        content_category_name = article[self.categoryName_index]
+        content_fashion_suitable_for = article[self.fashionSuitableFor_index]
+        sex = content_category_name.split(" > ")
         if len(sex) == 0:
-            sex = content_categoryName.split(">")
+            sex = content_category_name.split(">")
             sex = sex[1]
-            if content_fashionSuitableFor == "" or " ":
+            if content_fashion_suitable_for == "" or " ":
                 article[self.fashionSuitableFor_index] = sex
         return article
 
-    def renamingFashionSuitableForColumns(self, list_articles):
+    def renaming_fashion_suitable_for_columns(self, list_articles):
         with Pool() as p:
-            result_fashionSuitableFor_renamed = list(tqdm.tqdm(p.imap(self.renaming_fashion_suitable_for, list_articles)
-                                                               , total=(len(list_articles))))
-        return result_fashionSuitableFor_renamed
+            result_fashion_suitable_for_renamed = list(tqdm.tqdm(p.imap(self.renaming_fashion_suitable_for,
+                                                                        list_articles),
+                                                                 total=(len(list_articles))))
+        return result_fashion_suitable_for_renamed
 
-    def cleanPrice(self, article: list) -> list:
+    def clean_price(self, article: list) -> list:
         """
 
         :param article:
-        :return:
+        :return: article
         """
 
         if article[self.rrp_price_index] == "0" or article[self.rrp_price_index] == "0,00" \
@@ -175,7 +176,7 @@ class Cleanser:
 
     def clean_prices(self, list_articles):
         p = Pool()
-        cleaned_prices_articles = p.map(self.cleanPrice, list_articles)
+        cleaned_prices_articles = p.map(self.clean_price, list_articles)
         return cleaned_prices_articles
 
     def get_article_identifier(self, article: list) -> str:
@@ -186,9 +187,9 @@ class Cleanser:
 
         if "Avocadostore" in article[self.merchantName_index]:
             merchant_product_id = article[self.merchant_product_id_index]
-            splited_merchant_product_id_index = merchant_product_id.split("-")
+            split_merchant_product_id_index = merchant_product_id.split("-")
             colour: str = article[self.colour_index]
-            product_identifier: str = splited_merchant_product_id_index[0]
+            product_identifier: str = split_merchant_product_id_index[0]
             identifier: str = product_identifier + "-" + colour
         else:
             identifier: str = "aw_image_url"
@@ -212,9 +213,9 @@ class Cleanser:
             size_content = clean_size(size_content)
             if "Avocadostore" in article[self.merchantName_index]:
                 merchant_product_id = article[self.merchant_product_id_index]
-                splited_merchant_product_id_index = merchant_product_id.split("-")
+                split_merchant_product_id_index = merchant_product_id.split("-")
                 colour: str = article[self.colour_index]
-                product_identifier: str = splited_merchant_product_id_index[0]
+                product_identifier: str = split_merchant_product_id_index[0]
                 identifier: str = product_identifier + "-" + colour
                 mapping_identifier_sizes[identifier].append(
                     size_content)  # Mapping URL sizes
@@ -243,7 +244,7 @@ class Cleanser:
             for i in range(maxNumberFashionSizeColumns):
                 article.append("")
             list_size = list_size[:maxNumberFashionSizeColumns]
-            list_size = list(set(list_size))  # remove dupiclates
+            list_size = list(set(list_size))  # remove duplicates
             size_sorter: SizeSorter = SizeSorter(list_size)
             list_size: list = size_sorter.sorted_sizes
             for i, size in enumerate(list_size):
@@ -256,20 +257,18 @@ class Cleanser:
         """
         With a farm model we predict the categories of the articles based on relevant columns
         :param list_articles: 
-        :param list_categories:
         :return: list_categories with a predicted category_name
         """
 
         list_column_features = get_lines_csv(self.path_column_features, delimiter=";")
         list_column_features = [column[0] for column in list_column_features]
-        headers = get_lines_csv(self.input_data_feed, "\t")
         headers = list_articles[0]
-        data = []
         interesting_data = []
         list_index_interesting_data = []
         for i, header in enumerate(headers):
             if header in list_column_features:
                 list_index_interesting_data.append(i)
+        list_articles = list_articles[1:]
         for article in list_articles:
             article_data = []
             for position in list_index_interesting_data:
@@ -284,7 +283,7 @@ class Cleanser:
         for prediction, article in zip(result, list_articles):
             label = prediction["predictions"][0]["label"]
             article[self.categoryName_index] = label
-        return list_articles
+        return [headers] + list_articles
 
     def add_item_id(self, article: list):
         """
@@ -298,6 +297,7 @@ class Cleanser:
 def cleansing():
     with Pool() as p:
         clnsr = Cleanser()
+
         print("Begin cleansing")
         list_articles = get_lines_csv(clnsr.input_data_feed, "\t")
         print("Cleansing - Merging by size: Begin")
@@ -305,7 +305,9 @@ def cleansing():
         print("Cleansing - Merging by size: Done")
         headers = list_articles[0]
         list_articles = list_articles[1:]
+
         print("Cleansing - Renaming Categories: Begin")
+
         list_articles = clnsr.predict_categories([headers] + list_articles)
         headers = list_articles[0]
         list_articles = list_articles[1:]
@@ -322,9 +324,8 @@ def cleansing():
             tqdm.tqdm(p.imap(clnsr.renaming_fashion_suitable_for, renamed_category_articles)
                       , total=(len(
                     renamed_category_articles))))  # clnsr.renamingFashionSuitableForColumns(renamed_category_articles)
-        cleansed_prices = p.map(clnsr.cleanPrice,
+        cleansed_prices = p.map(clnsr.clean_price,
                                 cleansed_fashion_suitable_for)  # clnsr.cleanPrices(cleansed_fashion_suitable_for)
-        cleansed_with_item_id = p.map(clnsr.add_item_id,cleansed_prices)
         print("Cleansing - Sexes and Prices: Done")
-    cleansed_articles = [headers] + cleansed_with_item_id
+    cleansed_articles = [headers] + cleansed_prices
     write2File(cleansed_articles, file_paths["cleansed_sex_data_feed_path"])

@@ -35,5 +35,7 @@ def getHeadersIndex(header, file=filtered_data_feed_path):
         return getMappingColumnIndex(file, "\t")["colour"]
     if header == "aw_deep_link":
         return getMappingColumnIndex(file, "\t")["aw_deep_link"]
+    if header == "item_id":
+        return getMappingColumnIndex(file, "\t")["item_id"]
     else:
-        print("HEADER NOT IMPLEMENTED")
+        print("HEADER NOT IMPLEMENTED",header)

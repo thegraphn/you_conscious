@@ -1,4 +1,5 @@
 import csv
+
 csv.field_size_limit(100000000)
 import glob
 import os
@@ -14,8 +15,9 @@ folder = os.path.dirname(os.path.realpath(__file__))
 folder = folder.replace("/data_processing/merging_datafeeds", "")
 folder = folder.replace(r"\data_processing\merging_datafeeds", "")
 sys.path.append(folder)
-from data_processing.data_processing.utils.utils import download_data_feeds_directory_path, column_mapping_merging_path, \
-    merged_data_feed_path, shops_ids_names_path, merged_data_feed_with_IdNames_path, createMappingBetween2Columns
+from data_processing.data_processing.utils.utils import download_data_feeds_directory_path, \
+    column_mapping_merging_path, merged_data_feed_path, shops_ids_names_path, merged_data_feed_with_IdNames_path, \
+    createMappingBetween2Columns
 
 begin = datetime.datetime.now()
 print("Merging script: Started ", begin)
@@ -95,7 +97,7 @@ def changeProgrammId2MerchentName(csv_file, shop_id_name_mapping_csv, ):
     print("name ", pos_merchant_name)
 
 
-def changeColumnName(csv_file, mapping_file):
+def change_column_name(csv_file, mapping_file):
     dict_mapping_column = {}
     print(csv_file)
 
@@ -120,11 +122,11 @@ def changeColumnName(csv_file, mapping_file):
                     csv_writer.writerow(row)
 
 
-def mergeCSV(list_files, fieldnames, output_data):
+def merge_csv(list_files, fieldnames, output_data):
     fieldnames = list(fieldnames)
-    with open(output_data, 'w', encoding=enc) as output_csvfile:
-        writer = csv.DictWriter(output_csvfile, fieldnames=fieldnames, delimiter=",", quotechar='"')
-        csv_writer = csv.writer(output_csvfile, delimiter=",", quotechar='"')
+    with open(output_data, 'w', encoding=enc) as output_csv_file:
+        writer = csv.DictWriter(output_csv_file, fieldnames=fieldnames, delimiter=",", quotechar='"')
+        csv_writer = csv.writer(output_csv_file, delimiter=",", quotechar='"')
         csv_writer.writerow(fieldnames)
         for filename in list_files:
             with open(filename, "r", newline="") as f_in:
@@ -133,55 +135,17 @@ def mergeCSV(list_files, fieldnames, output_data):
                     writer.writerow(line)
 
 
-def getColumNames(file):
-    '''
-    :param file: csv file where the column has to be read
-    :return: list of column name
-    '''
-    c = 1
-    list_column_names = []
-    with open(file, encoding=enc) as f:
-        csvreader = csv.reader(f, delimiter=",")
-        for row in csvreader:
-            if c == 1:
-                list_column_names = row
-            c += 1
-            if c > 1:
-                break
-    return list_column_names
-
-
-def getNewColumnNames(file):
-    '''
-    :param file: csv file where the new column for the feature are
-    :return: list of the new column
-    '''
-    set_column_names = set()
-    with open(file, encoding=enc) as f:
-        csv_reader = csv.reader(f, delimiter=";")
-        c = 0
-        for row in csv_reader:
-            if c > 0:
-                set_column_names.add(row[2])
-            c += 1
-    set_column_names = list(set_column_names)
-    return set_column_names
-
-
 def merging():
     file_aggregator = FilesAggregator(download_data_feeds_directory_path)
     print("Begin merging")
     list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csv"))
     print("Merging - Changing column names: Begin")
-    set_col = set()
     for file in list_files:
-        changeColumnName(file, column_mapping_merging_path)
-    list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csvchange.csv"))
-    newColumnNames = column_ord
+        change_column_name(file, column_mapping_merging_path)
     print("Merging - Changing column names: Done")
     print("Merging - Merging : Begin")
     list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csvchange.csv"))
-    mergeCSV(list_files, newColumnNames, merged_data_feed_path)
+    merge_csv(list_files, column_ord, merged_data_feed_path)
     os.system("rm " + os.path.join(download_data_feeds_directory_path, "*.csvchange.csv"))
     print("Merging - Merging : Done")
     print("Merging - Changing ID to Name: Begin")
