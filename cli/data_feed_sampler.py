@@ -1,7 +1,7 @@
 import csv
 from random import shuffle
 
-from data_processing.data_processing.utils.utils import get_lines_csv, write2File
+from data_processing.data_processing.utils.utils import get_lines_csv, write_2_file
 
 input_data_path: str = input("Input file: Data feed to sample")
 input_data = get_lines_csv(file=input_data_path,delimiter="\t")
@@ -27,4 +27,4 @@ for id,article in id_2_articles.items():
 
 
 output_data = [headers] + output_articles
-write2File(list_articles=output_data, output_file=output_data_path, delimiter="\t")
+write_2_file(list_articles=output_data, output_file=output_data_path, delimiter="\t")

@@ -11,7 +11,7 @@ from data_processing.data_processing.utils.file_paths import file_paths
 from data_processing.data_processing.utils.getHeaders import getHeadersIndex
 from data_processing.data_processing.utils.utils import createMappingBetween2Columns, files_mapping_categories_path, \
     mapping_fashionSuitableFor, synonym_female, synonym_male, synonym_euro, getMappingColumnIndex, \
-    maxNumberFashionSizeColumns, get_lines_csv, write2File, cleansed_categories_data_feed_path, get_tokens
+    maxNumberFashionSizeColumns, get_lines_csv, write_2_file, cleansed_categories_data_feed_path, get_tokens
 
 
 class Cleanser:
@@ -308,14 +308,14 @@ def cleansing():
 
         print("Cleansing - Renaming Categories: Begin")
 
-        list_articles = clnsr.predict_categories([headers] + list_articles)
-        headers = list_articles[0]
-        list_articles = list_articles[1:]
+        renamed_category_articles = clnsr.predict_categories([headers] + list_articles)
+        renamed_category_articles = renamed_category_articles[1:]
         # renaming article's category and fashion suitable for
-        renamed_category_articles = list(tqdm.tqdm(p.imap(clnsr.article_cleansing, list_articles),
-                                                   total=len(list_articles)))  # clnsr.cleansing_articles(list_articles)
+        renamed_category_articles = list(tqdm.tqdm(p.imap(clnsr.article_cleansing, renamed_category_articles),
+                                                   total=len(list_articles)))
+
         renamed_category_articles = [headers] + renamed_category_articles
-        write2File(renamed_category_articles, cleansed_categories_data_feed_path)
+        write_2_file(renamed_category_articles, cleansed_categories_data_feed_path)
         print("Cleansing - Renaming Categories: Done")
         headers = renamed_category_articles[0]
         renamed_category_articles = renamed_category_articles[1:]
@@ -323,9 +323,9 @@ def cleansing():
         cleansed_fashion_suitable_for = list(
             tqdm.tqdm(p.imap(clnsr.renaming_fashion_suitable_for, renamed_category_articles)
                       , total=(len(
-                    renamed_category_articles))))  # clnsr.renamingFashionSuitableForColumns(renamed_category_articles)
+                    renamed_category_articles))))
         cleansed_prices = p.map(clnsr.clean_price,
-                                cleansed_fashion_suitable_for)  # clnsr.cleanPrices(cleansed_fashion_suitable_for)
+                                cleansed_fashion_suitable_for)
         print("Cleansing - Sexes and Prices: Done")
     cleansed_articles = [headers] + cleansed_prices
-    write2File(cleansed_articles, file_paths["cleansed_sex_data_feed_path"])
+    write_2_file(cleansed_articles, file_paths["cleansed_sex_data_feed_path"])

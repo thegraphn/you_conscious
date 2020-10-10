@@ -10,7 +10,7 @@ from data_processing.data_processing.filter_datafeed.utils import getFilters
 from data_processing.data_processing.utils.file_paths import file_paths
 from data_processing.data_processing.utils.getHeaders import getHeadersIndex
 from data_processing.data_processing.utils.utils import filters_black_file_path, get_lines_csv, merged_data_feed_path, \
-    write2File, filters_white_file_path, get_tokens
+    write_2_file, filters_white_file_path, get_tokens
 
 
 class Filter:
@@ -51,22 +51,22 @@ class Filter:
 
         article_words = sorted(set(article_words))
         article_words = list(article_words)
+
+        # todo bag affaire has in common a black filter
         vegan = bool
-
-        # White Filters
-        for filter_veg in self.vegan_white_filters:
-            filter_veg = filter_veg.split(" ")
-            if len(set(filter_veg).intersection(article_words)) == len(filter_veg):
-                vegan = True
-                break
-
-
         # Black Filters
         for filter_veg in self.vegan_black_filters:
             filter_veg = filter_veg.split(" ")
             if len(set(filter_veg).intersection(article_words)) == len(filter_veg):
                 vegan = False
                 break
+        # White Filters
+        for filter_veg in self.vegan_white_filters:
+            filter_veg_list = filter_veg.split(" ")
+            if len(set(filter_veg_list).intersection(article_words)) == len(filter_veg_list):
+                vegan = True
+                break
+
         if vegan:
             return tmp_article
 
@@ -98,31 +98,7 @@ class Filter:
 
         with Pool(processes=16) as p:
             result_vegan = list(tqdm.tqdm(p.imap(self.is_article_vegan, list_articles), total=len(list_articles)))
-        """
 
-        list_articles = list_articles[0:5000]
-        texts = []
-        result_vegan = []
-        for article in list_articles:
-            print(article[11] + article[12] + article[13] + article[31])
-            texts.append({"text": article[11] + article[12] + article[13] + article[31]})
-        # texts = texts[0:100]
-        n = 5000
-        texts_chunks = [texts[i * n:(i + 1) * n] for i in range((len(texts) + n - 1) // n)]
-        results = []
-        for text_chunk in texts_chunks:
-            result = self.model.inference_from_dicts(dicts=text_chunk)
-            results.append(result)
-        for result in results:
-            for i, prediction in enumerate(result):
-                p = prediction["predictions"]
-                print(p)
-                for pp in p:
-
-                    predicted_label = pp["label"]
-                    if predicted_label == "RELEVANT":
-                        result_vegan.append(list_articles[i])
-        """
         return result_vegan
 
     def remove_article_with_no_label(self, article: list) -> list:
@@ -160,9 +136,11 @@ class Filter:
             to_return = True
         if to_return:
             return article
+        else:
+            print(article)
 
     def delete_non_matching_categories(self, list_articles: list) -> list:
-        with Pool(processes=8) as p:
+        with Pool(processes=16) as p:
             deleted_non_matching_categories: list = list(
                 tqdm.tqdm(p.imap(self.delete_non_matching_category, list_articles),
                           total=len(list_articles)))
@@ -183,7 +161,7 @@ def filter_data_feed():
 
     print("Filtering - filtering: Done")
     list_articles_vegan = [headers] + list_articles_vegan
-    write2File(list_articles_vegan, file_paths["filtered_data_feed_path"])
+    write_2_file(list_articles_vegan, file_paths["filtered_data_feed_path"])
     print("Filtering: Done")
 
 
@@ -196,7 +174,7 @@ def get_articles_with_label():
     list_articles_with_label = fltr.remove_articles_with_no_label(list_articles)
     print("Filtering - remove articles without label: End")
     list_articles_with_label = [headers] + list_articles_with_label
-    write2File(list_articles_with_label, file_paths["labeled_data_feed_path"])
+    write_2_file(list_articles_with_label, file_paths["labeled_data_feed_path"])
     print("Removed all articles without label")
 
 
@@ -204,10 +182,15 @@ def delete_non_matching_categories():
     flt = Filter(relevancy_filter=False)
     print("Delete non matching categories : Begin")
     list_articles = get_lines_csv(file_paths["cleansed_sex_data_feed_path"], "\t")
+    print(len(list_articles))
+
     headers = list_articles[0]
     list_articles = list_articles[1:]
     deleted_non_matching_categories_articles = flt.delete_non_matching_categories(
         list_articles)
-    list_articles = [headers] + deleted_non_matching_categories_articles
-    write2File(list_articles, file_paths["filtered_only_matching_categories_datafeed"])
+    deleted_non_matching_categories_articles = [headers] + deleted_non_matching_categories_articles
+    write_2_file(deleted_non_matching_categories_articles, file_paths["filtered_only_matching_categories_datafeed"], "\t")
+    print(len(deleted_non_matching_categories_articles))
+    list_articles = get_lines_csv(file_paths["filtered_only_matching_categories_datafeed"], "\t")
+    print(len(list_articles))
     print("Delete non matching categories : Done")
