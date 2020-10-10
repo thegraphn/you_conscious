@@ -6,7 +6,7 @@ from data_processing.data_processing.utils.file_paths import file_paths
 from data_processing.data_processing.utils.getHeaders import getHeadersIndex
 from data_processing.data_processing.utils.utils import get_lines_csv, getMappingColumnIndex, features_mapping_path, \
     affiliateId, \
-    features_data_feed_path, write2File
+    features_data_feed_path, write_2_file
 
 
 class FeaturesAdder:
@@ -23,7 +23,7 @@ class FeaturesAdder:
         :param article: Article
         :return: Article
         """
-        #for cell in article:
+        # for cell in article:
         txt_article = " ".join(article)
         for string2Find_feature2Write_columnFeature in self.features_list:
             string2_find = string2Find_feature2Write_columnFeature[0]
@@ -31,22 +31,10 @@ class FeaturesAdder:
             column_feature = string2Find_feature2Write_columnFeature[2]
             if string2_find in txt_article:
                 article[self.mapping_columnHeader[column_feature]] = feature2_write
-                #return article
             elif re.match(string2_find, txt_article) is not None:
                 article[self.mapping_columnHeader[column_feature]] = feature2_write
-                #return article
 
         return article
-
-
-
-    """
-    def add_features_articles(self, list_articles) -> list:
-        with Pool(processes=12) as p:
-            result_featured_articles: list = list(tqdm.tqdm(p.imap(self.add_features_article, list_articles),
-                                                            total=len(list_articles)))
-        return result_featured_articles
-    """
 
     def add_affiliate_id_article(self, article) -> list:
         content_aw_deep_link_index: str = article[self.awDeepLink_index]
@@ -79,9 +67,9 @@ def add_features():
         print("Adding Features - add features: Begin")
         list_articles_with_features: list = list(tqdm.tqdm(p.imap(ft_adder.add_features_article, list_articles),
                                                            total=len(
-                                                               list_articles)))  # ft_adder.addFeaturesArticles(list_articles)
+                                                               list_articles)))
         list_articles_with_features: list = [headers] + list_articles_with_features
-        write2File(list_articles_with_features, features_data_feed_path)
+        write_2_file(list_articles_with_features, features_data_feed_path)
         print("Adding Features - add features: Done")
 
     with Pool(processes=10) as p:
@@ -96,4 +84,4 @@ def add_features():
                           list_articles)))
         print("Adding Features - add affiliate ids: Done")
         list_articles_with_affiliate_ids: list = [headers] + list_articles_with_affiliate_ids
-        write2File(list_articles_with_affiliate_ids, file_paths["featured_affiliateIds_datafeed_path"])
+        write_2_file(list_articles_with_affiliate_ids, file_paths["featured_affiliateIds_datafeed_path"])
