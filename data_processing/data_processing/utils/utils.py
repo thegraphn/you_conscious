@@ -25,10 +25,6 @@ files_mapping_categories_path = os.path.join(files_mapping_categories_path, "uti
 files_mapping_categories_path = os.path.join(files_mapping_categories_path, "data_dependencies")
 files_mapping_categories_path = os.path.join(files_mapping_categories_path, "categories_mapping.csv")
 
-
-
-
-
 mapping_fashionSuitableFor = os.path.join(root_folder, "data_processing")
 mapping_fashionSuitableFor = os.path.join(mapping_fashionSuitableFor, "utils")
 mapping_fashionSuitableFor = os.path.join(mapping_fashionSuitableFor, "data_dependencies")
@@ -142,9 +138,10 @@ def createMappingBetween2Columns(file, column1_id, column2_id, delimiter):
     return mapping
 
 
-def write2File(list_articles, output_file,delimiter:str="\t"):
+def write_2_file(list_articles, output_file, delimiter: str = "\t"):
     """
     write a list to a csv file
+    :param delimiter:
     :param output_file:
     :param list_articles:
     """
@@ -170,13 +167,15 @@ def change_delimiter_csv(csv_input: str, csv_output: str, delimiter_input: str, 
             csv_writer.writerow(element)
 
 
-def get_tokens(text:str)->list:
-    list_tokens =[]
+def get_tokens(text: str) -> list:
+    list_tokens = []
     for token in tokenize(text):
-        _,tkn,_= token
+        _, tkn, _ = token
         if tkn is not None:
             list_tokens.append(tkn)
     return list_tokens
+
+
 number_processes = os.cpu_count()
 
 mapping_cleaning_fashionSuitableFor = createMappingBetween2Columns(cleaning_categories_fashionSuitableFor_path, 2, 6,

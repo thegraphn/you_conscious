@@ -22,9 +22,9 @@ filtered_only_matching_categories_datafeed = os.path.join(filtered_only_matching
 filtered_only_matching_categories_datafeed = os.path.join(filtered_only_matching_categories_datafeed, "filtered")
 filtered_only_matching_categories_datafeed = os.path.join(filtered_only_matching_categories_datafeed,
                                                           datetime.now().strftime("%Y-%m-%d_") +
-                                                          "filtered_only_matching_categories_datafeed_" +
+                                                          "filtered_only_matching_categories_datafeed" +
 
-                                                          "csv")
+                                                          ".csv")
 
 features_affiliateId_data_feed_path = os.path.join(root_folder, "data_processing")
 features_affiliateId_data_feed_path = os.path.join(features_affiliateId_data_feed_path, "data_working_directory")
