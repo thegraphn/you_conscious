@@ -79,3 +79,18 @@ def clean_category_sex(article: list) -> str:
             else:
                 cat = article[categoryName_index]
     return cat
+
+def change_chain_characters_to_umlaut(string:str)->str:
+    text = ''
+    for zeichen in string:
+        if zeichen == u'ä':
+            text += '&auml;'
+        elif zeichen == u'ö':
+            text += '&ouml;'
+        elif zeichen == u'ü':
+            text += '&uuml;'
+        elif zeichen == u'ß':
+            text += '&szlig;'
+        else:
+            text += zeichen
+    return text
