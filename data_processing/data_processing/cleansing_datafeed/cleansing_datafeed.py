@@ -53,7 +53,7 @@ class Cleanser:
         article[self.categoryName_index] = clean_category_sex(article)
 
         # Change the content within Topman category to man
-        if "Topman" in article[self.merchantName_index]:
+        if "Topman" in article[self.merchantName_index] or "Uli Schott":
             article[self.categoryName_index]: str = article[self.categoryName_index].replace("Damen", "Herren")
 
         # The content in title is stronger than in fashion_suitable:for and fsf in stronger than category_name
@@ -259,7 +259,7 @@ class Cleanser:
         :param list_articles: 
         :return: list_categories with a predicted category_name
         """
-
+        list_articles_with_new_categories = []
         list_column_features = get_lines_csv(self.path_column_features, delimiter=";")
         list_column_features = [column[0] for column in list_column_features]
         headers = list_articles[0]
@@ -273,17 +273,22 @@ class Cleanser:
             article_data = []
             for position in list_index_interesting_data:
                 article_data.append(article[position])
-            article_data = " <SEP> ".join(article_data)
+            article_data = " [SEP] ".join(article_data)
 
             interesting_data.append({"text": article_data})
 
         interesting_data = interesting_data[1:]  # skip headers
-        model = Inferencer.load(self.model_path, batch_size=12, gpu=True)
-        result = model.inference_from_dicts(dicts=interesting_data)
-        for prediction, article in zip(result, list_articles):
-            label = prediction["predictions"][0]["label"]
-            article[self.categoryName_index] = label
-        return [headers] + list_articles
+        model = Inferencer.load(self.model_path, batch_size=24, gpu=True)
+        results = model.inference_from_dicts(dicts=interesting_data)
+        print(len(results), len(list_articles))
+        prediction_position = 0
+        for i, predictions in enumerate(results):
+            for prediction in predictions["predictions"]:
+                prediction_position += 1
+                label = prediction["label"]
+                list_articles[prediction_position][self.categoryName_index] = label
+                list_articles_with_new_categories.append(list_articles[prediction_position])
+        return list_articles_with_new_categories  # Does not return headers
 
     def add_item_id(self, article: list):
         """
@@ -305,15 +310,20 @@ def cleansing():
         print("Cleansing - Merging by size: Done")
         headers = list_articles[0]
         list_articles = list_articles[1:]
-
         print("Cleansing - Renaming Categories: Begin")
-
-        renamed_category_articles = clnsr.predict_categories([headers] + list_articles)
-        renamed_category_articles = renamed_category_articles[1:]
-        # renaming article's category and fashion suitable for
+        renamed_category_articles = list_articles
         renamed_category_articles = list(tqdm.tqdm(p.imap(clnsr.article_cleansing, renamed_category_articles),
                                                    total=len(list_articles)))
 
+        renamed_category_articles = clnsr.predict_categories([headers] + renamed_category_articles)
+
+        renamed_category_articles = renamed_category_articles  # [1:]
+        renamed_category_articles = renamed_category_articles
+        # renaming article's category and fashion suitable for
+
+        renamed_category_articles = list(tqdm.tqdm(p.imap(clnsr.article_cleansing, renamed_category_articles),
+                                                   total=len(list_articles)))
+        renamed_category_articles = clnsr.predict_categories([headers] + renamed_category_articles)
         renamed_category_articles = [headers] + renamed_category_articles
         write_2_file(renamed_category_articles, cleansed_categories_data_feed_path)
         print("Cleansing - Renaming Categories: Done")
@@ -322,8 +332,7 @@ def cleansing():
         print("Cleansing - Sexes and Prices: Begin")
         cleansed_fashion_suitable_for = list(
             tqdm.tqdm(p.imap(clnsr.renaming_fashion_suitable_for, renamed_category_articles)
-                      , total=(len(
-                    renamed_category_articles))))
+                      , total=(len(renamed_category_articles))))
         cleansed_prices = p.map(clnsr.clean_price,
                                 cleansed_fashion_suitable_for)
         print("Cleansing - Sexes and Prices: Done")
