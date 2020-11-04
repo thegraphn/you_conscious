@@ -8,9 +8,9 @@ import tqdm
 
 from data_processing.data_processing.filter_datafeed.utils import getFilters
 from data_processing.data_processing.utils.file_paths import file_paths
-from data_processing.data_processing.utils.getHeaders import getHeadersIndex
+from data_processing.data_processing.utils.getHeaders import get_headers_index
 from data_processing.data_processing.utils.utils import filters_black_file_path, get_lines_csv, merged_data_feed_path, \
-    write_2_file, filters_white_file_path, get_tokens
+    write_2_file, filters_white_file_path, get_tokens, get_mapping_column_index
 
 
 class Filter:
@@ -20,24 +20,24 @@ class Filter:
         self.vegan_black_filters.sort()
         self.vegan_white_filters = getFilters(filters_white_file_path)
         self.vegan_white_filters.sort()
+
+        self.merchant_name_index = get_mapping_column_index(merged_data_feed_path, "\t")["merchant_name"]
+
         if relevancy_filter:
             self.save_dir = "/home/graphn/repositories/you_conscious/dl_xp/trained_model/relevancy"
             self.model = Inferencer.load(self.save_dir, gpu=True)
         try:
 
-            self.label_index_feature_datafeed = getHeadersIndex("Labels",
-                                                                file_paths["featured_affiliateIds_datafeed_path"])
-            self.description_index = getHeadersIndex("description", merged_data_feed_path)
+            self.label_index_feature_datafeed = get_headers_index("Labels",
+                                                                  file_paths["merged_datafeed"])
+            self.description_index = get_headers_index("description", merged_data_feed_path, "\t")
 
-            self.merchant_name_index = getHeadersIndex("merchant_name", merged_data_feed_path)
-
-        except:
+        except ValueError:
             pass
 
     def is_article_vegan(self, article: list) -> Union[None, list]:
         """
         :param article: Article's line in a list format
-        :param vegan_filters: List of filter to be apply in oder to know if the article is vegan or not
         :return: The article's line if it is vegan
         """
         tmp_article = article
@@ -73,10 +73,9 @@ class Filter:
     def is_article_not_vegan(self, article: list) -> Union[None, list]:
         """
         :param article: Article's line in a list format
-        :param vegan_filters: List of filter to be apply in oder to know if the article is vegan or not
         :return: The article's line if it is vegan
         """
-        vegan: bool = bool()
+        # vegan: bool = bool()
         tmp_article = article
         article = " ".join(article)
         article_words = sorted(set(word_tokenize(article.replace(",", " "))))
@@ -95,7 +94,6 @@ class Filter:
         Iteration over all article in the list and create list of vegan article filtered with the filters
         :param list_articles: list of all articles
         """
-
         with Pool(processes=16) as p:
             result_vegan = list(tqdm.tqdm(p.imap(self.is_article_vegan, list_articles), total=len(list_articles)))
 
@@ -106,25 +104,26 @@ class Filter:
         :param article: Article in a list format
         :return: Return the article if it has a label
         """
-        material_index_feature_datafeed = getHeadersIndex("Material",
-                                                          file_paths["featured_affiliateIds_datafeed_path"])
+        material_index_feature_datafeed = get_headers_index("Material",
+                                                            file_paths["featured_affiliateIds_datafeed_path"])
         if article[self.label_index_feature_datafeed] or article[material_index_feature_datafeed] != "":
             return article
 
     def remove_articles_with_no_label(self, list_articles: list) -> list:
         with Pool(processes=8) as p:
             list_articles_with_label = list(tqdm.tqdm(p.imap(self.remove_article_with_no_label, list_articles),
-                                                      total=len(list_articles)))
+                                                      total=len(list_articles), desc="Deleting article without label"))
 
         return list_articles_with_label
 
-    def delete_non_matching_category(self, article: list) -> list:
+    @staticmethod
+    def delete_non_matching_category(article: list) -> list:
         """
         Does not return an article if Damen or Herren is not in the category_name
         :param article: Article to be processed
         :return: Article if Herren or Damen is in the category_name
         """
-        category_name_index = getHeadersIndex("category_name", file_paths["cleansed_sex_data_feed_path"])
+        category_name_index = get_headers_index("category_name", file_paths["cleansed_sex_data_feed_path"])
 
         category_name_content: str = article[category_name_index]
         category_name_content_tokens: list = get_tokens(category_name_content)
@@ -143,7 +142,7 @@ class Filter:
         with Pool(processes=16) as p:
             deleted_non_matching_categories: list = list(
                 tqdm.tqdm(p.imap(self.delete_non_matching_category, list_articles),
-                          total=len(list_articles)))
+                          total=len(list_articles), desc="Deleting non matching categories"))
 
         return deleted_non_matching_categories
 
@@ -152,7 +151,7 @@ def filter_data_feed():
     fltr = Filter(relevancy_filter=False)
     print("Filtering script has begun ")
     print("List filters has been created.")
-    list_articles = get_lines_csv(merged_data_feed_path, ",")
+    list_articles = get_lines_csv(merged_data_feed_path, "\t")
     headers = list_articles[0]
     list_articles = list_articles[1:]
     print("List of articles has been created")
@@ -189,7 +188,8 @@ def delete_non_matching_categories():
     deleted_non_matching_categories_articles = flt.delete_non_matching_categories(
         list_articles)
     deleted_non_matching_categories_articles = [headers] + deleted_non_matching_categories_articles
-    write_2_file(deleted_non_matching_categories_articles, file_paths["filtered_only_matching_categories_datafeed"], "\t")
+    write_2_file(deleted_non_matching_categories_articles, file_paths["filtered_only_matching_categories_datafeed"],
+                 "\t")
     print(len(deleted_non_matching_categories_articles))
     list_articles = get_lines_csv(file_paths["filtered_only_matching_categories_datafeed"], "\t")
     print(len(list_articles))
