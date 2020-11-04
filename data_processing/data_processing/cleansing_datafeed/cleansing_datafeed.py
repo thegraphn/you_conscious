@@ -8,10 +8,11 @@ from data_processing.data_processing.cleansing_datafeed.size_finder import SizeF
 from data_processing.data_processing.cleansing_datafeed.size_sorter import SizeSorter
 from data_processing.data_processing.cleansing_datafeed.utils import clean_category_sex, clean_size
 from data_processing.data_processing.utils.file_paths import file_paths
-from data_processing.data_processing.utils.getHeaders import getHeadersIndex
-from data_processing.data_processing.utils.utils import createMappingBetween2Columns, files_mapping_categories_path, \
-    mapping_fashionSuitableFor, synonym_female, synonym_male, synonym_euro, getMappingColumnIndex, \
-    maxNumberFashionSizeColumns, get_lines_csv, write_2_file, cleansed_categories_data_feed_path, get_tokens
+from data_processing.data_processing.utils.getHeaders import get_headers_index
+from data_processing.data_processing.utils.utils import create_mapping_between_2_columns, \
+    files_mapping_categories_path, \
+    mapping_fashionSuitableFor, synonym_female, synonym_male, synonym_euro, get_mapping_column_index, \
+    maxNumberFashionSizeColumns, get_lines_csv, write_2_file, get_tokens
 
 
 class Cleanser:
@@ -19,21 +20,26 @@ class Cleanser:
         self.input_data_feed: str = file_paths["labeled_data_feed_path"]
         self.category_name_cleansing: str = file_paths["category_name_cleansing"]
         self.category_name_cleansing_conditions: list = get_lines_csv(self.category_name_cleansing, ",")[1:]
-        self.feature_mapping = createMappingBetween2Columns(files_mapping_categories_path, 1, 2, ",")
-        self.fashionSuitableFor_mapping = createMappingBetween2Columns(mapping_fashionSuitableFor, 2, 6, ";")
-        self.categoryName_index = getHeadersIndex("category_name")
-        self.fashionSuitableFor_index = getHeadersIndex("Fashion:suitable_for")
-        self.rrp_price_index = getHeadersIndex("rrp_price", file=self.input_data_feed)
-        self.delivery_cost_index = getHeadersIndex("delivery_cost", file=self.input_data_feed)
-        self.search_price_index = getHeadersIndex("search_price", file=self.input_data_feed)
-        self.merchantName_index = getHeadersIndex("merchant_name", file=self.input_data_feed)
-        self.title_index = getHeadersIndex("Title", file=self.input_data_feed)
-        self.merchant_product_id_index = getHeadersIndex("merchant_product_id", file=self.input_data_feed)
-        self.colour_index = getHeadersIndex("colour", file=self.input_data_feed)
-        self.aw_deep_link_index = getHeadersIndex("aw_deep_link", file=self.input_data_feed)
-        self.item_id_index = getHeadersIndex("item_id", file=self.input_data_feed)
-        self.model_path = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/category"
-        self.path_column_features = "/home/graphn/repositories/you_conscious/dl_xp/data/category/column_features.csv"
+        self.feature_mapping = create_mapping_between_2_columns(files_mapping_categories_path, 1, 2, ",")
+        self.fashionSuitableFor_mapping = create_mapping_between_2_columns(mapping_fashionSuitableFor, 2, 6, ";")
+        self.categoryName_index = get_headers_index("category_name")
+        self.fashionSuitableFor_index = get_headers_index("Fashion:suitable_for")
+        self.rrp_price_index = get_headers_index("rrp_price", file=self.input_data_feed)
+        self.delivery_cost_index = get_headers_index("delivery_cost", file=self.input_data_feed)
+        self.search_price_index = get_headers_index("search_price", file=self.input_data_feed)
+        self.merchantName_index = get_headers_index("merchant_name", file=self.input_data_feed)
+        self.title_index = get_headers_index("Title", file=self.input_data_feed)
+        self.merchant_product_id_index = get_headers_index("merchant_product_id", file=self.input_data_feed)
+        self.colour_index = get_headers_index("colour", file=self.input_data_feed)
+        self.aw_deep_link_index = get_headers_index("aw_deep_link", file=self.input_data_feed)
+        self.item_id_index = get_headers_index("item_id", file=self.input_data_feed)
+        self.model_path_categories = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/category"
+        self.model_path_colors = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/color"
+        self.column_features = ["brand",
+                                "merchant_name",
+                                "Fashion:suitable_for",
+                                "Title",
+                                "description"]
 
     # todo refactor !
     def article_cleansing(self, article: list) -> list:
@@ -206,7 +212,7 @@ class Cleanser:
         list_articles_merged = []
         mapping_identifier_sizes = defaultdict(list)
         mapping_identifier_article = {}
-        mapping_column_header = getMappingColumnIndex(self.input_data_feed, "\t")
+        mapping_column_header = get_mapping_column_index(self.input_data_feed, "\t")
 
         for article in list_art:
             size_content = article[mapping_column_header["Fashion:size"]]
@@ -259,16 +265,16 @@ class Cleanser:
         :param list_articles: 
         :return: list_categories with a predicted category_name
         """
+        category_normalized_index = get_headers_index("category_normalized")
         list_articles_with_new_categories = []
-        list_column_features = get_lines_csv(self.path_column_features, delimiter=";")
-        list_column_features = [column[0] for column in list_column_features]
+        list_column_features = self.column_features
         headers = list_articles[0]
         interesting_data = []
         list_index_interesting_data = []
         for i, header in enumerate(headers):
             if header in list_column_features:
                 list_index_interesting_data.append(i)
-        list_articles = list_articles[1:]
+        list_articles = list_articles[1:]  # skip headers
         for article in list_articles:
             article_data = []
             for position in list_index_interesting_data:
@@ -278,17 +284,56 @@ class Cleanser:
             interesting_data.append({"text": article_data})
 
         interesting_data = interesting_data[1:]  # skip headers
-        model = Inferencer.load(self.model_path, batch_size=24, gpu=True)
+        model = Inferencer.load(self.model_path_categories, batch_size=24, gpu=True, task_type="text_classification")
         results = model.inference_from_dicts(dicts=interesting_data)
-        print(len(results), len(list_articles))
         prediction_position = 0
         for i, predictions in enumerate(results):
             for prediction in predictions["predictions"]:
                 prediction_position += 1
                 label = prediction["label"]
-                list_articles[prediction_position][self.categoryName_index] = label
+                list_articles[prediction_position][category_normalized_index] = label
                 list_articles_with_new_categories.append(list_articles[prediction_position])
         return list_articles_with_new_categories  # Does not return headers
+
+    def predict_colors(self, list_articles: list) -> list:
+        color_index = get_headers_index("colour")
+        colors_normalized_zero_index = get_headers_index("color_normalized_0")
+        colors_normalized_one_index = get_headers_index("color_normalized_1")
+        colors_normalized_two_index = get_headers_index("color_normalized_2")
+
+        data_to_predict = []
+        list_articles_with_new_colors = []
+        for article in list_articles:
+            if len(article[color_index]) == 0:
+                color_text = "NO_COLOR"
+            else:
+                color_text = article[color_index]
+            data_to_predict.append({"text": color_text})
+
+        data_to_predict = data_to_predict[1:]  # skip headers
+        model = Inferencer.load(self.model_path_colors, batch_size=256, gpu=True, task_type="text_classification")
+        results = model.inference_from_dicts(dicts=data_to_predict)
+        prediction_position = 0
+        for i, predictions in enumerate(results):
+            for prediction in predictions["predictions"]:
+                prediction_position += 1
+                label = prediction["label"]
+                label = label.replace('"', "")
+                label = label.replace("[", "")
+                label = label.replace("]", "")
+                label = label.replace("'", "")
+                label = label.replace(" ", "")
+                labels = label.split(",")
+                labels = labels[0:3]  # take the first 3 colors
+
+                list_articles[prediction_position][colors_normalized_zero_index] = labels[0]
+                if len(labels) == 2:
+                    list_articles[prediction_position][colors_normalized_one_index] = labels[1]
+                if len(labels) == 3:
+                    list_articles[prediction_position][colors_normalized_two_index] = labels[2]
+
+                list_articles_with_new_colors.append(list_articles[prediction_position])
+        return list_articles_with_new_colors
 
     def add_item_id(self, article: list):
         """
@@ -311,30 +356,36 @@ def cleansing():
         headers = list_articles[0]
         list_articles = list_articles[1:]
         print("Cleansing - Renaming Categories: Begin")
-        renamed_category_articles = list_articles
-        renamed_category_articles = list(tqdm.tqdm(p.imap(clnsr.article_cleansing, renamed_category_articles),
-                                                   total=len(list_articles)))
+        list_articles = list_articles
+        list_articles = list(tqdm.tqdm(p.imap(clnsr.article_cleansing, list_articles),
+                                       total=len(list_articles)))
 
-        renamed_category_articles = clnsr.predict_categories([headers] + renamed_category_articles)
-
-        renamed_category_articles = renamed_category_articles  # [1:]
-        renamed_category_articles = renamed_category_articles
+        list_articles = list_articles
         # renaming article's category and fashion suitable for
 
-        renamed_category_articles = list(tqdm.tqdm(p.imap(clnsr.article_cleansing, renamed_category_articles),
-                                                   total=len(list_articles)))
-        renamed_category_articles = clnsr.predict_categories([headers] + renamed_category_articles)
-        renamed_category_articles = [headers] + renamed_category_articles
-        write_2_file(renamed_category_articles, cleansed_categories_data_feed_path)
+        list_articles = list(tqdm.tqdm(p.imap(clnsr.article_cleansing, list_articles),
+                                       total=len(list_articles)))
         print("Cleansing - Renaming Categories: Done")
-        headers = renamed_category_articles[0]
-        renamed_category_articles = renamed_category_articles[1:]
+
+        print("Cleansing - Renaming Categories DL: Begin")
+        list_articles = clnsr.predict_categories([headers] + list_articles)
+
+        print("Cleansing - Renaming Categories DL: Done")
+
+        print("Cleansing - Renaming Colors DL: Begin")
+        list_articles = clnsr.predict_colors(list_articles)
+
+        print("Cleansing - Renaming Colors DL: Done")
+        # write_2_file(list_articles, list_articles)
+
         print("Cleansing - Sexes and Prices: Begin")
         cleansed_fashion_suitable_for = list(
-            tqdm.tqdm(p.imap(clnsr.renaming_fashion_suitable_for, renamed_category_articles)
-                      , total=(len(renamed_category_articles))))
-        cleansed_prices = p.map(clnsr.clean_price,
-                                cleansed_fashion_suitable_for)
+            tqdm.tqdm(p.imap(clnsr.renaming_fashion_suitable_for, list_articles),
+                      total=(len(list_articles)), desc="Cleansing Fashion Suitable for"))
+
+        cleansed_prices = list(tqdm.tqdm(p.map(clnsr.clean_price,
+                                               cleansed_fashion_suitable_for), total=len(cleansed_fashion_suitable_for),
+                                         desc="Cleansing Prices"))
         print("Cleansing - Sexes and Prices: Done")
     cleansed_articles = [headers] + cleansed_prices
     write_2_file(cleansed_articles, file_paths["cleansed_sex_data_feed_path"])
