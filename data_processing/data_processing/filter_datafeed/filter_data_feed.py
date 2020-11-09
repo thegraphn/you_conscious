@@ -1,12 +1,13 @@
 import tokenizer
 from multiprocessing import Pool
 from typing import Union
-
+import numpy as np
 from farm.infer import Inferencer
 from nltk import word_tokenize
 import tqdm
 
 from data_processing.data_processing.filter_datafeed.utils import getFilters
+from data_processing.data_processing.utils.columns_order import column_ord, column_index_mapping
 from data_processing.data_processing.utils.file_paths import file_paths
 from data_processing.data_processing.utils.getHeaders import get_headers_index
 from data_processing.data_processing.utils.utils import filters_black_file_path, get_lines_csv, merged_data_feed_path, \
@@ -20,8 +21,9 @@ class Filter:
         self.vegan_black_filters.sort()
         self.vegan_white_filters = getFilters(filters_white_file_path)
         self.vegan_white_filters.sort()
-
-        self.merchant_name_index = get_mapping_column_index(merged_data_feed_path, "\t")["merchant_name"]
+        self.irrelevant_non_matching_category_articles = []
+        self.category_name_index = column_index_mapping["category_name"]
+        self.merchant_name_index = column_index_mapping["merchant_name"]
 
         if relevancy_filter:
             self.save_dir = "/home/graphn/repositories/you_conscious/dl_xp/trained_model/relevancy"
@@ -116,8 +118,7 @@ class Filter:
 
         return list_articles_with_label
 
-    @staticmethod
-    def delete_non_matching_category(article: list) -> list:
+    def delete_non_matching_category(self, article: list) -> list:
         """
         Does not return an article if Damen or Herren is not in the category_name
         :param article: Article to be processed
@@ -135,8 +136,9 @@ class Filter:
             to_return = True
         if to_return:
             return article
-        else:
-            print(article)
+        if not to_return:
+            article[self.category_name_index] = "irrelevant"
+            return article
 
     def delete_non_matching_categories(self, list_articles: list) -> list:
         with Pool(processes=16) as p:
@@ -190,6 +192,8 @@ def delete_non_matching_categories():
     deleted_non_matching_categories_articles = [headers] + deleted_non_matching_categories_articles
     write_2_file(deleted_non_matching_categories_articles, file_paths["filtered_only_matching_categories_datafeed"],
                  "\t")
+    # irrelevant_non_matching_category_articles = [item for item in list_articles if item not in deleted_non_matching_categories_articles]
+    # write_2_file(irrelevant_non_matching_category_articles, "irrelevant_articles.csv", "\t")
     print(len(deleted_non_matching_categories_articles))
     list_articles = get_lines_csv(file_paths["filtered_only_matching_categories_datafeed"], "\t")
     print(len(list_articles))

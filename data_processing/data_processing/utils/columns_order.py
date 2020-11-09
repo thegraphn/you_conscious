@@ -2,10 +2,9 @@ column_ord: list = [
     'item_id',
     'plus_sizes',
     'Labels',
-    'label_0',
-    'label_1',
-    'label_2',
-    'label_3',
+    'Labels2',
+    'Labels3',
+    'Labels3-Siegel',
     'verified',
     'Material',
     'search_price',
@@ -130,3 +129,5 @@ column_ord: list = [
     'ext_ppu',
     'ext_mpnr'
 ]
+
+column_index_mapping = {column_name:index for index,column_name in enumerate(column_ord)}

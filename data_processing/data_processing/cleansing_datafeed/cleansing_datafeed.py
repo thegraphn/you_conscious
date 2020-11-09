@@ -22,7 +22,7 @@ class Cleanser:
         self.category_name_cleansing_conditions: list = get_lines_csv(self.category_name_cleansing, ",")[1:]
         self.feature_mapping = create_mapping_between_2_columns(files_mapping_categories_path, 1, 2, ",")
         self.fashionSuitableFor_mapping = create_mapping_between_2_columns(mapping_fashionSuitableFor, 2, 6, ";")
-        self.categoryName_index = get_headers_index("category_name")
+        self.category_name_index = get_headers_index("category_name")
         self.fashionSuitableFor_index = get_headers_index("Fashion:suitable_for")
         self.rrp_price_index = get_headers_index("rrp_price", file=self.input_data_feed)
         self.delivery_cost_index = get_headers_index("delivery_cost", file=self.input_data_feed)
@@ -41,7 +41,6 @@ class Cleanser:
                                 "Title",
                                 "description"]
 
-    # todo refactor !
     def article_cleansing(self, article: list) -> list:
         """
         Cleansing of the category_name, merchant_name, fashion suitable for
@@ -51,16 +50,16 @@ class Cleanser:
         """
 
         # category_name cleansing
-        content_category_name = article[self.categoryName_index]
+        content_category_name = article[self.category_name_index]
         content_category_tokens: list = get_tokens(content_category_name)
         for string2find, new_category in self.feature_mapping.items():
             if string2find in content_category_name:
-                article[self.categoryName_index] = new_category
-        article[self.categoryName_index] = clean_category_sex(article)
+                article[self.category_name_index] = new_category
+        article[self.category_name_index] = clean_category_sex(article)
 
         # Change the content within Topman category to man
         if "Topman" in article[self.merchantName_index] or "Uli Schott":
-            article[self.categoryName_index]: str = article[self.categoryName_index].replace("Damen", "Herren")
+            article[self.category_name_index]: str = article[self.category_name_index].replace("Damen", "Herren")
 
         # The content in title is stronger than in fashion_suitable:for and fsf in stronger than category_name
         # Title > fashion_suitable:for > category_name
@@ -71,21 +70,21 @@ class Cleanser:
 
         for female_token in synonym_female:
             if female_token in title_tokens:
-                article[self.categoryName_index]: str = article[self.categoryName_index].replace("Herren", "Damen")
+                article[self.category_name_index]: str = article[self.category_name_index].replace("Herren", "Damen")
                 article[self.fashionSuitableFor_index] = "Damen"
                 break
             if female_token in fashion_suitable_for_tokens:
-                if "Herren" in article[self.categoryName_index]:
-                    article[self.categoryName_index]: str = article[self.categoryName_index].replace("Herren", "Damen")
+                if "Herren" in article[self.category_name_index]:
+                    article[self.category_name_index]: str = article[self.category_name_index].replace("Herren", "Damen")
 
         for male_token in synonym_male:
             if male_token in title_tokens:
-                article[self.categoryName_index]: str = article[self.categoryName_index].replace("Damen", "Herren")
+                article[self.category_name_index]: str = article[self.category_name_index].replace("Damen", "Herren")
                 article[self.fashionSuitableFor_index] = "Herren"
                 break
             if male_token in fashion_suitable_for_tokens:
-                if "Damen" in article[self.categoryName_index]:
-                    article[self.categoryName_index]: str = article[self.categoryName_index].replace("Damen", "Herren")
+                if "Damen" in article[self.category_name_index]:
+                    article[self.category_name_index]: str = article[self.category_name_index].replace("Damen", "Herren")
 
         # Clean fashion_suitable_:for
         if "Female" == article[self.fashionSuitableFor_index]:
@@ -130,12 +129,12 @@ class Cleanser:
                 content_category_content: str = " ".join(content_category_tokens)
                 content_category_content = content_category_content.replace(frm, "")
                 content_category_content = content_category_content.replace("&", "")
-                article[self.categoryName_index] = content_category_content.replace(frm, to)
+                article[self.category_name_index] = content_category_content.replace(frm, to)
                 break
         return article
 
     def renaming_fashion_suitable_for(self, article) -> list:
-        content_category_name = article[self.categoryName_index]
+        content_category_name = article[self.category_name_index]
         content_fashion_suitable_for = article[self.fashionSuitableFor_index]
         sex = content_category_name.split(" > ")
         if len(sex) == 0:

@@ -2,8 +2,8 @@ import re
 from multiprocessing.pool import Pool
 import tqdm
 
+from data_processing.data_processing.utils.columns_order import column_index_mapping
 from data_processing.data_processing.utils.file_paths import file_paths
-from data_processing.data_processing.utils.getHeaders import get_headers_index
 from data_processing.data_processing.utils.utils import get_lines_csv, get_mapping_column_index, features_mapping_path, \
     affiliateId, \
     features_data_feed_path, write_2_file
@@ -14,11 +14,11 @@ class FeaturesAdder:
         self.input_file: str = file_paths["filtered_data_feed_path"]
         self.features_list = get_lines_csv(features_mapping_path, ";")[1:]  # be aware of the header
         self.mapping_columnHeader = get_mapping_column_index(self.input_file, "\t")
-        self.awDeepLink_index = get_headers_index("aw_deep_link", file=self.input_file)
-        self.label_zero_index = get_headers_index("label_0", file=self.input_file)
-        self.label_one_index = get_headers_index("label_1", file=self.input_file)
-        self.label_two_index = get_headers_index("label_2", file=self.input_file)
-        self.label_three_index = get_headers_index("label_3", file=self.input_file)
+        self.awDeepLink_index = column_index_mapping["aw_deep_link"]
+        self.label_zero_index = column_index_mapping["label_0"]
+        self.label_one_index = column_index_mapping["label_1"]
+        self.label_two_index = column_index_mapping["label_2"]
+        self.label_three_index = column_index_mapping["label_3"]
 
     def add_features_article(self, article: list) -> list:
         """
@@ -44,9 +44,9 @@ class FeaturesAdder:
                 elif re.match(string2_find, txt_article) is not None:
                     article[self.mapping_columnHeader[column_feature]] = feature2_write
         list_label_features = list(list_label_features)
-        if len(list_label_features) > 0:
 
-            if len(list_label_features) >0:
+        if len(list_label_features) > 0:
+            if len(list_label_features) > 0:
                 article[self.label_zero_index] = list_label_features[0]
             if len(list_label_features) > 1:
                 article[self.label_one_index] = list_label_features[1]
