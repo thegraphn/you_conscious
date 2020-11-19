@@ -1,14 +1,11 @@
 import csv
-import os
 from tokenizer import tokenize
 import tqdm
 from progressbar import *
 
 root_folder = os.path.dirname(os.path.realpath(__file__))
-print(root_folder)
 root_folder = root_folder.replace(r"\data_processing\data_processing\utils", "")
 root_folder = root_folder.replace(r"data_processing/data_processing/utils", "")
-print(root_folder)
 
 filters_black_file_path = os.path.join(root_folder, "data_processing")
 filters_black_file_path = os.path.join(filters_black_file_path, "utils")
@@ -68,7 +65,13 @@ merged_data_feed_with_IdNames_path = os.path.join(root_folder, "data_processing"
 merged_data_feed_with_IdNames_path = os.path.join(merged_data_feed_with_IdNames_path, "data_working_directory")
 merged_data_feed_with_IdNames_path = os.path.join(merged_data_feed_with_IdNames_path, "merged")
 merged_data_feed_with_IdNames_path = os.path.join(merged_data_feed_with_IdNames_path,
-                                                  "merged_datafeeds.csvshopId2Name.csv")
+                                                  "merged_datafeeds.csvshop_id_2_name.csv")
+
+merged_data_feed_utf_path = os.path.join(root_folder, "data_processing")
+merged_data_feed_utf_path = os.path.join(merged_data_feed_utf_path, "data_working_directory")
+merged_data_feed_utf_path = os.path.join(merged_data_feed_utf_path, "merged")
+merged_data_feed_utf_path = os.path.join(merged_data_feed_utf_path,
+                                         "merged_datafeeds_utf.csv")
 
 cleansed_categories_data_feed_path = os.path.join(root_folder, "data_processing")
 cleansed_categories_data_feed_path = os.path.join(cleansed_categories_data_feed_path, "data_working_directory")
@@ -89,13 +92,13 @@ cleaning_categories_fashionSuitableFor_path: str = os.path.join(cleaning_categor
                                                                 "categoriesCleaning_fashionSuitableFor_mapping.csv")
 
 
-def getMappingColumnIndex(file, delimiter) -> dict:
-    '''
+def get_mapping_column_index(file, delimiter) -> dict:
+    """
     Create the mapping columnName: Index
     :param delimiter:
     :param file:
     :return: dictionary: columnName: index
-    '''
+    """
     mapping = {}
     with open(file, "r", encoding="utf-8") as f:
         csv_reader = csv.reader(f, delimiter=delimiter)
@@ -116,12 +119,12 @@ def get_lines_csv(file, delimiter) -> list:
     with open(file, "r", encoding="utf-8") as f:
         csv_reader = csv.reader(f, delimiter=delimiter)
         csv.field_size_limit(100100000000)
-        for j, row in enumerate(csv_reader):
+        for j, row in tqdm.tqdm(enumerate(csv_reader), desc="Getting lines of " + file):
             lines.append(row)
     return lines
 
 
-def createMappingBetween2Columns(file, column1_id, column2_id, delimiter):
+def create_mapping_between_2_columns(file, column1_id, column2_id, delimiter):
     """
     From a file create a dict in order to map 2 columns
     :param delimiter:
@@ -178,8 +181,9 @@ def get_tokens(text: str) -> list:
 
 number_processes = os.cpu_count()
 
-mapping_cleaning_fashionSuitableFor = createMappingBetween2Columns(cleaning_categories_fashionSuitableFor_path, 2, 6,
-                                                                   ";")
+mapping_cleaning_fashionSuitableFor = create_mapping_between_2_columns(cleaning_categories_fashionSuitableFor_path,
+                                                                       2, 6,
+                                                                       ";")
 
 awDeepLink_index = 42
 

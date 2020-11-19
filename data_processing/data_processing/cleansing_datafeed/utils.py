@@ -1,18 +1,18 @@
 import re
 
-from nltk import word_tokenize
+import tqdm
 
-from data_processing.data_processing.utils.getHeaders import getHeadersIndex
+from data_processing.data_processing.utils.getHeaders import get_headers_index
 from data_processing.data_processing.utils.utils import mapping_cleaning_fashionSuitableFor, get_tokens
 
 
 def clean_size(size) -> list:
-    '''
+    """
     clean size, try to split with different separator.
     delete unnecessary strings etc...
     :param size:
     :return:
-    '''
+    """
     regex = r"(\(\d{2}(\/\d{2})*\))"
     if "(" and ")" in size:
         size = re.sub(regex, "", size)
@@ -39,7 +39,33 @@ def clean_size(size) -> list:
     return size
 
 
-def cleanTitleRow(row):
+def convert_to_utf(list_articles: list) -> list:
+    mapping_to_utf = {"&uuml;": "ü",
+                      "&ouml;": "ö",
+                      "&auml;": "ä",
+                      "&szlig;": "ß",
+                      "&Auml;": "Ä",
+                      "&Uuml;": "Ü",
+                      "&Ouml;": "Ö",
+                      "&bdquo;": "„",
+                      "&quot;": '"',
+                      "&rsquo;": "'",
+
+                      }
+
+    headers = list_articles[0]
+    list_article_no_header = list_articles[1:]
+    for a, article in tqdm.tqdm(enumerate(list_article_no_header), total=len(list_article_no_header),
+                                desc="Converting to utf-8"):
+        for c, cell in enumerate(article):
+            for encoding, utf_ch in mapping_to_utf.items():
+                cell = cell.replace(encoding, utf_ch)
+                article[c] = cell
+        list_article_no_header[a] = article
+    return [headers] + list_article_no_header
+
+
+def clean_title_row(row):
     """
     delete useless substring from the title content
     :param row:
@@ -57,17 +83,17 @@ def cleanTitleRow(row):
 
 
 def clean_category_sex(article: list) -> str:
-    categoryName_index = getHeadersIndex("category_name")
-    fashionSuitableFor_index = getHeadersIndex("Fashion:suitable_for")
-    words_title = get_tokens(article[getHeadersIndex("Title")])
-    cat = article[categoryName_index]
+    category_name_index = get_headers_index("category_name")
+    fashion_suitable_for_index = get_headers_index("Fashion:suitable_for")
+    words_title = get_tokens(article[get_headers_index("Title")])
+    cat = article[category_name_index]
     for word in words_title:
         for k, v in mapping_cleaning_fashionSuitableFor.items():
             if word == k:
-                article[categoryName_index] = v
-                cat = article[categoryName_index].split(" > ")
+                article[category_name_index] = v
+                cat = article[category_name_index].split(" > ")
                 if len(cat) > 1 and len(article) > 20:
-                    cat[1] = article[fashionSuitableFor_index]
+                    cat[1] = article[fashion_suitable_for_index]
                     if cat[1] == "" or cat[1] == " ":
                         cat[1] = "Damen"
                     cat = " > ".join(cat)
@@ -77,10 +103,11 @@ def clean_category_sex(article: list) -> str:
                     cat = cat.replace("Male", "Herren")
                     break
             else:
-                cat = article[categoryName_index]
+                cat = article[category_name_index]
     return cat
 
-def change_chain_characters_to_umlaut(string:str)->str:
+
+def change_chain_characters_to_umlaut(string: str) -> str:
     text = ''
     for zeichen in string:
         if zeichen == u'ä':

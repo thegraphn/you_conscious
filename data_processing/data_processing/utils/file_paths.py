@@ -1,6 +1,8 @@
 import os
 from datetime import datetime
 
+from data_processing.data_processing.utils.utils import merged_data_feed_path
+
 root_folder = os.path.dirname(os.path.realpath(__file__))
 
 root_folder = root_folder.replace(r"\data_processing\data_processing\utils", "")
@@ -35,7 +37,7 @@ features_affiliateId_data_feed_path = os.path.join(features_affiliateId_data_fee
 cleansed_sex_data_feed_path = os.path.join(root_folder, "data_processing")
 cleansed_sex_data_feed_path = os.path.join(cleansed_sex_data_feed_path, "data_working_directory")
 cleansed_sex_data_feed_path = os.path.join(cleansed_sex_data_feed_path, "cleansed")
-cleansed_sex_data_feed_path = os.path.join(cleansed_sex_data_feed_path, "cleansedSexes_datafeed.csv")
+cleansed_sex_data_feed_path = os.path.join(cleansed_sex_data_feed_path, "cleansed_sexes_datafeed.csv")
 
 file_datafeed_location = os.path.join(root_folder, "data_processing")
 file_datafeed_location = os.path.join(file_datafeed_location, "utils")
@@ -53,6 +55,7 @@ file_paths = {"labeled_data_feed_path": labeled_data_feed_path,
               "cleansed_sex_data_feed_path": cleansed_sex_data_feed_path,
               "filtered_only_matching_categories_datafeed": filtered_only_matching_categories_datafeed,
               "file_datafeed_location": file_datafeed_location,
-              "category_name_cleansing": category_name_cleansing
+              "category_name_cleansing": category_name_cleansing,
+              "merged_datafeed": "/home/graphn/repositories/you_conscious/data_processing/data_working_directory/merged/merged_datafeeds.csv"
 
               }
