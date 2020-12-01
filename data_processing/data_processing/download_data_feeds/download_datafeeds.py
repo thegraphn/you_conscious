@@ -13,7 +13,7 @@ import tqdm
 
 from data_processing.data_processing.utils.file_paths import file_paths
 from data_processing.data_processing.utils.utils import download_data_feeds_directory_path, \
-    createMappingBetween2Columns, change_delimiter_csv
+    change_delimiter_csv
 
 folder = os.path.dirname(os.path.realpath(__file__))
 folder = folder.replace("/data_processing/download_data_feeds", "")
@@ -28,11 +28,11 @@ from multiprocessing import Pool
 class Downloader:
 
     def __init__(self):
-        self.datafeed_infos: list = self.get_datafeed_infos()
-        print(self.datafeed_infos)
+        self.datafeed_info: list = self.get_datafeed_info()
+        print(self.datafeed_info)
 
     @staticmethod
-    def get_datafeed_infos() -> list:
+    def get_datafeed_info() -> list:
         """
         Get the info in order to download the datafeeds properly: URL and csv_file delimiter
         :return: list [Shop_name,URL,delimiter],
@@ -77,8 +77,7 @@ class Downloader:
         headers: list = []
         with open(in_file, encoding="utf-8") as file:
             with open(os.path.join(file_paths["file_datafeed_location"],
-                                   "datafeeds_preprocessing\downloaded_datafeeds/SORBAS_with_merchant_name.csv"),
-                      'w',
+                                   "datafeeds_preprocessing/downloaded_datafeeds/SORBAS_with_merchant_name.csv"), 'w',
                       encoding="utf-8") as o:
                 csv_reader: csv.reader = csv.reader(file)
                 csv_writer: csv.writer = csv.writer(o)
@@ -100,8 +99,6 @@ class Downloader:
         """
         for element in list_tuples_shops_urls:
             self.download_datafeed(element)
-        # with Pool() as p:
-        #   list(tqdm.tqdm(p.imap(self.download_datafeed, list_tuples_shops_urls), total=len(list_tuples_shops_urls)))
 
     @staticmethod
     def download_datafeed(tuple_shop_url: tuple):
@@ -112,7 +109,6 @@ class Downloader:
         shop_name: str = tuple_shop_url[0]
         link: str = tuple_shop_url[1]
         shop_name = shop_name.replace(" ", "_")
-        format_file: str = ""
         try:
             if "LOVECO" == shop_name:
                 format_file = ".csv"
@@ -136,7 +132,7 @@ class Downloader:
                 path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
                                               datetime.datetime.now().strftime("%y-%m-%d") + format_file)
                 urllib.request.urlretrieve(link, path_file)
-        except:
+        except ValueError:
             print(" did not worked", shop_name, link)
 
     def unzip_files(self, list_files: list):
@@ -185,7 +181,7 @@ class Downloader:
         :param csv_file_path: csv file in which the delimiter may change
         :return:
         """
-        for info in self.datafeed_infos:
+        for info in self.datafeed_info:
             shop_name: str = info[0].replace(" ", "_")
             _: str = info[1]
             delimiter: str = info[2]
@@ -198,7 +194,7 @@ def downloading():
     downloader: Downloader = Downloader()
     downloader.delete_non_csv_datafeeds(download_data_feeds_directory_path)
     print("Downloading - Downloading data feeds: Begin")
-    downloader.download_datafeeds(list_tuples_shops_urls=downloader.datafeed_infos)
+    downloader.download_datafeeds(list_tuples_shops_urls=downloader.datafeed_info)
     print("Downloading - Downloading data feeds: End")
     list_downloaded_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*"))
     print("Downloading - Unzipping data feeds: Begin")
