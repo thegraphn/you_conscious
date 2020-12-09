@@ -1,7 +1,7 @@
 import csv
 from random import shuffle
 
-from data_processing.data_processing.utils.utils import getMappingColumnIndex
+from data_processing.data_processing.utils.utils import get_mapping_column_index
 
 interesting_columns = ["search_price",
                        "rrp_price",
@@ -27,12 +27,12 @@ interesting_columns = ["search_price",
                        "ship_to",
                        "Fashion:size0"
                        ]
-h = getMappingColumnIndex("/home/graphn/repositories/you_conscious/dl_xp/data_processing/datafeed.csv",";")
+h = get_mapping_column_index("/dl_xp/data/category/training_category.csv", ";")
 print(h)
 label_pos = h["Fashion:suitable_for"]
 interesting_data = []
 label_set = set()
-with open("/home/graphn/repositories/you_conscious/dl_xp/data_processing/datafeed.csv", encoding="utf-8") as f:
+with open("/dl_xp/data/category/training_category.csv", encoding="utf-8") as f:
     csv_reader = csv.reader(f, delimiter=";")
     list_index_interesting_data = []
     for row in csv_reader:

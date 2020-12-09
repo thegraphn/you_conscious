@@ -66,7 +66,7 @@ class FilesAggregator:
 
 def change_program_id_2_merchant_name(csv_file, shop_id_name_mapping_csv, ):
     shop_id2_name = {}
-    with open(shop_id_name_mapping_csv, encoding="utf-8-sig") as f:
+    with open(shop_id_name_mapping_csv, encoding="utf-8") as f:
         csv_reader_mapping = csv.reader(f, delimiter=";")
         for row in csv_reader_mapping:
             shop_id2_name[row[0]] = row[1]
@@ -141,6 +141,7 @@ def merging():
     file_aggregator = FilesAggregator(download_data_feeds_directory_path)
     print("Begin merging")
     list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csv"))
+
     print("Merging - Changing column names: Begin")
     for file in list_files:
         change_column_name(file, column_mapping_merging_path)

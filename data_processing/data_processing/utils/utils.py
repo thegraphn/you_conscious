@@ -2,6 +2,7 @@ import csv
 from tokenizer import tokenize
 import tqdm
 from progressbar import *
+import pandas as pd
 
 root_folder = os.path.dirname(os.path.realpath(__file__))
 root_folder = root_folder.replace(r"\data_processing\data_processing\utils", "")
@@ -177,6 +178,14 @@ def get_tokens(text: str) -> list:
         if tkn is not None:
             list_tokens.append(tkn)
     return list_tokens
+
+
+def rename_column(file: str, sep: str, column_input: str, column_target: str):
+    df = pd.read_csv(file, sep=sep)
+    print(df.head())
+    mapping = {column_input: column_target}
+    df.rename(columns=mapping, inplace=False)
+    return df
 
 
 number_processes = os.cpu_count()

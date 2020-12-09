@@ -7,6 +7,7 @@ from farm.infer import Inferencer
 from data_processing.data_processing.cleansing_datafeed.size_finder import SizeFinder
 from data_processing.data_processing.cleansing_datafeed.size_sorter import SizeSorter
 from data_processing.data_processing.cleansing_datafeed.utils import clean_category_sex, clean_size
+from data_processing.data_processing.utils.columns_order import column_index_mapping
 from data_processing.data_processing.utils.file_paths import file_paths
 from data_processing.data_processing.utils.getHeaders import get_headers_index
 from data_processing.data_processing.utils.utils import create_mapping_between_2_columns, \
@@ -23,6 +24,7 @@ class Cleanser:
         self.feature_mapping = create_mapping_between_2_columns(files_mapping_categories_path, 1, 2, ",")
         self.fashionSuitableFor_mapping = create_mapping_between_2_columns(mapping_fashionSuitableFor, 2, 6, ";")
         self.category_name_index = get_headers_index("category_name")
+        self.description_index = get_headers_index("description")
         self.fashionSuitableFor_index = get_headers_index("Fashion:suitable_for")
         self.rrp_price_index = get_headers_index("rrp_price", file=self.input_data_feed)
         self.delivery_cost_index = get_headers_index("delivery_cost", file=self.input_data_feed)
@@ -35,11 +37,19 @@ class Cleanser:
         self.item_id_index = get_headers_index("item_id", file=self.input_data_feed)
         self.model_path_categories = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/category"
         self.model_path_colors = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/color"
+        self.model_path_saison = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/saison"
         self.column_features = ["brand",
                                 "merchant_name",
                                 "Fashion:suitable_for",
                                 "Title",
                                 "description"]
+        self.column_id_mapping = column_index_mapping
+        self.unwanted_replacement_string = {"<div>": "", "<ul>": "", "<li>": "|", "<span>": "", "</span>": "",
+                                            "<br>": "|", "</li>": "", "</ul>": "", "</div>": "",
+                                            "&lt;/div&gt;": "", "&lt;div&gt;": "", "&lt;ul&gt;": "", "&lt;li&gt;": "",
+                                            "&lt;span&gt;": "", "&lt;/span&gt;": "", "&lt;br&gt;": "",
+                                            "&lt;/li&gt;": "", "&lt;/ul&gt;": ""
+                                            }
 
     def article_cleansing(self, article: list) -> list:
         """
@@ -75,7 +85,8 @@ class Cleanser:
                 break
             if female_token in fashion_suitable_for_tokens:
                 if "Herren" in article[self.category_name_index]:
-                    article[self.category_name_index]: str = article[self.category_name_index].replace("Herren", "Damen")
+                    article[self.category_name_index]: str = article[self.category_name_index].replace("Herren",
+                                                                                                       "Damen")
 
         for male_token in synonym_male:
             if male_token in title_tokens:
@@ -84,7 +95,8 @@ class Cleanser:
                 break
             if male_token in fashion_suitable_for_tokens:
                 if "Damen" in article[self.category_name_index]:
-                    article[self.category_name_index]: str = article[self.category_name_index].replace("Damen", "Herren")
+                    article[self.category_name_index]: str = article[self.category_name_index].replace("Damen",
+                                                                                                       "Herren")
 
         # Clean fashion_suitable_:for
         if "Female" == article[self.fashionSuitableFor_index]:
@@ -100,7 +112,26 @@ class Cleanser:
         # category name cleansing
         article = self.cleansing_category_names(article, content_category_tokens)
 
+        # description cleansing
+        article[self.description_index] = self.cleansing_description(article[self.description_index])
+
+        # in_stock cleansing
+        if article[self.column_id_mapping["in_stock"]] == "1":
+            article[self.column_id_mapping["in_stock"]] = "Ja"
+        if article[self.column_id_mapping["stock_status"]] == "JA" or article[self.column_id_mapping
+        ["stock_status"]] == "in stock":
+            article[self.column_id_mapping["stock_status"]] = "Verfügbar"
         return article
+
+    def cleansing_description(self, description: str) -> str:
+        """
+        Cleanse a description
+        :param description:
+        :return:
+        """
+        for string_to_find, replacement in self.unwanted_replacement_string.items():
+            description = description.replace(string_to_find, replacement)
+        return description
 
     def cleansing_articles(self, list_vegan_articles):
         with Pool() as p:
@@ -214,6 +245,12 @@ class Cleanser:
         mapping_column_header = get_mapping_column_index(self.input_data_feed, "\t")
 
         for article in list_art:
+            if article[self.column_id_mapping["merchant_name"]] == "muso koroni" or article[
+                self.column_id_mapping["merchant_name"]] == "":
+
+                identifier_column = "aw_deep_link"
+            else:
+                identifier_column = "aw_image_url"
             size_content = article[mapping_column_header["Fashion:size"]]
             size_content = clean_size(size_content)
             if "Avocadostore" in article[self.merchantName_index]:
@@ -227,10 +264,11 @@ class Cleanser:
                 mapping_identifier_article[identifier] = article  # Mapping URL article
 
             else:
-                mapping_identifier_sizes[article[mapping_column_header["aw_image_url"]]].append(
+
+                mapping_identifier_sizes[article[mapping_column_header[identifier_column]]].append(
                     size_content)  # Mapping URL sizes
                 mapping_identifier_article[
-                    article[mapping_column_header["aw_image_url"]]] = article  # Mapping URL article
+                    article[mapping_column_header[identifier_column]]] = article  # Mapping URL article
 
         # Add the sizes columns to the headers
         headers = [header.replace("Fashion:size", "Fashion:size0") for header in headers]
@@ -264,6 +302,7 @@ class Cleanser:
         :param list_articles: 
         :return: list_categories with a predicted category_name
         """
+
         category_normalized_index = get_headers_index("category_normalized")
         list_articles_with_new_categories = []
         list_column_features = self.column_features
@@ -279,11 +318,11 @@ class Cleanser:
             for position in list_index_interesting_data:
                 article_data.append(article[position])
             article_data = " [SEP] ".join(article_data)
-
             interesting_data.append({"text": article_data})
 
         interesting_data = interesting_data[1:]  # skip headers
-        model = Inferencer.load(self.model_path_categories, batch_size=24, gpu=True, task_type="text_classification")
+        model = Inferencer.load(self.model_path_categories, batch_size=24, gpu=True, task_type="text_classification",
+                                disable_tqdm=True, use_fast=True)
         results = model.inference_from_dicts(dicts=interesting_data)
         prediction_position = 0
         for i, predictions in enumerate(results):
@@ -310,7 +349,8 @@ class Cleanser:
             data_to_predict.append({"text": color_text})
 
         data_to_predict = data_to_predict[1:]  # skip headers
-        model = Inferencer.load(self.model_path_colors, batch_size=256, gpu=True, task_type="text_classification")
+        model = Inferencer.load(self.model_path_colors, batch_size=256, gpu=True, task_type="text_classification",
+                                disable_tqdm=True, use_fast=True)
         results = model.inference_from_dicts(dicts=data_to_predict)
         prediction_position = 0
         for i, predictions in enumerate(results):
@@ -334,6 +374,42 @@ class Cleanser:
                 list_articles_with_new_colors.append(list_articles[prediction_position])
         return list_articles_with_new_colors
 
+    def predict_saison(self, list_articles: list) -> list:
+        saison_index = get_headers_index("saison")
+        saison_conf_score_index = get_headers_index("saison_conf_score_index")
+
+        list_articles_with_saison = []
+        list_column_features = self.column_features
+        headers = list_articles[0]
+        interesting_data = []
+        list_index_interesting_data = []
+        for i, header in enumerate(headers):
+            if header in list_column_features:
+                list_index_interesting_data.append(i)
+        list_articles = list_articles[1:]  # skip headers
+
+        for article in list_articles:
+            article_data = []
+            for position in list_index_interesting_data:
+                article_data.append(article[position])
+            article_data = " [SEP] ".join(article_data)
+
+            interesting_data.append({"text": article_data})
+        interesting_data = interesting_data[1:]  # skip headers
+        model = Inferencer.load(self.model_path_saison, batch_size=24, gpu=True, task_type="text_classification",
+                                disable_tqdm=True, use_fast=True)
+        results = model.inference_from_dicts(dicts=interesting_data)
+        prediction_position = 0
+        for i, predictions in enumerate(results):
+            for prediction in predictions["predictions"]:
+                prediction_position += 1
+                label = prediction["label"]
+                probability = prediction["probability"]
+                list_articles[prediction_position][saison_conf_score_index] = probability
+                list_articles[prediction_position][saison_index] = label
+                list_articles_with_saison.append(list_articles[prediction_position])
+        return list_articles_with_saison  # Does not return headers
+
     def add_item_id(self, article: list):
         """
         Generate and add to the item_id column an item_id for every article
@@ -349,8 +425,12 @@ def cleansing():
 
         print("Begin cleansing")
         list_articles = get_lines_csv(clnsr.input_data_feed, "\t")
+        print("0", len(list_articles))
+
         print("Cleansing - Merging by size: Begin")
         list_articles = clnsr.merged_product_by_size(list_articles)
+        print("00", len(list_articles))
+
         print("Cleansing - Merging by size: Done")
         headers = list_articles[0]
         list_articles = list_articles[1:]
@@ -360,10 +440,13 @@ def cleansing():
                                        total=len(list_articles)))
 
         list_articles = list_articles
+        print("1", len(list_articles))
         # renaming article's category and fashion suitable for
 
         list_articles = list(tqdm.tqdm(p.imap(clnsr.article_cleansing, list_articles),
                                        total=len(list_articles)))
+        print("2", len(list_articles))
+
         print("Cleansing - Renaming Categories: Done")
 
         print("Cleansing - Renaming Categories DL: Begin")
@@ -376,6 +459,9 @@ def cleansing():
 
         print("Cleansing - Renaming Colors DL: Done")
         # write_2_file(list_articles, list_articles)
+        print("Cleansing - Adding saison DL: Begin")
+        list_articles = clnsr.predict_saison([headers] + list_articles)
+        print("Cleansing - Adding saison DL: Done")
 
         print("Cleansing - Sexes and Prices: Begin")
         cleansed_fashion_suitable_for = list(

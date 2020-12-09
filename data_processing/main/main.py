@@ -14,7 +14,7 @@ sys.path.append(folder)
 from data_processing.data_processing.add_features.add_features import add_features
 from data_processing.data_processing.cleansing_datafeed.cleansing_datafeed import cleansing
 from data_processing.data_processing.download_data_feeds.download_datafeeds import downloading
-from data_processing.data_processing.filter_datafeed.filter_data_feed import filter_data_feed, getArticlesWithLabel, \
+from data_processing.data_processing.filter_datafeed.filter_data_feed import filter_data_feed, get_articles_with_label, \
     delete_non_matching_categories
 from data_processing.data_processing.merging_datafeeds.merging_datafeeds_old import merging
 import datetime
@@ -27,9 +27,10 @@ def main_app():
                        "merging": True,
                        "filtering": True,
                        "adding_features": True,
-                       "filtering_without_label": False,
-                       "cleansing": False,
-                       "filtering_only_matching_category": False}
+                       "filtering_without_label": True,
+                       "cleansing": True,
+                       "filtering_only_matching_category": True,
+                       "shut_down": False}
 
     for process, todo in processes.items():
         print(process, todo)
@@ -47,14 +48,16 @@ def main_app():
                 add_features()
         if process == "filtering_without_label":
             if todo:
-                getArticlesWithLabel()
+                get_articles_with_label()
         if process == "cleansing":
             if todo:
                 cleansing()
         if process == "filtering_only_matching_category":
             if todo:
                 delete_non_matching_categories()
-
+        if process == "shut_down":
+            #os.system("shutdown")
+            pass
     end = datetime.datetime.now()
     print("End data processing", end)
     print("It took ", end - begin)

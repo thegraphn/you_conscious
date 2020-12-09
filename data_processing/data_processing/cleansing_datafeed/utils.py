@@ -39,7 +39,7 @@ def clean_size(size) -> list:
     return size
 
 
-def convert_to_utf(list_articles: list) -> list:
+def convert_to_utf(list_articles):
     mapping_to_utf = {"&uuml;": "ü",
                       "&ouml;": "ö",
                       "&auml;": "ä",
@@ -63,6 +63,8 @@ def convert_to_utf(list_articles: list) -> list:
                 article[c] = cell
         list_article_no_header[a] = article
     return [headers] + list_article_no_header
+
+    return data_frame
 
 
 def clean_title_row(row):

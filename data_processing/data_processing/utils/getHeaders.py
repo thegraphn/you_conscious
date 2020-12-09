@@ -8,6 +8,7 @@ def get_headers_index(header, file=filtered_data_feed_path, sep="\t"):
     if header == "category_name":
         return get_mapping_column_index(filtered_data_feed_path, sep)["category_name"]
     if header == "Labels":
+        print(get_mapping_column_index(file, sep))
         return get_mapping_column_index(file, sep)["Labels"]
     if header == "Material":
         return get_mapping_column_index(file, sep)["Material"]
@@ -55,7 +56,10 @@ def get_headers_index(header, file=filtered_data_feed_path, sep="\t"):
         return get_mapping_column_index(file,sep)["color_normalized_1"]
     if header == "color_normalized_2":
         return get_mapping_column_index(file,sep)["color_normalized_2"]
-
+    if header =="saison":
+        return get_mapping_column_index(file,sep)["saison"]
+    if header =="saison_conf_score_index":
+        return get_mapping_column_index(file,sep)["saison_conf_score_index"]
     else:
         print("HEADER NOT IMPLEMENTED", header)
         return get_mapping_column_index(file, sep)[header]
