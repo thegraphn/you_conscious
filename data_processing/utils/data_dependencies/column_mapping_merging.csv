@@ -83,3 +83,5 @@ gender;Fashion:suitable_for
 Hersteller;brand_name
 Vorschaubild-URL
 merchant_image_url
+deeplink;aw_deep_link
+short_description;description
