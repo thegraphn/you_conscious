@@ -1,3 +1,4 @@
+import datetime
 from collections import defaultdict
 from multiprocessing import Pool
 
@@ -38,11 +39,13 @@ class Cleanser:
         self.model_path_categories = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/category"
         self.model_path_colors = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/color"
         self.model_path_saison = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/saison"
+        self.model_path_origin = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/origin"
         self.column_features = ["brand",
                                 "merchant_name",
                                 "Fashion:suitable_for",
                                 "Title",
                                 "description"]
+        self.column_features_origin = ["Title", "description"]
         self.column_id_mapping = column_index_mapping
         self.unwanted_replacement_string = {"<div>": "", "<ul>": "", "<li>": "|", "<span>": "", "</span>": "",
                                             "<br>": "|", "</li>": "", "</ul>": "", "</div>": "",
@@ -303,7 +306,7 @@ class Cleanser:
         :return: list_categories with a predicted category_name
         """
 
-        category_normalized_index = get_headers_index("category_normalized")
+        category_predicted_index = get_headers_index("category_predicted")
         list_articles_with_new_categories = []
         list_column_features = self.column_features
         headers = list_articles[0]
@@ -329,9 +332,54 @@ class Cleanser:
             for prediction in predictions["predictions"]:
                 prediction_position += 1
                 label = prediction["label"]
-                list_articles[prediction_position][category_normalized_index] = label
+                list_articles[prediction_position][category_predicted_index] = label
                 list_articles_with_new_categories.append(list_articles[prediction_position])
         return list_articles_with_new_categories  # Does not return headers
+
+    def predict_origin(self, list_articles: list, ) -> list:
+        """
+        With a farm model we predict the categories of the articles based on relevant columns
+        :param list_articles:
+        :return: list_categories with a predicted category_name
+        """
+
+        origin_predicted_index = column_index_mapping["origin_predicted"]
+        data_to_predict = []
+        list_column_features = self.column_features_origin
+        headers = list_articles[0]
+        interesting_data = []
+        list_index_interesting_data = []
+        for i, header in enumerate(headers):
+            if header in list_column_features:
+                list_index_interesting_data.append(i)
+        list_articles = list_articles[1:]  # skip headers
+        for article in list_articles:
+            article_data = []
+            for position in list_index_interesting_data:
+                article_data.append(article[position])
+            article_data = " [SEP] ".join(article_data)
+            interesting_data.append({"text": article_data})
+
+
+        interesting_data = interesting_data[1:]  # skip headers
+        model = Inferencer.load(self.model_path_origin, batch_size=16, gpu=True, task_type="text_classification",
+                                disable_tqdm=True, use_fast=True)
+        results = model.inference_from_dicts(dicts=interesting_data)
+        prediction_position = 0
+        for i, predictions in enumerate(results):
+            for prediction in predictions["predictions"]:
+                prediction_position += 1
+                label = prediction["label"]
+                label = label.replace('"', "")
+                label = label.replace("[", "")
+                label = label.replace("]", "")
+                label = label.replace("'", "")
+                label = label.replace(" ", "")
+                labels = label.split(",")
+                labels = labels[0:3]  # take the first 3 colors
+
+                list_articles[prediction_position][origin_predicted_index] = labels[0]
+        return list_articles
 
     def predict_colors(self, list_articles: list) -> list:
         color_index = get_headers_index("colour")
@@ -421,56 +469,57 @@ class Cleanser:
 
 def cleansing():
     with Pool() as p:
-        clnsr = Cleanser()
+        cleanser = Cleanser()
 
-        print("Begin cleansing")
-        list_articles = get_lines_csv(clnsr.input_data_feed, "\t")
+        print("Begin cleansing", datetime.datetime.now())
+        list_articles = get_lines_csv(cleanser.input_data_feed, "\t")
         print("0", len(list_articles))
 
-        print("Cleansing - Merging by size: Begin")
-        list_articles = clnsr.merged_product_by_size(list_articles)
+        print("Cleansing - Merging by size: Begin", datetime.datetime.now())
+        list_articles = cleanser.merged_product_by_size(list_articles)
         print("00", len(list_articles))
 
-        print("Cleansing - Merging by size: Done")
+        print("Cleansing - Merging by size: Done", datetime.datetime.now())
         headers = list_articles[0]
         list_articles = list_articles[1:]
-        print("Cleansing - Renaming Categories: Begin")
+        print("Cleansing - Renaming Categories: Begin", datetime.datetime.now())
         list_articles = list_articles
-        list_articles = list(tqdm.tqdm(p.imap(clnsr.article_cleansing, list_articles),
+        list_articles = list(tqdm.tqdm(p.imap(cleanser.article_cleansing, list_articles),
                                        total=len(list_articles)))
 
         list_articles = list_articles
         print("1", len(list_articles))
         # renaming article's category and fashion suitable for
 
-        list_articles = list(tqdm.tqdm(p.imap(clnsr.article_cleansing, list_articles),
+        list_articles = list(tqdm.tqdm(p.imap(cleanser.article_cleansing, list_articles),
                                        total=len(list_articles)))
-        print("2", len(list_articles))
 
-        print("Cleansing - Renaming Categories: Done")
+        print("Cleansing - Renaming Categories: Done", datetime.datetime.now())
 
-        print("Cleansing - Renaming Categories DL: Begin")
-        list_articles = clnsr.predict_categories([headers] + list_articles)
+        print("Cleansing - Renaming Categories DL: Begin", datetime.datetime.now())
+        list_articles = cleanser.predict_categories([headers] + list_articles)
 
-        print("Cleansing - Renaming Categories DL: Done")
+        print("Cleansing - Renaming Categories DL: Done", datetime.datetime.now())
 
-        print("Cleansing - Renaming Colors DL: Begin")
-        list_articles = clnsr.predict_colors(list_articles)
+        print("Cleansing - Renaming Colors DL: Begin", datetime.datetime.now())
+        list_articles = cleanser.predict_colors(list_articles)
 
-        print("Cleansing - Renaming Colors DL: Done")
-        # write_2_file(list_articles, list_articles)
-        print("Cleansing - Adding saison DL: Begin")
-        list_articles = clnsr.predict_saison([headers] + list_articles)
-        print("Cleansing - Adding saison DL: Done")
+        print("Cleansing - Renaming Colors DL: Done", datetime.datetime.now())
+        print("Cleansing - Adding saison DL: Begin", datetime.datetime.now())
+        list_articles = cleanser.predict_saison([headers] + list_articles)
+        print("Cleansing - Adding saison DL: Done", datetime.datetime.now())
+        print("Cleansing - Adding origin DL: Begin", datetime.datetime.now())
+        list_articles = cleanser.predict_origin([headers] + list_articles)
+        print("Cleansing - Adding origin DL: Done", datetime.datetime.now())
 
         print("Cleansing - Sexes and Prices: Begin")
         cleansed_fashion_suitable_for = list(
-            tqdm.tqdm(p.imap(clnsr.renaming_fashion_suitable_for, list_articles),
+            tqdm.tqdm(p.imap(cleanser.renaming_fashion_suitable_for, list_articles),
                       total=(len(list_articles)), desc="Cleansing Fashion Suitable for"))
 
-        cleansed_prices = list(tqdm.tqdm(p.map(clnsr.clean_price,
+        cleansed_prices = list(tqdm.tqdm(p.map(cleanser.clean_price,
                                                cleansed_fashion_suitable_for), total=len(cleansed_fashion_suitable_for),
                                          desc="Cleansing Prices"))
-        print("Cleansing - Sexes and Prices: Done")
+        print("Cleansing - Sexes and Prices: Done", datetime.datetime.now())
     cleansed_articles = [headers] + cleansed_prices
     write_2_file(cleansed_articles, file_paths["cleansed_sex_data_feed_path"])

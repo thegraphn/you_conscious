@@ -168,7 +168,9 @@ class Filter:
     def delete_not_in_stock_article(self, article: list):
         stock_status_content = article[self.column_id_mapping["stock_status"]]
 
-        if "Nicht verfügbar" not in stock_status_content or "out of stock" not in stock_status_content:
+        if "Nicht verfügbar" not in stock_status_content:
+            return article
+        if "out of stock" not in stock_status_content:
             return article
 
         if "in stock" in list(article[self.column_id_mapping.keys()]):
@@ -176,6 +178,8 @@ class Filter:
 
             if "0" != in_stock_content:
                 return article
+
+        print(stock_status_content)
 
 
 def filter_data_feed():

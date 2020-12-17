@@ -126,11 +126,13 @@ def change_column_name(csv_file, mapping_file):
 
 def merge_csv(list_files, fieldnames, output_data):
     fieldnames = list(fieldnames)
+    print(fieldnames)
     with open(output_data, 'w', encoding=enc) as output_csv_file:
         writer = csv.DictWriter(output_csv_file, fieldnames=fieldnames, delimiter=",", quotechar='"')
         csv_writer = csv.writer(output_csv_file, delimiter=",", quotechar='"')
         csv_writer.writerow(fieldnames)
         for filename in list_files:
+            print(filename)
             with open(filename, "r", newline="") as f_in:
                 reader = csv.DictReader(f_in, delimiter=",", quotechar='"')  # Uses the field names in this file
                 for line in reader:
