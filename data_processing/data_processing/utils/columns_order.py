@@ -166,7 +166,8 @@ column_ord: list = [
     'ext_Grundpreiseinheit',
     'ext_Währung',
     'additional_image_link.1',
-    'additional_image_link.2'
+    'additional_image_link.2',
+'country', 'weight'
 
 ]
 
