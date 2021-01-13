@@ -27,12 +27,12 @@ Zero Waste;Zero Waste;Labels3-Siegel
 Biobaumwolle;Bio-Baumwolle;Material
 Bio Baumwoll;Bio-Baumwolle;Material
 Bio-Baumwoll-Mix;Bio-Baumwolle;Material
-GOTS;Global Organic Textile Standard;Labels3-Siegel
-(GOTS);Global Organic Textile Standard;Labels3-Siegel
-GOTS-zertifiziert;Global Organic Textile Standard;Labels3-Siegel
-(GOTS-zertifiziert);Global Organic Textile Standard;Labels3-Siegel
+GOTS;GOTS (Global Organic Textile Standard);Labels3-Siegel
+(GOTS);GOTS (Global Organic Textile Standard);Labels3-Siegel
+GOTS-zertifiziert;GOTS (Global Organic Textile Standard);Labels3-Siegel
+(GOTS-zertifiziert);GOTS (Global Organic Textile Standard);Labels3-Siegel
 Bio Baumwolle;Bio-Baumwolle;Material
-Global Organic Textile Standard;Global Organic Textile Standard;Labels3-Siegel
+Global Organic Textile Standard;GOTS (Global Organic Textile Standard);Labels3-Siegel
 recycelter;Recycled;Labels3
 recycelte;Recycled;Labels3
 recycelten;Recycled;Labels3
@@ -399,3 +399,5 @@ fairen Arbeitsbedigungen;Aus fairer Produktion;Labels3
 nachhaltige Materialien;Aus nachhaltiger Produktion;Labels3
 recolution DE;Vegan;Labels
 AWARE by VERO MODA;Aus nachhaltiger Produktion;Labels3
+Grüner Knopf;Grüner Knopf;Labels3-Siegel
+Made in India;Indien;Hergestellt in
