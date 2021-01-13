@@ -77,14 +77,16 @@ class Downloader:
         sep = ";"
         if "SORBAS" in in_file:
             sep=","
-        df = pd.read_csv(in_file, sep=sep,)
+        print(in_file)
+        df = pd.read_csv(in_file, sep=sep)
         if "muso_koroni" in in_file:
             merchant_name = "muso koroni"
         if "ETHLETIC" in in_file:
             merchant_name = "ETHLETIC"
         if "SORBAS" in in_file:
             merchant_name = "SORBAS"
-            print("x",df.columns.tolist())
+        if "recolution" in in_file:
+            merchant_name = "recolution"
         df["merchant_name"] = merchant_name
 
 
@@ -158,7 +160,11 @@ class Downloader:
                 path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
                                               datetime.datetime.now().strftime("%y-%m-%d") + format_file)
                 urllib.request.urlretrieve(link, path_file)
-
+            if "recolution" in shop_name:
+                format_file = ".csv"
+                path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
+                                              datetime.datetime.now().strftime("%y-%m-%d") + format_file)
+                urllib.request.urlretrieve(link, path_file)
 
             else:
                 format_file = ".gz"
@@ -194,6 +200,11 @@ class Downloader:
             return 1
         if "Uli_Schott" in file:
             return 1
+        if "ETHLETIC" in file:
+            os.rename(file, file[:-3] + ".csv")
+            return 1
+        #if "recolution" in file:
+            #os.rename(file[:-3],file[:-3]+".csv")
         if "gz" in file:
             length_to_delete: int = -3
             os.system("gunzip -kc " + str(file) + " > " + str(file[:length_to_delete]) + ".csv")

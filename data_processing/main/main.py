@@ -56,7 +56,7 @@ def main_app():
             if todo:
                 delete_non_matching_categories()
         if process == "shut_down":
-            #os.system("shutdown")
+            # os.system("shutdown")
             pass
     end = datetime.datetime.now()
     print("End data processing", end)

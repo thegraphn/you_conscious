@@ -26,18 +26,20 @@ column_ord: list = [
     'label_19',
     'verified',
     'Material',
+    'Hergestellt in',
     'search_price',
     'rrp_price',
     'delivery_cost',
     'merchant_name',
     'category_name',
-    'category_normalized',
+    'category_predicted',
     'saison',
     'saison_conf_score_index',
     'Fashion:suitable_for',
     'Title',
     'description',
     'brand',
+    'origin_predicted',
     'payment_methods',
     'custom_8',
     'custom_6',
@@ -164,7 +166,8 @@ column_ord: list = [
     'ext_Grundpreiseinheit',
     'ext_Währung',
     'additional_image_link.1',
-    'additional_image_link.2'
+    'additional_image_link.2',
+'country', 'weight'
 
 ]
 

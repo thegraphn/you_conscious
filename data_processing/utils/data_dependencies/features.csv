@@ -1,29 +1,29 @@
 description;feature;column
-made in Green;MADE IN GREEN by OEKO-TEX;Labels3-Siegel
-nachhaltig produziert;Aus nachhaltiger Produktion;Labels3
-aus fairer Produktion;Aus fairer Produktion;Labels3
-Fair-Trade;Fair-Trade;Labels3-Siegel
-Pflanzenfärbung;Pflanzenfärbung;Labels3
-nachhaltig gefertigter;Aus nachhaltiger Produktion;Labels3
-rundum nachhaltig;Aus nachhaltiger Produktion;Labels3
+made in Green;MADE IN GREEN by OEKO-TEX;Labels
+nachhaltig produziert;Aus nachhaltiger Produktion;Labels
+aus fairer Produktion;Aus fairer Produktion;Labels
+Fair-Trade;Fair-Trade;Labels
+Pflanzenfärbung;Pflanzenfärbung;Labels
+nachhaltig gefertigter;Aus nachhaltiger Produktion;Labels
+rundum nachhaltig;Aus nachhaltiger Produktion;Labels
 Baumwolle für hessnatur Jeans stammt aus kontrolliert biologischem Anbau;Bio-Baumwolle;Material
 Bio-Denim;Bio-Denim;Material
-Recycling-Polyester;Recycled;Labels3
+Recycling-Polyester;Recycled;Labels
 biologisch angebauter Baumwolle;Bio-Baumwolle;Material
 Bio-Baumwolle;Bio-Baumwolle;Material
-Zero Waste ;Zero Waste;Labels3-Siegel
+Zero Waste ;Zero Waste;Labels
 (organic cotton);Bio-Baumwolle;Material
 organic cotton;Bio-Baumwolle;Material
 Eukalyptusfaser;Eukalyptus;Material
-recycelt nachhaltige Produktion;Recycled;Labels3
-recycelten Polyamid;Recycled;Labels3
-recyceltem;Recycled;Labels3
-recycelbar;Recycelbar;Labels3
-Recyceltes Polyester;Recycled;Labels3
-recycelten PET-Flaschen;Recycled;Labels3
-Recycled Polyester;Recycled;Labels3
-recycelten Textilien;Recycled Texile;Labels3
-Zero Waste;Zero Waste;Labels3-Siegel
+recycelt nachhaltige Produktion;Recycled;Labels
+recycelten Polyamid;Recycled;Labels
+recyceltem;Recycled;Labels
+recycelbar;Recycelbar;Labels
+Recyceltes Polyester;Recycled;Labels
+recycelten PET-Flaschen;Recycled;Labels
+Recycled Polyester;Recycled;Labels
+recycelten Textilien;Recycled Texile;Labels
+Zero Waste;Zero Waste;Labels
 Biobaumwolle;Bio-Baumwolle;Material
 Bio Baumwoll;Bio-Baumwolle;Material
 Bio-Baumwoll-Mix;Bio-Baumwolle;Material
@@ -54,7 +54,7 @@ Obermaterial: 100% Nylon;Nylon;Material
 Obermaterial: 100% Leinen;Leinen;Material
 Obermaterial: 100% Stoff;Textil;Material
 Material: 100% Viskose;Viskose;Material
-recycelten Kaffeebohnen;Recycelte Kaffeebohnen;Labels3
+recycelten Kaffeebohnen;Recycelte Kaffeebohnen;Labels
 Jersey-Bllazer;Jersey;Material
 Kunstleder-Leggins;Kunstleder;Material
 Baumwollpullover;Baumwolle;Material
@@ -83,7 +83,7 @@ Material: Oberstoff: 100% Polyester;Polyester;Material
 Obermaterial und Futter: Textil (100% Baumwolle);Baumwolle;Material
 Materialzusammensetzung: 100% Polyacryl;Polyacryl;Material
 Materialzusammensetzung: 100% Viskose;Viskose;Material
-Materialzusammensetzung: 100% Recyceltes Polyester;Recycled;Labels3
+Materialzusammensetzung: 100% Recyceltes Polyester;Recycled;Labels
 Materialzusammensetzung: Außenmaterial: 100% Polyester;Polyester;Material
 Maschinenwäsche, 100% Baumwolle, Model trägt;Baumwolle;Material
 Chemisch reinigen, 100% Polyester, Model trägt;Polyester;Material
@@ -97,17 +97,17 @@ Chemisch reinigen, 100% Rayon, unser Model;Rayon;Material
 Handwäsche, 100% Viskose, Model;Viskose;Material
 Maschinenwäsche, 100% Polyurethan, Unser;Polyurethan;Material
 Maschinenwäsche, 100% Acryl.;Acryl;Material
-Help Refugees;Help Refugees;Labels3-Siegel
-Oeko-Tex Standard;Oeko-Tex Standard;Labels3-Siegel
+Help Refugees;Help Refugees;Labels
+Oeko-Tex Standard;Oeko-Tex Standard;Labels
 Stoff: Baumwolle 100%;Baumwolle;Material
-100% recycelbar;Recycelbar;Labels3
+100% recycelbar;Recycelbar;Labels
 Material: 100% Organic Baumwolle;Bio-Baumwolle;Material
-OEKO-TEX 100;OEKO-TEX 100;Labels3-Siegel
-ÖKO TEX 100Standard;OEKO-TEX 100;Labels3-Siegel
-Ökotex 100 zertifiziert;OEKO-TEX 100;Labels3-Siegel
-Blauer Engel;Blauer Engel;Labels3-Siegel
-Fair Wear Foundation;Fair Wear Foundation;Labels3-Siegel
-Bluesign;Bluesign;Labels3-Siegel
+OEKO-TEX 100;OEKO-TEX 100;Labels
+ÖKO TEX 100Standard;OEKO-TEX 100;Labels
+Ökotex 100 zertifiziert;OEKO-TEX 100;Labels
+Blauer Engel;Blauer Engel;Labels
+Fair Wear Foundation;Fair Wear Foundation;Labels
+Bluesign;Bluesign;Labels
 Obermaterial 100 % Textil;Textil;Material
 Obermaterial 100 % Polyurethan;Polyurethan;Material
 Obermaterial 100 % Polyester;Polyester;Material
@@ -214,15 +214,15 @@ aus kontrolliert biologischem Anbau;Bio-Baumwolle;Material
 .*\d\d\d\%\s100% Textile.*;Textil;Material
 .*\d\d\d\%\s100% textile.*;Textil;Material
 .*\d\d\d\%\s100% Cotton Recycled.*;Baumwolle;Material
-.*\d\d\d\%\s100% Cotton Recycled.*;Recycled;Labels3
+.*\d\d\d\%\s100% Cotton Recycled.*;Recycled;Labels
 .*\d\d\d\%\s100% Polyamide.*;Polyamid;Material
 .*\d\d\d\%\s100% Recycled¬†¬†Polyester.*;Polyester;Material
-.*\d\d\d\%\s100% Recycled¬†¬†Polyester.*;Recycled;Labels3
+.*\d\d\d\%\s100% Recycled¬†¬†Polyester.*;Recycled;Labels
 .*\d\d\d\%\s100% PVC.*;PVC;Material
-aus nachhaltig gefertigter Baumwolle;Aus nachhaltiger Produktion;Labels3
-100% nachhaltig;Aus nachhaltiger Produktion;Labels3
-nachhaltig gefertigt;Aus nachhaltiger Produktion;Labels3
-nachhaltigen Bio-Baumwolle;Aus nachhaltiger Produktion;Labels3
+aus nachhaltig gefertigter Baumwolle;Aus nachhaltiger Produktion;Labels
+100% nachhaltig;Aus nachhaltiger Produktion;Labels
+nachhaltig gefertigt;Aus nachhaltiger Produktion;Labels
+nachhaltigen Bio-Baumwolle;Aus nachhaltiger Produktion;Labels
 JUNAROSE;JUNAROSE;plus_sizes
 SAMOON;SAMOON;plus_sizes
 sheego;sheego;plus_sizes
@@ -238,7 +238,7 @@ Cotton;Baumwolle;Material
 cotton;Baumwolle;Material
 Tencel;Tencel;Material
 Bambus;Bambus;Material
-recycelten PETFlaschen;Recycled;Labels3
+recycelten PETFlaschen;Recycled;Labels
 BioBaumwolle;Bio-Baumwolle;Material
 BambusViskose;Bambus;Material
 Bambus;Bambus;Material
@@ -260,40 +260,40 @@ veganem;Vegan;Labels
 vegam.;Vegan;Labels
 VEGAN;Vegan;Labels
 Matt & Nat;Vegan;Labels
-PETA verifiziert;PETA-Approved Vegan;Labels1
-PETA-zertifiziert (vegan);PETA-Approved Vegan;Labels1
-Peta approved Vegan;PETA-Approved Vegan;Labels1
-Peta approved;PETA-Approved Vegan;Labels1
-Peta- approved Vegan;PETA-Approved Vegan;Labels1
-PeTA zertifiziert vegan;PETA-Approved Vegan;Labels1
-PETA approved vegan;PETA-Approved Vegan;Labels1
-Vegan approved by PETA;PETA-Approved Vegan;Labels1
-PETA zertifiziert;PETA-Approved Vegan;Labels1
-PETA-zertifiziert;PETA-Approved Vegan;Labels1
-vegane Machart wurde durch Peta;PETA-Approved Vegan;Labels1
-PETA-Verifizierung;PETA-Approved Vegan;Labels1
-in veganer Peta zertifierter;PETA-Approved Vegan;Labels1
-PETA-zertifiziert (vegan);PETA-Approved Vegan;Labels1
-'PETA-Approved Vegan';PETA-Approved Vegan;Labels1
-PETA-Approved Vegan;PETA-Approved Vegan;Labels1
-Vegan von PETA verifiziert;PETA-Approved Vegan;Labels1
-Fritzi aus Preußen;PETA-Approved Vegan;Labels1
-Kings Of Indigo;PETA-Approved Vegan;Labels1
-Ragwear;PETA-Approved Vegan;Labels1
-vegan (PETA-Approved);PETA-Approved Vegan;Labels1
-Vegan approved von PETA;PETA-Approved Vegan;Labels1
-Vegan zertifiziert durch PETA;PETA-Approved Vegan;Labels1
-Vegan von PETA;PETA-Approved Vegan;Labels1
-PETA Vegan zugelassen;PETA-Approved Vegan;Labels1
-Vegan Approved by PETA;PETA-Approved Vegan;Labels1
-PETA-ApprovVegan';PETA-Approved Vegan;Labels1
-Peta-vegan;PETA-Approved Vegan;Labels1
-PETA-Approved Vegan;PETA-Approved Vegan;Labels1
-PETA approved vegan;PETA-Approved Vegan;Labels1
-Peta approved Vegan;PETA-Approved Vegan;Labels1
-peta;PETA-Approved Vegan;Labels1
-PETA;PETA-Approved Vegan;Labels1
-PETA VEGAN APPROVED;PETA-Approved Vegan;Labels1
+PETA verifiziert;PETA-Approved Vegan;Labels
+PETA-zertifiziert (vegan);PETA-Approved Vegan;Labels
+Peta approved Vegan;PETA-Approved Vegan;Labels
+Peta approved;PETA-Approved Vegan;Labels
+Peta- approved Vegan;PETA-Approved Vegan;Labels
+PeTA zertifiziert vegan;PETA-Approved Vegan;Labels
+PETA approved vegan;PETA-Approved Vegan;Labels
+Vegan approved by PETA;PETA-Approved Vegan;Labels
+PETA zertifiziert;PETA-Approved Vegan;Labels
+PETA-zertifiziert;PETA-Approved Vegan;Labels
+vegane Machart wurde durch Peta;PETA-Approved Vegan;Labels
+PETA-Verifizierung;PETA-Approved Vegan;Labels
+in veganer Peta zertifierter;PETA-Approved Vegan;Labels
+PETA-zertifiziert (vegan);PETA-Approved Vegan;Labels
+'PETA-Approved Vegan';PETA-Approved Vegan;Labels
+PETA-Approved Vegan;PETA-Approved Vegan;Labels
+Vegan von PETA verifiziert;PETA-Approved Vegan;Labels
+Fritzi aus Preußen;PETA-Approved Vegan;Labels
+Kings Of Indigo;PETA-Approved Vegan;Labels
+Ragwear;PETA-Approved Vegan;Labels
+vegan (PETA-Approved);PETA-Approved Vegan;Labels
+Vegan approved von PETA;PETA-Approved Vegan;Labels
+Vegan zertifiziert durch PETA;PETA-Approved Vegan;Labels
+Vegan von PETA;PETA-Approved Vegan;Labels
+PETA Vegan zugelassen;PETA-Approved Vegan;Labels
+Vegan Approved by PETA;PETA-Approved Vegan;Labels
+PETA-ApprovVegan';PETA-Approved Vegan;Labels
+Peta-vegan;PETA-Approved Vegan;Labels
+PETA-Approved Vegan;PETA-Approved Vegan;Labels
+PETA approved vegan;PETA-Approved Vegan;Labels
+Peta approved Vegan;PETA-Approved Vegan;Labels
+peta;PETA-Approved Vegan;Labels
+PETA;PETA-Approved Vegan;Labels
+PETA VEGAN APPROVED;PETA-Approved Vegan;Labels
 Ananasleder;Ananasleder;Material
 Maisleder;Maisleder;Material
 PETA verifiziert;Vegan;Labels
@@ -330,7 +330,7 @@ Peta approved Vegan;Vegan;Labels
 peta;Vegan;Labels
 PETA;Vegan;Labels
 PETA VEGAN APPROVED;Vegan;Labels
-LOVECO;VEGAN;Labels
+LOVECO;Vegan;Labels
 muso koroni;Vegan;Labels
 ETHLETIC;Vegan;Labels
 Baumwolle (bio);Bio-Baumwolle;Material
@@ -371,10 +371,10 @@ Hergestellt in Brasilien;Brasilien;Hergestellt in
 Hergestellt in Tunisia;Tunesien;Hergestellt in
 Hergestellt in Turkey;Türkei;Hergestellt in
 Hergestellt in India;Indien;Hergestellt in
-Nachhaltig und fair hergestellt;Aus fairer Produktion;Labels3
-Nachhaltig und fair hergestellt;Aus nachhaltiger Produktion;Labels3
+Nachhaltig und fair hergestellt;Aus fairer Produktion;Labels
+Nachhaltig und fair hergestellt;Aus nachhaltiger Produktion;Labels
 hergestellt in fairer Produktion in Indien;Indien;Hergestellt in
-unter fairen Bedingungen;Aus fairer Produktion;Labels3
+unter fairen Bedingungen;Aus fairer Produktion;Labels
 Hergestellt in der Ukraine;Ukraine;Hergestellt in
 Hergestellt in Peru;Peru;Hergestellt in
 hergestellt in Kroatien;Kroatien;Hergestellt in
@@ -385,15 +385,15 @@ hergestellt in Slowenien;Slowenien;Hergestellt in
 hergestellt in Österreich;Österreich;Hergestellt in
 hergestellt in Ljubljana, Slowenien;Slowenien;Hergestellt in
 hergestellt in Europa (Lettland);Lettland;Hergestellt in
-Fabriken mit sozialer Verantwortung;Aus fairer Produktion;Labels3
-fairen Herstellung;Aus fairer Produktion;Labels3
-Fairtrade;Fair-Trade;Labels3-Siegel
-fair produzierter;Aus fairer Produktion;Labels3
-fair produzierte;Aus fairer Produktion;Labels3
-fair produziertes;Aus fairer Produktion;Labels3
-auch sozial fair verarbeitet;Aus fairer Produktion;Labels3
-nachhaltige und fair;Aus nachhaltiger Produktion;Labels3
-nachhaltige und fair;Aus fairer Produktion;Labels3
+Fabriken mit sozialer Verantwortung;Aus fairer Produktion;Labels
+fairen Herstellung;Aus fairer Produktion;Labels
+Fairtrade;Fair-Trade;Labels
+fair produzierter;Aus fairer Produktion;Labels
+fair produzierte;Aus fairer Produktion;Labels
+fair produziertes;Aus fairer Produktion;Labels
+auch sozial fair verarbeitet;Aus fairer Produktion;Labels
+nachhaltige und fair;Aus nachhaltiger Produktion;Labels
+nachhaltige und fair;Aus fairer Produktion;Labels
 LOVJOI produziert unter fairen Arbeitsbedigungen in Süddeutschland;Deutschland;Hergestellt in
 fairen Arbeitsbedigungen;Aus fairer Produktion;Labels3
 nachhaltige Materialien;Aus nachhaltiger Produktion;Labels3
