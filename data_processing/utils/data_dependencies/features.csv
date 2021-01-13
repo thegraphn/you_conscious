@@ -27,16 +27,16 @@ Zero Waste;Zero Waste;Labels
 Biobaumwolle;Bio-Baumwolle;Material
 Bio Baumwoll;Bio-Baumwolle;Material
 Bio-Baumwoll-Mix;Bio-Baumwolle;Material
-GOTS;Global Organic Textile Standard;Labels
-(GOTS);Global Organic Textile Standard;Labels
-GOTS-zertifiziert;Global Organic Textile Standard;Labels
-(GOTS-zertifiziert);Global Organic Textile Standard;Labels
+GOTS;GOTS (Global Organic Textile Standard);Labels3-Siegel
+(GOTS);GOTS (Global Organic Textile Standard);Labels3-Siegel
+GOTS-zertifiziert;GOTS (Global Organic Textile Standard);Labels3-Siegel
+(GOTS-zertifiziert);GOTS (Global Organic Textile Standard);Labels3-Siegel
 Bio Baumwolle;Bio-Baumwolle;Material
-Global Organic Textile Standard;Global Organic Textile Standard;Labels
-recycelter;Recycled;Labels
-recycelte;Recycled;Labels
-recycelten;Recycled;Labels
-recycelten PET-Flaschen ;Recycled;Labels
+Global Organic Textile Standard;GOTS (Global Organic Textile Standard);Labels3-Siegel
+recycelter;Recycled;Labels3
+recycelte;Recycled;Labels3
+recycelten;Recycled;Labels3
+recycelten PET-Flaschen ;Recycled;Labels3
 Obermaterial: PVC ;PVC;Material
 Obermaterial: Nylon;Nylon;Material
 Obermaterial: Synthetik;Synthetik;Material
@@ -395,5 +395,9 @@ auch sozial fair verarbeitet;Aus fairer Produktion;Labels
 nachhaltige und fair;Aus nachhaltiger Produktion;Labels
 nachhaltige und fair;Aus fairer Produktion;Labels
 LOVJOI produziert unter fairen Arbeitsbedigungen in Süddeutschland;Deutschland;Hergestellt in
-fairen Arbeitsbedigungen;Aus fairer Produktion;Labels
-nachhaltige Materialien;Aus nachhaltiger Produktion;Labels
+fairen Arbeitsbedigungen;Aus fairer Produktion;Labels3
+nachhaltige Materialien;Aus nachhaltiger Produktion;Labels3
+recolution DE;Vegan;Labels
+AWARE by VERO MODA;Aus nachhaltiger Produktion;Labels3
+Grüner Knopf;Grüner Knopf;Labels3-Siegel
+Made in India;Indien;Hergestellt in

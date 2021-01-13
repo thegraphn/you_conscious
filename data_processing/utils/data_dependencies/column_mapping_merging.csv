@@ -81,3 +81,7 @@ Versandkosten Allgemein;delivery_cost
 Lieferzeit/Verfügbarkeit;delivery_time
 gender;Fashion:suitable_for
 Hersteller;brand_name
+Vorschaubild-URL;aw_image_url
+merchant_image_url;merchant_image_url
+deeplink;aw_deep_link
+short_description;description
