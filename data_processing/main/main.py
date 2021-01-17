@@ -23,13 +23,13 @@ import datetime
 def main_app():
     begin = datetime.datetime.now()
     print("Begin data processing", begin)
-    processes: dict = {"downloading": True,
-                       "merging": True,
+    processes: dict = {"downloading": False,
+                       "merging": False,
                        "filtering": True,
                        "adding_features": True,
                        "filtering_without_label": True,
-                       "cleansing": True,
-                       "filtering_only_matching_category": True,
+                       "cleansing": False,
+                       "filtering_only_matching_category": False,
                        "shut_down": False}
 
     for process, todo in processes.items():

@@ -190,15 +190,15 @@ def filter_data_feed():
     headers = list_articles[0]
     list_articles = list_articles[1:]
     print("Filtering: Remove articles not in stock : Begin")
-    in_stock_articles = fltr.delete_not_in_stock_articles(list_articles)
+    list_articles = fltr.delete_not_in_stock_articles(list_articles)
     print("Filtering: Remove articles not in stock : End")
     print("List of articles has been created")
     print("Filtering - filtering: Begin")
-    list_articles_vegan = fltr.get_list_vegan_articles(in_stock_articles)
+    list_articles = fltr.get_list_vegan_articles(list_articles)
 
     print("Filtering - filtering: Done")
-    list_articles_vegan = [headers] + list_articles_vegan
-    write_2_file(list_articles_vegan, file_paths["filtered_data_feed_path"])
+    list_articles = [headers] + list_articles
+    write_2_file(list_articles, file_paths["filtered_data_feed_path"])
     print("Filtering: Done")
 
 
