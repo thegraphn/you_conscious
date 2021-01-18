@@ -14,7 +14,7 @@ Bio-Baumwolle;Bio-Baumwolle;Material
 Zero Waste ;Zero Waste;Labels
 (organic cotton);Bio-Baumwolle;Material
 organic cotton;Bio-Baumwolle;Material
-Eukalyptusfaser;Eukalyptus;Material
+Eukalyptusfaser;Eukalyptus;label_3
 recycelt nachhaltige Produktion;Recycled;Labels
 recycelten Polyamid;Recycled;Labels
 recyceltem;Recycled;Labels
@@ -27,16 +27,16 @@ Zero Waste;Zero Waste;Labels
 Biobaumwolle;Bio-Baumwolle;Material
 Bio Baumwoll;Bio-Baumwolle;Material
 Bio-Baumwoll-Mix;Bio-Baumwolle;Material
-GOTS;GOTS (Global Organic Textile Standard);Labels3-Siegel
-(GOTS);GOTS (Global Organic Textile Standard);Labels3-Siegel
-GOTS-zertifiziert;GOTS (Global Organic Textile Standard);Labels3-Siegel
-(GOTS-zertifiziert);GOTS (Global Organic Textile Standard);Labels3-Siegel
+GOTS;GOTS (Global Organic Textile Standard);label_3
+(GOTS);GOTS (Global Organic Textile Standard);label_3
+GOTS-zertifiziert;GOTS (Global Organic Textile Standard);label_3
+(GOTS-zertifiziert);GOTS (Global Organic Textile Standard);label_3
 Bio Baumwolle;Bio-Baumwolle;Material
-Global Organic Textile Standard;GOTS (Global Organic Textile Standard);Labels3-Siegel
-recycelter;Recycled;Labels3
-recycelte;Recycled;Labels3
-recycelten;Recycled;Labels3
-recycelten PET-Flaschen ;Recycled;Labels3
+Global Organic Textile Standard;GOTS (Global Organic Textile Standard);label_3
+recycelter;Recycled;label_3
+recycelte;Recycled;label_3
+recycelten;Recycled;label_3
+recycelten PET-Flaschen ;Recycled;label_3
 Obermaterial: PVC ;PVC;Material
 Obermaterial: Nylon;Nylon;Material
 Obermaterial: Synthetik;Synthetik;Material
@@ -395,9 +395,9 @@ auch sozial fair verarbeitet;Aus fairer Produktion;Labels
 nachhaltige und fair;Aus nachhaltiger Produktion;Labels
 nachhaltige und fair;Aus fairer Produktion;Labels
 LOVJOI produziert unter fairen Arbeitsbedigungen in Süddeutschland;Deutschland;Hergestellt in
-fairen Arbeitsbedigungen;Aus fairer Produktion;Labels3
-nachhaltige Materialien;Aus nachhaltiger Produktion;Labels3
+fairen Arbeitsbedigungen;Aus fairer Produktion;label_3
+nachhaltige Materialien;Aus nachhaltiger Produktion;label_3
 recolution DE;Vegan;Labels
-AWARE by VERO MODA;Aus nachhaltiger Produktion;Labels3
-Grüner Knopf;Grüner Knopf;Labels3-Siegel
+AWARE by VERO MODA;Aus nachhaltiger Produktion;label_3
+Grüner Knopf;Grüner Knopf;label_3
 Made in India;Indien;Hergestellt in
