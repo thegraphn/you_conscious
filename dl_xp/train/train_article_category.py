@@ -21,7 +21,7 @@ def doc_classification_multilabel():
     # https://public-mlflow.deepset.ai/#/experiments/162
     #https://public-mlflow.deepset.ai/#/experiments/162
     ml_logger = MLFlowLogger(tracking_uri="https://public-mlflow.deepset.ai/")
-    ml_logger.init_experiment(experiment_name="category", run_name="10")
+    ml_logger.init_experiment(experiment_name="category", run_name="11")
 
     ##########################
     # Settings
@@ -29,10 +29,10 @@ def doc_classification_multilabel():
     data_path = "/home/graphn/repositories/you_conscious/dl_xp/data/category"
     set_all_seeds(seed=42)
     device, n_gpu = initialize_device_settings(use_cuda=True)
-    n_epochs = 8
-    batch_size = 12
+    n_epochs = 12
+    batch_size = 8
 
-    evaluate_every = 1756
+    evaluate_every = 2633
     lang_model = "bert-base-german-cased"
     do_lower_case = False
 
@@ -54,7 +54,7 @@ def doc_classification_multilabel():
     metric = "f1_macro"
 
     processor = TextClassificationProcessor(tokenizer=tokenizer,
-                                            max_seq_len=300,
+                                            max_seq_len=356,
                                             data_dir=Path(
                                                 data_path),
                                             label_list=label_list,
