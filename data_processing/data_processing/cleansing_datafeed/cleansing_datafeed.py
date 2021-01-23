@@ -40,6 +40,7 @@ class Cleanser:
         self.model_path_colors = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/color"
         self.model_path_saison = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/saison"
         self.model_path_origin = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/origin"
+        self.model_path_keywords = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/keywords"
         self.column_features = ["brand",
                                 "merchant_name",
                                 "Fashion:suitable_for",
@@ -458,6 +459,42 @@ class Cleanser:
                 list_articles_with_saison.append(list_articles[prediction_position])
         return list_articles_with_saison  # Does not return headers
 
+    def predict_keywords(self, list_articles: list) -> list:
+        keyword_index = get_headers_index("keywords")
+        keyword_conf_score_index = get_headers_index("saison_conf_score_index")
+
+        list_articles_with_keyword = []
+        list_column_features = self.column_features
+        headers = list_articles[0]
+        interesting_data = []
+        list_index_interesting_data = []
+        for i, header in enumerate(headers):
+            if header in list_column_features:
+                list_index_interesting_data.append(i)
+        list_articles = list_articles[1:]  # skip headers
+
+        for article in list_articles:
+            article_data = []
+            for position in list_index_interesting_data:
+                article_data.append(article[position])
+            article_data = " [SEP] ".join(article_data)
+
+            interesting_data.append({"text": article_data})
+        interesting_data = interesting_data[1:]  # skip headers
+        model = Inferencer.load(self.model_path_saison, batch_size=24, gpu=True, task_type="text_classification",
+                                disable_tqdm=True, use_fast=True)
+        results = model.inference_from_dicts(dicts=interesting_data)
+        prediction_position = 0
+        for i, predictions in enumerate(results):
+            for prediction in predictions["predictions"]:
+                prediction_position += 1
+                label = prediction["label"]
+                probability = prediction["probability"]
+                list_articles[prediction_position][keyword_conf_score_index] = probability
+                list_articles[prediction_position][keyword_index] = label
+                list_articles_with_keyword.append(list_articles[prediction_position])
+        return list_articles_with_keyword  # Does not return headers
+
     def add_item_id(self, article: list):
         """
         Generate and add to the item_id column an item_id for every article
@@ -508,8 +545,14 @@ def cleansing():
         print("Cleansing - Adding saison DL: Begin", datetime.datetime.now())
         list_articles = cleanser.predict_saison([headers] + list_articles)
         print("Cleansing - Adding saison DL: Done", datetime.datetime.now())
+
+        print("Cleansing - Adding keywords DL: Begin", datetime.datetime.now())
+
+        list_articles = cleanser.predict_keywords([headers] + list_articles)
+        print("Cleansing - Adding keywords DL: Done", datetime.datetime.now())
+
         print("Cleansing - Adding origin DL: Begin", datetime.datetime.now())
-        list_articles = cleanser.predict_origin([headers] + list_articles)
+        #list_articles = cleanser.predict_origin([headers] + list_articles)
         print("Cleansing - Adding origin DL: Done", datetime.datetime.now())
 
         print("Cleansing - Sexes and Prices: Begin")
