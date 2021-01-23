@@ -18,7 +18,7 @@ class FeaturesAdder:
         self.features_list = get_lines_csv(features_mapping_path, ";")[1:]  # be aware of the header
         self.mapping_columnHeader = get_mapping_column_index(self.input_file, "\t")
         self.awDeepLink_index = column_index_mapping["aw_deep_link"]
-        # self.label_zero_index = get_headers_index("label_0", file=self.input_file)
+        self.all_labels_index = get_headers_index("Labels", file=self.input_file)
         # self.label_one_index = get_headers_index("label_1", file=self.input_file)
         # self.label_two_index = get_headers_index("label_2", file=self.input_file)
         # self.label_three_index = get_headers_index("label_3", file=self.input_file)
@@ -33,6 +33,7 @@ class FeaturesAdder:
         txt_article = " ".join(article)
         list_label_features = set()
         feature_column = defaultdict(list)
+        set_article_features = [""]
         for string2Find_feature2Write_columnFeature in self.features_list:
             string2_find = string2Find_feature2Write_columnFeature[0]
             feature2_write = string2Find_feature2Write_columnFeature[1]
@@ -43,15 +44,19 @@ class FeaturesAdder:
                     article[self.mapping_columnHeader[column_feature]] += feature2_write
                     list_label_features.add(feature2_write)
                     feature_column[column_feature].append(feature2_write)
+                    set_article_features.append (feature2_write)
             if column_feature != "Labels":
                 if string2_find in txt_article:
                     article[self.mapping_columnHeader[column_feature]] = feature2_write
                     feature_column[column_feature].append(feature2_write)
+                    set_article_features.append(feature2_write)
+
                 elif re.match(string2_find, txt_article) is not None:
                     article[self.mapping_columnHeader[column_feature]] = feature2_write
                     feature_column[column_feature].append(feature2_write)
-        feature_column = {column: list(set(feature)) for column, feature in feature_column.items()}
+                    set_article_features.append(feature2_write)
 
+        feature_column = {column: list(set(feature)) for column, feature in feature_column.items()}
         list_label_features = list(list_label_features)
         if len(feature_column) > 0:
             for column, features in feature_column.items():
@@ -62,6 +67,9 @@ class FeaturesAdder:
                         article[column_index_mapping[column+position]] = feature
                 else:
                     article[column_index_mapping[column]] = features[0]
+        set_article_features = list(set(set_article_features))
+
+        article[self.all_labels_index] = "-".join(set_article_features)
 
         """    
         if len(list_label_features) > 0:
