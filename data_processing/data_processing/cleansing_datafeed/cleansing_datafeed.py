@@ -7,10 +7,13 @@ from farm.infer import Inferencer
 
 from data_processing.data_processing.cleansing_datafeed.size_finder import SizeFinder
 from data_processing.data_processing.cleansing_datafeed.size_sorter import SizeSorter
-from data_processing.data_processing.cleansing_datafeed.utils import clean_category_sex, clean_size
+from data_processing.data_processing.cleansing_datafeed.utils import clean_category_sex, clean_size, \
+    check_if_relevant_ean_merchant_is_present, sort_ean_merchant
+from data_processing.data_processing.filter_datafeed.utils import replace_merchant_names_ean_order
 from data_processing.data_processing.utils.columns_order import column_index_mapping
 from data_processing.data_processing.utils.file_paths import file_paths
 from data_processing.data_processing.utils.getHeaders import get_headers_index
+from data_processing.data_processing.utils.merchant_ean_ranking import ranking_merchant_ean
 from data_processing.data_processing.utils.utils import create_mapping_between_2_columns, \
     files_mapping_categories_path, \
     mapping_fashionSuitableFor, synonym_female, synonym_male, synonym_euro, get_mapping_column_index, \
@@ -361,7 +364,6 @@ class Cleanser:
             article_data = " [SEP] ".join(article_data)
             interesting_data.append({"text": article_data})
 
-
         interesting_data = interesting_data[1:]  # skip headers
         model = Inferencer.load(self.model_path_origin, batch_size=16, gpu=True, task_type="text_classification",
                                 disable_tqdm=True, use_fast=True)
@@ -461,7 +463,6 @@ class Cleanser:
 
     def predict_keywords(self, list_articles: list) -> list:
         keyword_index = get_headers_index("keywords")
-        keyword_conf_score_index = get_headers_index("saison_conf_score_index")
 
         list_articles_with_keyword = []
         list_column_features = self.column_features
@@ -481,7 +482,7 @@ class Cleanser:
 
             interesting_data.append({"text": article_data})
         interesting_data = interesting_data[1:]  # skip headers
-        model = Inferencer.load(self.model_path_saison, batch_size=24, gpu=True, task_type="text_classification",
+        model = Inferencer.load(self.model_path_keywords, batch_size=24, gpu=True, task_type="text_classification",
                                 disable_tqdm=True, use_fast=True)
         results = model.inference_from_dicts(dicts=interesting_data)
         prediction_position = 0
@@ -489,8 +490,7 @@ class Cleanser:
             for prediction in predictions["predictions"]:
                 prediction_position += 1
                 label = prediction["label"]
-                probability = prediction["probability"]
-                list_articles[prediction_position][keyword_conf_score_index] = probability
+                print(label)
                 list_articles[prediction_position][keyword_index] = label
                 list_articles_with_keyword.append(list_articles[prediction_position])
         return list_articles_with_keyword  # Does not return headers
@@ -502,6 +502,67 @@ class Cleanser:
         :return: article
         """
         article[self.item_id_index] = self.aw_deep_link_index
+
+    def ean_cleanser(self, list_articles: list) -> list:
+        # {ean:(list_index,merchant)}
+        # todo first case with over 2k
+        # if list only avocado store keep all
+        list_clean_ean_articles = []
+        list_index_articles_cleansed = []
+        list_articles_to_return = []
+        articles_index_to_return = []
+        merchant_ean_to_clean = ["0Avocadostore", "1Im walking", "2mirapodo", "3OTTO"]
+        ean_mapping = defaultdict(list)
+        ean_relevant_merchant = (ranking_merchant_ean.keys())
+        ean_index = get_headers_index("ean", self.input_data_feed)
+        merchant_name_index = get_headers_index("merchant_name", self.input_data_feed)
+        for a, article in enumerate(list_articles):
+            ean = article[ean_index]
+            ean_mapping[ean].append({"merchant_name": replace_merchant_names_ean_order(article[merchant_name_index]),
+                                     "index": a})
+            list_index_articles_cleansed.append(a)
+
+        for ean, merchants in ean_mapping.items():
+            ean_cleansed = False
+            if ean == str(889556801404):
+                print("xx", merchants)
+            length_merchant_names = len(merchants)
+            list_merchant_names = [merchant["merchant_name"] for merchant in merchants]
+            set_merchant_names = set(list_merchant_names)
+            if ean != "":
+                if len(set(list_merchant_names).intersection(merchant_ean_to_clean)) > 0:
+                    # print(set_merchant_names)
+                    if "0Avocadostore" in list_merchant_names:
+                        if len(set_merchant_names) == 1:
+                            for merchant in merchants:
+                                articles_index_to_return.append(merchant["index"])
+                        else:
+                            for merchant in merchants:
+                                if merchant["merchant_name"] == "0Avocadostore":
+                                    articles_index_to_return.append(merchant["index"])
+
+
+
+                    else:
+                        ordered_merchants = []
+                        ord_merchants = {}
+                        ordered_merchants = [merchant["merchant_name"] + "-" + str(merchant["index"]) for merchant in
+                                             merchants]
+                        merchant_to_return = ordered_merchants[0]
+                        index_to_return = merchant_to_return.split("-")[-1]
+                        index_to_return = int(index_to_return)
+                        articles_index_to_return.append(index_to_return)
+
+
+
+
+            else:
+                for merchant in merchants:
+                    articles_index_to_return.append(merchant["index"])
+        for article_index in articles_index_to_return:
+            if type(article_index) == int:
+                list_articles_to_return.append(list_articles[article_index])
+        return list_articles_to_return
 
 
 def cleansing():
@@ -530,6 +591,7 @@ def cleansing():
 
         list_articles = list(tqdm.tqdm(p.imap(cleanser.article_cleansing, list_articles),
                                        total=len(list_articles)))
+        list_articles = cleanser.ean_cleanser(list_articles)
 
         print("Cleansing - Renaming Categories: Done", datetime.datetime.now())
 
@@ -552,7 +614,7 @@ def cleansing():
         print("Cleansing - Adding keywords DL: Done", datetime.datetime.now())
 
         print("Cleansing - Adding origin DL: Begin", datetime.datetime.now())
-        #list_articles = cleanser.predict_origin([headers] + list_articles)
+        # list_articles = cleanser.predict_origin([headers] + list_articles)
         print("Cleansing - Adding origin DL: Done", datetime.datetime.now())
 
         print("Cleansing - Sexes and Prices: Begin")

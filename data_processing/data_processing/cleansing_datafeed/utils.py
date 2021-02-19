@@ -3,6 +3,7 @@ import re
 import tqdm
 
 from data_processing.data_processing.utils.getHeaders import get_headers_index
+from data_processing.data_processing.utils.merchant_ean_ranking import ranking_merchant_ean
 from data_processing.data_processing.utils.utils import mapping_cleaning_fashionSuitableFor, get_tokens
 
 
@@ -123,3 +124,19 @@ def change_chain_characters_to_umlaut(string: str) -> str:
         else:
             text += zeichen
     return text
+
+
+def check_if_relevant_ean_merchant_is_present(relevant_ean_merchants, list_merchant_names):
+    for relevant_ean_merchant in relevant_ean_merchants:
+        if relevant_ean_merchant in list_merchant_names:
+            return True
+    return False
+
+
+def sort_ean_merchant(l):
+    tmp_list = [[] for i in range(len(ranking_merchant_ean))]
+    for sub_list in l:
+        for m, r in ranking_merchant_ean.items():
+            if sub_list[0] == m:
+                tmp_list[r] = sub_list
+    return tmp_list

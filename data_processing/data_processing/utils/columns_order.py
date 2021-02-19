@@ -4,6 +4,7 @@ column_ord: list = [
     'plus_sizes',
     'label_all_together',
     'featured',
+    'keywords',
     'Labels',
     'label_1',
     'label_2',
@@ -167,7 +168,8 @@ column_ord: list = [
     'ext_Währung',
     'additional_image_link.1',
     'additional_image_link.2',
-'country', 'weight'
+'country', 'weight',
+'ext_google_product_category_de', 'ext_gender', 'ext_product_sku', 'ext_active_for_sale', 'ext_colour', 'ext_stock'
 
 ]
 

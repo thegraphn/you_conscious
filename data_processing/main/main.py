@@ -3,8 +3,11 @@ This scripts executes the data processing pipe line.
 At the end of this script the used data feed for the web site will have been
 generated.
 """
+import glob
 import os
 import sys
+
+from data_processing.data_processing.utils.utils import download_data_feeds_directory_path
 
 folder = os.path.dirname(os.path.realpath(__file__))
 folder = folder.replace("/data_processing/main", "")
@@ -23,22 +26,26 @@ import datetime
 def main_app():
     begin = datetime.datetime.now()
     print("Begin data processing", begin)
-    processes: dict = {"downloading": False,
-                       "merging": False,
+    processes: dict = {"downloading": True,
+                       "merging": True,
                        "filtering": True,
                        "adding_features": True,
                        "filtering_without_label": True,
-                       "cleansing": False,
-                       "filtering_only_matching_category": False,
+                       "cleansing": True,
+                       "filtering_only_matching_category": True,
                        "shut_down": False}
 
     for process, todo in processes.items():
         print(process, todo)
         if process == "downloading":
             if todo:
+                list_downloaded_files = glob.glob(os.path.join(download_data_feeds_directory_path,"*.csv"))
+                for file in list_downloaded_files:
+                    os.remove(file)
                 downloading()
         if process == "merging":
             if todo:
+
                 merging()
         if process == "filtering":
             if todo:
