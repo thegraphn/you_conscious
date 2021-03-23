@@ -25,7 +25,6 @@ CF_Verfügbare Größen;Fashion:size
 product_name;Title
 merchant_category;category_name
 deeplink;aw_deep_link
-image_url;aw_image_url
 category_path;category_name
 merchant_product_category_path;category_name
 Colour;colour
@@ -85,3 +84,15 @@ Vorschaubild-URL;aw_image_url
 merchant_image_url;merchant_image_url
 deeplink;aw_deep_link
 short_description;description
+image_url;merchant_image_url
+image_large_url;merchant_image_url
+european_article_number;ean
+europäische Artikelnummer EAN;ean
+ext_colour;colour
+ext_stock;stock_quantity
+Produktbeschreibung lang;description
+Produktbild-URL;merchant_image_url
+in_stock;stock_status
+ext_gender;Fashion:suitable_for
+ext_size;Fashion:size
+ext_stock;stock_status
