@@ -27,7 +27,7 @@ from data_processing.data_processing.utils.utils import create_mapping_between_2
     maxNumberFashionSizeColumns, get_lines_csv, write_2_file, get_tokens
 import pandas as pd
 
-batch_size = 100
+batch_size = 250
 
 
 class Cleanser:
@@ -53,7 +53,7 @@ class Cleanser:
         self.colour_index = self.column_2_id["colour"]
         self.aw_deep_link_index = self.column_2_id["aw_deep_link"]
         self.item_id_index = self.column_2_id["item_id"]
-        self.model_path_categories = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/category_distil_v1"
+        self.model_path_categories = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/category_distil_v9"
         self.model_path_colors = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/color_distil"
         self.model_path_saison = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/saison"
         self.model_path_origin = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/origin"
@@ -267,10 +267,7 @@ class Cleanser:
 
         for article in list_art:
             merchant_name = article[self.merchantName_index]
-
             identifier_column = merchant_to_identifier[merchant_name]
-            if "LOVECO" in merchant_name:
-                print(merchant_name,identifier_column)
             size_content = article[mapping_column_header["Fashion:size"]]
             size_content = clean_size(size_content)
             stock_content = article[mapping_column_header["stock_status"]]
@@ -542,8 +539,6 @@ class Cleanser:
 
         for ean, merchants in ean_mapping.items():
             ean_cleansed = False
-            if ean == str(889556801404):
-                print("xx", merchants)
             length_merchant_names = len(merchants)
             list_merchant_names = [merchant["merchant_name"] for merchant in merchants]
             set_merchant_names = set(list_merchant_names)

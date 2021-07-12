@@ -25,7 +25,7 @@ merchant_to_identifier = {"asos": "merchant_image_url",
                           "Uli Schott - The unknown brand": "merchant_image_url",
                           "United Colors of Benetton": "merchant_image_url",
                           "Benetton DE": "merchant_image_url",
-
+                        "Nordgreen DACH":"merchant_image_url",
                           "VERO MODA": "merchant_image_url",
                           "Vero Moda DE": "merchant_image_url",
                           "": "aw_image_url",
