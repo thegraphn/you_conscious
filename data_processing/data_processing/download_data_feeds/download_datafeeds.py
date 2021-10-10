@@ -80,14 +80,11 @@ class Downloader:
         :param in_file: datafeed file
         :param merchant_name: name to add into the data feed
         """
-        merchant_name = ""
-        sep = ";"
-        if "SORBAS" in in_file:
-            sep = ","
+
         if "LOVECO" in in_file:
             sep = ","
             df = pd.read_csv(in_file, sep=sep)
-            sep = ","
+            merchant_name = "LOVECO - Fair & Vegan Fashion and Shoes"
             df["merchant_name"] = merchant_name
 
         if "JW_PEI" in in_file:
@@ -100,8 +97,13 @@ class Downloader:
             df = pd.read_csv(in_file, sep=sep)
             df.insert(0, "merchant_name", "Uli Schott - The unknown brand", True)
             df["merchant_name"] = merchant_name
-        else:
+        if "Le_Shop_Vegan" in in_file:
+            merchant_name = "Le Shop Vegan"
+            sep = ","
             df = pd.read_csv(in_file, sep=sep)
+            df.insert(0, "merchant_name", merchant_name, True)
+            df["merchant_name"] = merchant_name
+
         if "muso_koroni" in in_file:
             merchant_name = "muso koroni"
             sep = ";"
@@ -113,25 +115,30 @@ class Downloader:
             sep = ";"
             df = pd.read_csv(in_file, sep=sep)
             df.insert(0, "merchant_name", merchant_name, True)
+            df["merchant_name"] = merchant_name
         if "SORBAS" in in_file:
             merchant_name = "SORBAS"
             sep = ","
             df = pd.read_csv(in_file, sep=sep)
             df.insert(0, "merchant_name", merchant_name, True)
+            df["merchant_name"] = merchant_name
         if "recolution" in in_file:
             merchant_name = "recolution"
             sep = ","
             df = pd.read_csv(in_file, sep=sep, quotechar='"')
             df.insert(0, "merchant_name", merchant_name, True)
         if "LOVECO" in in_file:
+            df = pd.read_csv(in_file,sep=",")
             merchant_name = "LOVECO - Fair & Vegan Fashion and Shoes"
+            df["merchant_name"] = merchant_name
         if "JW_PEI" in in_file:
+            df = pd.read_csv(in_file, sep=",")
             merchant_name = "JW PEI DE"
-        df["merchant_name"] = merchant_name
+            df["merchant_name"] = merchant_name
 
         return df
 
-    def add_merchant_names(self, list_file_paths: list) -> list:
+    def add_merchant_names(self, list_file_paths: list):
         """
         :param list_file_paths:
         :return:
@@ -141,8 +148,6 @@ class Downloader:
             list_df = list(tqdm.tqdm(p.imap(self.add_merchant_name, list_file_paths), total=len(list_file_paths)))
         for file, df in zip(list_file_paths, list_df):
             print(df.head())
-            print("2", file)
-            print(df["merchant_name"])
             df.to_csv(file, sep=",")
 
     def download_datafeeds(self, list_tuples_shops_urls: list):
@@ -166,44 +171,15 @@ class Downloader:
         shop_name: str = tuple_shop_url[0]
         link: str = tuple_shop_url[1]
         shop_name = shop_name.replace(" ", "_")
-
+        already_csv_files = ["LOVECO", "SORBAS", "Le_Shop_Vegan", "Uli_Schott", "muso_koroni", "ETHLETIC", "recolution"]
         try:
-            if "LOVECO" == shop_name:
+            if shop_name in already_csv_files:
                 format_file = ".csv"
                 path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
                                               datetime.datetime.now().strftime("%y-%m-%d") + format_file)
                 urllib.request.urlretrieve(link, path_file)
 
-            if "SORBAS" == shop_name:
-                format_file = ".csv"
-                path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
-                                              datetime.datetime.now().strftime("%y-%m-%d") + format_file)
 
-                urllib.request.urlretrieve(link, path_file)
-
-                os.remove(os.path.join(download_data_feeds_directory_path, shop_name + "-" +
-                                       datetime.datetime.now().strftime("%y-%m-%d") + ".gz"))
-            if "Uli_Schott" in shop_name:
-                format_file = ".csv"
-                path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
-                                              datetime.datetime.now().strftime("%y-%m-%d") + format_file)
-                urllib.request.urlretrieve(link, path_file)
-
-            if "muso_koroni" in shop_name:
-                format_file = ".csv"
-                path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
-                                              datetime.datetime.now().strftime("%y-%m-%d") + format_file)
-                urllib.request.urlretrieve(link, path_file)
-            if "ETHLETIC" in shop_name:
-                format_file = ".csv"
-                path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
-                                              datetime.datetime.now().strftime("%y-%m-%d") + format_file)
-                urllib.request.urlretrieve(link, path_file)
-            if "recolution" in shop_name:
-                format_file = ".csv"
-                path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
-                                              datetime.datetime.now().strftime("%y-%m-%d") + format_file)
-                urllib.request.urlretrieve(link, path_file)
 
             else:
                 format_file = ".gz"
@@ -231,6 +207,8 @@ class Downloader:
         """
         if ".csv" in file:
             return 1
+        if "Le_Shop_Vegan" in file:
+            return 1
         if "LOVECO" in file:
             return 1
         if "SORBAS" in file:
@@ -240,6 +218,9 @@ class Downloader:
         if "Uli_Schott" in file:
             return 1
         if "ETHLETIC" in file:
+            os.rename(file, file[:-3] + ".csv")
+            return 1
+        if "Nordgreen" in file:
             os.rename(file, file[:-3] + ".csv")
             return 1
         # if "recolution" in file:
@@ -294,13 +275,12 @@ def downloading():
     print("Downloading - Change csv file delimiter: End")
     print("Downloading - Unzipping data feeds: Begin")
     downloader.delete_non_csv_datafeeds(download_data_feeds_directory_path)  # does not work
-    list_file_merchant_name_to_add = glob.glob(os.path.join(download_data_feeds_directory_path, "*muso_koroni*.csv"))
-    list_file_merchant_name_to_add += glob.glob(os.path.join(download_data_feeds_directory_path, "*SORBAS*.csv"))
-    list_file_merchant_name_to_add += glob.glob(os.path.join(download_data_feeds_directory_path, "*ETHLETIC*.csv"))
-    list_file_merchant_name_to_add += glob.glob(os.path.join(download_data_feeds_directory_path, "*recolution*.csv"))
-    list_file_merchant_name_to_add += glob.glob(os.path.join(download_data_feeds_directory_path, "*LOVECO*.csv"))
-    list_file_merchant_name_to_add += glob.glob(os.path.join(download_data_feeds_directory_path, "*JW_PEI*.csv"))
-    list_file_merchant_name_to_add += glob.glob(os.path.join(download_data_feeds_directory_path, "*Uli_Sc*.csv"))
+    merchant_names_to_add = ["*muso_koroni*.csv", "*SORBAS*.csv", "*ETHLETIC*.csv", "*recolution*.csv", "*LOVECO*.csv",
+                             "*JW_PEI*.csv", "*Uli_Sc*.csv", "*Le_Shop_Vegan*.csv"
+                             ]
+    # merchant_names_to_add = ["*Le_Shop_Vegan*.csv"]
+    list_file_merchant_name_to_add = [glob.glob(os.path.join(download_data_feeds_directory_path, shop))[0]
+                                      for shop in merchant_names_to_add]
 
     downloader.add_merchant_names(list_file_merchant_name_to_add)
 

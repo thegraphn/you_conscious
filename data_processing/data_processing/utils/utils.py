@@ -165,11 +165,15 @@ def change_delimiter_csv(csv_input: str, csv_output: str, delimiter_input: str, 
     Change the format of the csv file 
     """
     input_rows: list = []
-    with open(csv_input, "r", encoding="utf-8") as ic:
+    encoding_input = "utf-8"
+    encoding_output = "utf-8"
+    if "Le_Shop_Vegan" in csv_input:
+        encoding_input="ISO-8859-1"
+    with open(csv_input, "r", encoding=encoding_input) as ic:
         csv_reader = csv.reader(ic, delimiter=delimiter_input)
         for row in csv_reader:
             input_rows.append(row)
-    with open(csv_output, "w", encoding="utf-8", newline="") as oc:
+    with open(csv_output, "w", encoding=encoding_output, newline="") as oc:
         csv_writer = csv.writer(oc, delimiter=delimiter_output, quoting=csv.QUOTE_ALL)
         for element in tqdm.tqdm(input_rows):
             csv_writer.writerow(element)
@@ -201,7 +205,8 @@ mapping_cleaning_fashionSuitableFor = create_mapping_between_2_columns(cleaning_
 awDeepLink_index = 42
 
 maxNumberFashionSizeColumns = 100
-affiliateId = "?affiliates=3"
+affiliate_id_sorbas = "?affiliates=3"
+affiliate_id_le_shop_vegan = "?sPartner=1207wrt2107"
 
 synonym_female = ["female", "weiblich", "damen", "Female", "Weiblich", "Damen"]
 synonym_male = ["male", "Male", "Herren", "Man", "männlich"]

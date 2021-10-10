@@ -44,10 +44,10 @@ class FilesAggregator:
         return {one: two for one, two in zip(column_1, column_2)}
 
     def change_program_id_2_merchant_name(self, csv_file):
-        def program_id_2_merchant_name(merchant_name):
-            return merchant_name.replace(self.shop_id_name_mapping, self.shop_id_name_mapping[merchant_name])
-
-        df = pd.read_csv(csv_file, sep=",", low_memory=False)
+        #def program_id_2_merchant_name(merchant_name):
+        #    return merchant_name.replace(self.shop_id_name_mapping, self.shop_id_name_mapping[merchant_name])
+        print(csv_file)
+        df = pd.read_csv(csv_file, sep=",", low_memory=False,encoding="utf-8")
         # todo with multi processing
         merchant_names_frame = df["merchant_name"].tolist()
         # with Pool(processes=16) as p:
@@ -61,7 +61,11 @@ class FilesAggregator:
     def change_column_name(self, csv_file, mapping_file):
         print(csv_file)
         dict_mapping_column = self.get_mapping_2_columns(mapping_file, "from", "to")
-        df = pd.read_csv(csv_file, sep=",", low_memory=False)
+        if "ETHLETIC" in csv_file:
+            sep = ";"
+        else:
+            sep =","
+        df = pd.read_csv(csv_file, sep=sep, low_memory=False)
         print(df.columns)
         df = df.rename(columns=dict_mapping_column)
         print(df.columns)
@@ -93,11 +97,12 @@ def merging():
     print("Merging - Changing ID to Name: Begin")
     file_aggregator.change_program_id_2_merchant_name(merged_data_feed_path)
     print("Merging - Changing ID to Name: Done")
-    print("Merging: Done ", datetime.datetime.now())
+
     df_merged = pd.read_csv(merged_data_feed_path, sep="\t", low_memory=False)
     df_merged.replace(to_replace=mapping_to_utf)
+    df_merged = df_merged[column_ord]
     df_merged.to_csv(merged_data_feed_path, sep="\t")
-
+    print("Merging: Done ", datetime.datetime.now())
 
 def parallelize_dataframe(self, df, func, n_cores=16):
     df_split = np.array_split(df, n_cores)

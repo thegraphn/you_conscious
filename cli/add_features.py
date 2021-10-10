@@ -6,7 +6,7 @@ import tqdm
 from data_processing.data_processing.utils.file_paths import file_paths
 from data_processing.data_processing.utils.getHeaders import getHeadersIndex
 from data_processing.data_processing.utils.utils import get_lines_csv, getMappingColumnIndex, features_mapping_path, \
-    affiliateId, \
+    affiliate_id_sorbas, \
     features_data_feed_path, write_2_file
 
 
@@ -55,7 +55,7 @@ class FeaturesAdder:
         if "https://sorbasshoes.com" in content_aw_deep_link_index:
             for i, char in enumerate(content_aw_deep_link_index):
                 if char == "?":
-                    link = content_aw_deep_link_index[:i] + affiliateId
+                    link = content_aw_deep_link_index[:i] + affiliate_id_sorbas
                     break
             article[self.awDeepLink_index] = link
         return article

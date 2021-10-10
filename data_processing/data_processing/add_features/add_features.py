@@ -7,12 +7,13 @@ from data_processing.data_processing.utils.file_paths import file_paths
 from data_processing.data_processing.utils.getHeaders import get_headers_index
 from data_processing.data_processing.utils.utils import get_lines_csv, \
     get_mapping_column_index, features_mapping_path, \
-    affiliateId, \
-    features_data_feed_path, write_2_file
+    affiliate_id_sorbas, \
+    features_data_feed_path, write_2_file, affiliate_id_le_shop_vegan
 
 
 class FeaturesAdder:
     """Add feature Class"""
+
     def __init__(self):
         self.input_file: str = file_paths["filtered_data_feed_path"]
         self.features_list = get_lines_csv(features_mapping_path, ";")[1:]  # be aware of the header
@@ -27,11 +28,11 @@ class FeaturesAdder:
         :param article: Article
         :return: Article
         """
-        txt_article = " ".join(article)
+        txt_article = " ".join(article).lower()
 
         for string_2_find_feature_2_write_column_feature in self.features_list:
 
-            string2_find = string_2_find_feature_2_write_column_feature[0]
+            string2_find = string_2_find_feature_2_write_column_feature[0].lower()
             feature2_write = string_2_find_feature_2_write_column_feature[1]
             column_feature = string_2_find_feature_2_write_column_feature[2]
             if string2_find in txt_article:
@@ -41,14 +42,21 @@ class FeaturesAdder:
         return article
 
     def add_affiliate_id_article(self, article) -> list:
-        content_aw_deep_link_index: str = article[self.aw_deep_link_index]
-        link: str = ""
+        content_aw_deep_link_index: str = article[self.mapping_column_header["aw_deep_link"]]
+
         if "https://sorbasshoes.com" in content_aw_deep_link_index:
+            link: str = ""
             for i, char in enumerate(content_aw_deep_link_index):
                 if char == "?":
-                    link = content_aw_deep_link_index[:i] + affiliateId
+                    link = content_aw_deep_link_index[:i] + affiliate_id_sorbas
                     break
-            article[self.aw_deep_link_index] = link
+            article[self.mapping_column_header["aw_deep_link"]] = link
+            return article
+        if "le-shop-vegan.de" in content_aw_deep_link_index:
+            link = content_aw_deep_link_index + "?sPartner=1207wrt2107"
+            article[self.mapping_column_header["aw_deep_link"]] = link
+
+            return article
         return article
 
     def add_affiliate_id_articles(self, list_articles) -> list:

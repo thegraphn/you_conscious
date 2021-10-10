@@ -18,10 +18,11 @@ def doc_classification_multilabel():
         format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
         datefmt="%m/%d/%Y %H:%M:%S",
         level=logging.INFO)
+    experiment_name = "distill_v17"
     # https://public-mlflow.deepset.ai/#/experiments/162
-    #https://public-mlflow.deepset.ai/#/experiments/162
+
     ml_logger = MLFlowLogger(tracking_uri="https://public-mlflow.deepset.ai/")
-    ml_logger.init_experiment(experiment_name="category", run_name="distill_v3")
+    ml_logger.init_experiment(experiment_name="category", run_name=experiment_name)
 
     ##########################
     # Settings
@@ -30,29 +31,29 @@ def doc_classification_multilabel():
     set_all_seeds(seed=42)
     device, n_gpu = initialize_device_settings(use_cuda=True)
     n_epochs = 40
-    batch_size =50
+    batch_size = 50
 
-    evaluate_every = 1074
-    lang_model = "distilbert-base-german-cased"
+
+    lang_model = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/category_distill_v16"  # "distilbert-base-german-cased"
     do_lower_case = False
 
     # 1.Create a tokenizer
     tokenizer = Tokenizer.load(
         pretrained_model_name_or_path=lang_model,
         do_lower_case=do_lower_case)
-
     # 2. Create a DataProcessor that handles all the conversion from raw text into a pytorch Dataset
     # Here we load Toxic Comments Data automatically if it is not available.
 
     # get label lists
 
     import pandas as pd
-    t = pd.read_csv("/home/graphn/repositories/you_conscious/dl_xp/data/category/train_category.tsv",sep="\t")
+    t = pd.read_csv("/home/graphn/repositories/you_conscious/dl_xp/data/category/train_category.tsv", sep="\t")
     tt = pd.read_csv("/home/graphn/repositories/you_conscious/dl_xp/data/category/test_category.tsv", sep="\t")
     tl = t["label"].tolist()
     ttl = tt["label"].tolist()
-    label_list = list(set(tl+ttl))
+    label_list = list(set(tl + ttl))
     metric = "f1_macro"
+    evaluate_every = round((len(t)*0.8)/batch_size)
 
     processor = TextClassificationProcessor(tokenizer=tokenizer,
                                             max_seq_len=200,
@@ -67,7 +68,8 @@ def doc_classification_multilabel():
                                             dev_split=0.2,
                                             )
 
-    # 3. Create a DataSilo that loads several datasets (train/dev/test), provides DataLoaders for them and calculates a few descriptive statistics of our datasets
+    # 3. Create a DataSilo that loads several datasets (train/dev/test), provides DataLoaders for them and calculates
+    # a few descriptive statistics of our datasets
     data_silo = DataSilo(
         processor=processor,
         batch_size=batch_size)
@@ -91,7 +93,7 @@ def doc_classification_multilabel():
         n_batches=len(data_silo.loaders["train"]),
         n_epochs=n_epochs,
     )
-    save_dir = Path("../trained_models/category_distil_v3")
+    save_dir = Path("../trained_models/category_" + experiment_name)
 
     earlystopping = EarlyStopping(
         metric="f1_macro", mode="max",  # use the metric from our own metrics function instead of loss
@@ -120,7 +122,21 @@ def doc_classification_multilabel():
     # 9. Load it & harvest your fruits (Inference)
     basic_texts = [
         {
-            "text": "Avocadostore [SEP] Herren [SEP] Gumbies Brown Retro – Nachhaltige Sommerschuhe Für Damen Und Herren [SEP] GUMBIES Brown Retro – 100% vegan. Nachhaltigkeit ist unser Gedanke. Deswegen verwenden wir für deine Sommerschuhe recyceltes Material: Die Sohle besteht aus recyceltem Kautschuk und der Fußriemen ist aus recycelter Baumwolle hergestellt. Sohle besteht aus recyceltem Kautschuk Besonders robuste Sohle für einen idealen Halt auf beinahe allen Untergründen Fußriemen aus recycelter Baumwolle Baumwoll-Zehensteg ist besonders weich und tragefreundlich Ideales Tragegefühl durch das ergonomisch geformte Fußbett Keine Verwendung von Polyester und Plastik Farbe: Braun / türkiser Fußriemen Größen: 36-46 Deine GUMBIES kannst du den ganzen Tag tragen. Die nachhaltigen Sandalen sind super weich und extrem bequem. Und das Beste: Endlich kein Scheuern mehr zwischen deinen Zehen. Deine Füße werden dich dafür lieben. Als die Idee der GUMBIES entstanden ist, war der Grundgedanke, einen nachhaltigen Sommer-Schuh zu entwickeln. Die Grundlage hinter den GUMBIES bildet dabei die markante Sohle, die aus recyceltem Kautschuk sowie Jute besteht und perfekten Halt auf allen Untergründen bietet. Die einzige Spur, die unsere GUMBIES in der Natur hinterlassen, ist ein nachhaltiger Fußabdruck beim Laufen durch den Sand. <SEP>"},
+            "text": "Avocadostore [SEP] Herren [SEP] Gumbies Brown Retro – Nachhaltige Sommerschuhe Für Damen Und "
+                    "Herren [SEP] GUMBIES Brown Retro – 100% vegan. Nachhaltigkeit ist unser Gedanke. Deswegen "
+                    "verwenden wir für deine Sommerschuhe recyceltes Material: Die Sohle besteht aus recyceltem "
+                    "Kautschuk und der Fußriemen ist aus recycelter Baumwolle hergestellt. Sohle besteht aus "
+                    "recyceltem Kautschuk Besonders robuste Sohle für einen idealen Halt auf beinahe allen "
+                    "Untergründen Fußriemen aus recycelter Baumwolle Baumwoll-Zehensteg ist besonders weich und "
+                    "tragefreundlich Ideales Tragegefühl durch das ergonomisch geformte Fußbett Keine Verwendung von "
+                    "Polyester und Plastik Farbe: Braun / türkiser Fußriemen Größen: 36-46 Deine GUMBIES kannst du "
+                    "den ganzen Tag tragen. Die nachhaltigen Sandalen sind super weich und extrem bequem. Und das "
+                    "Beste: Endlich kein Scheuern mehr zwischen deinen Zehen. Deine Füße werden dich dafür lieben. "
+                    "Als die Idee der GUMBIES entstanden ist, war der Grundgedanke, einen nachhaltigen Sommer-Schuh "
+                    "zu entwickeln. Die Grundlage hinter den GUMBIES bildet dabei die markante Sohle, "
+                    "die aus recyceltem Kautschuk sowie Jute besteht und perfekten Halt auf allen Untergründen "
+                    "bietet. Die einzige Spur, die unsere GUMBIES in der Natur hinterlassen, ist ein nachhaltiger "
+                    "Fußabdruck beim Laufen durch den Sand. <SEP>"},
 
     ]
     model = Inferencer.load(save_dir)
@@ -130,4 +146,3 @@ def doc_classification_multilabel():
 
 if __name__ == "__main__":
     doc_classification_multilabel()
-

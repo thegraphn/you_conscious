@@ -52,4 +52,5 @@ data_processing/utils/data_dependencies/datafeed-locations.csv
 data_processing.data_processing.cleansing_datafeed.config/config
 ``
   
+- add the idientifier for merge by size into config
 N30dh6so9X1nSNxtjY

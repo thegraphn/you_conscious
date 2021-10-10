@@ -53,14 +53,13 @@ class Cleanser:
         self.colour_index = self.column_2_id["colour"]
         self.aw_deep_link_index = self.column_2_id["aw_deep_link"]
         self.item_id_index = self.column_2_id["item_id"]
-        self.model_path_categories = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/category_distil_v9"
+        self.model_path_categories = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/category_distill_v17"
         self.model_path_colors = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/color_distil"
         self.model_path_saison = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/saison"
         self.model_path_origin = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/origin"
         self.model_path_keywords = "/home/graphn/repositories/you_conscious/dl_xp/trained_models/keywords"
         self.column_features = ["brand_name",
                                 "merchant_name",
-                                "Fashion:suitable_for",
                                 "Title",
                                 "description"]
         self.column_features_keywords = ["Title"]
@@ -131,7 +130,7 @@ class Cleanser:
         article = self.cleansing_title(article)
 
         # category name cleansing
-        #article = self.cleansing_category_names(article, content_category_tokens)
+        # article = self.cleansing_category_names(article, content_category_tokens)
 
         # description cleansing
         article[self.description_index] = self.cleansing_description(article[self.description_index])
@@ -235,22 +234,6 @@ class Cleanser:
         p = Pool()
         cleaned_prices_articles = p.map(self.clean_price, list_articles)
         return cleaned_prices_articles
-
-    def get_article_identifier(self, article: list) -> str:
-        """
-        Get an article identifier in order to merge articles by their sizes
-        :return: identifier
-        """
-
-        if "Avocadostore" in article[self.merchantName_index]:
-            merchant_product_id = article[self.merchant_product_id_index]
-            split_merchant_product_id_index = merchant_product_id.split("-")
-            colour: str = article[self.colour_index]
-            product_identifier: str = split_merchant_product_id_index[0]
-            identifier: str = product_identifier + "-" + colour
-        else:
-            identifier: str = "aw_image_url"
-        return identifier
 
     def merged_product_by_size(self, input_list_articles):
         """
@@ -529,6 +512,7 @@ class Cleanser:
         merchant_name_index = self.merchantName_index
         for a, article in enumerate(list_articles):
             ean = article[ean_index]
+
             merchant_name = article[self.merchantName_index]
             if merchant_name == "ETHLETIC":
                 if ean.endswith(".0"):
@@ -543,8 +527,11 @@ class Cleanser:
             list_merchant_names = [merchant["merchant_name"] for merchant in merchants]
             set_merchant_names = set(list_merchant_names)
             # print(list_merchant_names)
+            if set_merchant_names == {"Le Shop Vegan"}:
+                for merchant in merchants:
+                    articles_index_to_return.append(merchant["index"])
+            if ean != "" or ean != "nan":
 
-            if ean != "":
                 if len(set(list_merchant_names).intersection(merchant_ean_to_clean)) > 0:
                     if "0Avocadostore" in list_merchant_names:
                         if len(set_merchant_names) == 1:
@@ -589,8 +576,6 @@ class Cleanser:
 
 
 def cleansing():
-    # merged ok
-    # ean looks ok
     with Pool() as p:
         cleanser = Cleanser()
 
@@ -616,7 +601,7 @@ def cleansing():
 
         # list_articles = list(tqdm.tqdm(p.imap(cleanser.article_cleansing, list_articles),
         #                              total=len(list_articles)))
-        list_articles = cleanser.ean_cleanser(list_articles)
+        #list_articles = cleanser.ean_cleanser(list_articles)
         write_2_file(list_articles, "ean.tsv")
 
         print("Cleansing - Renaming Categories: Done", datetime.datetime.now())

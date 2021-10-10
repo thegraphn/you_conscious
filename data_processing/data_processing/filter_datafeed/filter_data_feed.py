@@ -118,10 +118,14 @@ class Filter:
         """
         material_index_feature_datafeed = get_headers_index("Material",
                                                             file_paths["featured_affiliateIds_datafeed_path"])
-        if "LOVECO" in article[self.merchant_name_index]:
-            print(article[self.label_index_feature_datafeed])
+
         if article[self.label_index_feature_datafeed] or article[material_index_feature_datafeed] != "":
+
             return article
+        else:
+            a = article
+
+            a = a
 
     def remove_articles_with_no_label(self, list_articles: list) -> list:
         with Pool(processes=8) as p:
@@ -150,6 +154,7 @@ class Filter:
             return article
         if not to_return:
             article[self.category_name_index] = "irrelevant"
+            print(category_name_content_tokens)
             return article
 
     def delete_non_matching_categories(self, list_articles: list) -> list:

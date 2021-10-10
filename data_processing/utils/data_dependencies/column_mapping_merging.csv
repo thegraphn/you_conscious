@@ -53,7 +53,6 @@ Bildlink;merchant_image_url
 Größe;Fashion:size
 Produktname;Title
 Gender;Fashion:suitable_for
-Hersteller;merchant_name
 Bildlink 2;aw_image_url
 Farbe;colour
 Beschreibung;description
@@ -67,15 +66,12 @@ Deeplink_URL;aw_deep_link
 Image_big_URL;merchant_image_url
 Image_small_URL;aw_image_url
 Merchant_Product_Category;category_name
-Price;search_price
-Price_old;rrp_price
 shipping;delivery_cost
 Belboon_ProgramId;merchant_id
 Deeplink;aw_deep_link
 Produkt-Titel;Title
 Produktbeschreibung;description
 Preis (Brutto);search_price
-Produktbild-URL;aw_image_url
 Produktkategorie;category_name
 Versandkosten Allgemein;delivery_cost
 Lieferzeit/Verfügbarkeit;delivery_time
@@ -97,3 +93,11 @@ in_stock;stock_status
 ext_gender;Fashion:suitable_for
 ext_size;Fashion:size
 ext_stock;stock_status
+Kategorie;category_name
+Produktbezeichnung;Title
+Hersteller-Artikelnummer;Hersteller-Artikelnummer
+PZN;PZN
+ISBN;ISBN
+Artikelnummer;Artikelnummer
+Link Produktbild;merchant_image_url
+Produkt Kurztext;description
