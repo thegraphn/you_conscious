@@ -7,14 +7,20 @@ import sys
 from multiprocessing import Pool
 import tqdm
 import numpy as np
+
+from data_processing.data_processing.merging_datafeeds.size_merger import SizeMerger
 from data_processing.data_processing.utils.columns_order import column_ord
+import logging
+
+logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 folder = os.path.dirname(os.path.realpath(__file__))
-folder = folder.replace("/data_processing/merging_datafeeds", "")
+folder = folder.replace("/data_processing/merging", "")
 folder = folder.replace(r"\data_processing\merging_datafeeds", "")
 sys.path.append(folder)
 from data_processing.data_processing.utils.utils import download_data_feeds_directory_path, \
-    column_mapping_merging_path, merged_data_feed_path, shops_ids_names_path, create_mapping_between_2_columns
+    column_mapping_merging_path, merged_data_feed_path, shops_ids_names_path, create_mapping_between_2_columns, \
+    get_lines_csv, write_2_file
 
 begin = datetime.datetime.now()
 
@@ -44,10 +50,9 @@ class FilesAggregator:
         return {one: two for one, two in zip(column_1, column_2)}
 
     def change_program_id_2_merchant_name(self, csv_file):
-        #def program_id_2_merchant_name(merchant_name):
+        # def program_id_2_merchant_name(merchant_name):
         #    return merchant_name.replace(self.shop_id_name_mapping, self.shop_id_name_mapping[merchant_name])
-        print(csv_file)
-        df = pd.read_csv(csv_file, sep=",", low_memory=False,encoding="utf-8")
+        df = pd.read_csv(csv_file, sep=",", low_memory=False, encoding="utf-8")
         # todo with multi processing
         merchant_names_frame = df["merchant_name"].tolist()
         # with Pool(processes=16) as p:
@@ -59,16 +64,13 @@ class FilesAggregator:
         df.to_csv(csv_file, sep="\t")
 
     def change_column_name(self, csv_file, mapping_file):
-        print(csv_file)
         dict_mapping_column = self.get_mapping_2_columns(mapping_file, "from", "to")
         if "ETHLETIC" in csv_file:
             sep = ";"
         else:
-            sep =","
+            sep = ","
         df = pd.read_csv(csv_file, sep=sep, low_memory=False)
-        print(df.columns)
         df = df.rename(columns=dict_mapping_column)
-        print(df.columns)
         df.to_csv(csv_file + "change.csv", sep=",")
 
 
@@ -83,31 +85,25 @@ def merge_csv(list_files, fieldnames, output_data):
 
 def merging():
     file_aggregator = FilesAggregator(download_data_feeds_directory_path)
-    print("Begin merging")
+    logging.info("Begin merging")
     list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csv"))
-    print("Merging - Changing column names: Begin")
-    for file in list_files:
+    logging.info("Merging - Changing column names: Begin")
+    for file in tqdm.tqdm(list_files, total=len(list_files), desc="Aggregating files"):
         file_aggregator.change_column_name(file, column_mapping_merging_path)
-    print("Merging - Changing column names: Done")
-    print("Merging - Merging : Begin")
+    logging.info("Merging - Changing column names: Done")
+    logging.info("Merging - Merging : Begin")
     list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csvchange.csv"))
     merge_csv(list_files, column_ord, merged_data_feed_path)
     os.system("rm " + os.path.join(download_data_feeds_directory_path, "*.csvchange.csv"))
-    print("Merging - Merging : Done")
-    print("Merging - Changing ID to Name: Begin")
+    logging.info("Merging - Merging : Done")
+    logging.info("Merging - Changing ID to Name: Begin")
     file_aggregator.change_program_id_2_merchant_name(merged_data_feed_path)
-    print("Merging - Changing ID to Name: Done")
+    logging.info("Merging - Changing ID to Name: Done")
 
     df_merged = pd.read_csv(merged_data_feed_path, sep="\t", low_memory=False)
     df_merged.replace(to_replace=mapping_to_utf)
     df_merged = df_merged[column_ord]
     df_merged.to_csv(merged_data_feed_path, sep="\t")
-    print("Merging: Done ", datetime.datetime.now())
 
-def parallelize_dataframe(self, df, func, n_cores=16):
-    df_split = np.array_split(df, n_cores)
-    pool = Pool(n_cores)
-    df = pd.concat(pool.map(func, df_split))
-    pool.close()
-    pool.join()
-    return df
+
+    logging.info("Merging: Done ")
