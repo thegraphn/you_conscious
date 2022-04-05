@@ -101,3 +101,12 @@ ISBN;ISBN
 Artikelnummer;Artikelnummer
 Link Produktbild;merchant_image_url
 Produkt Kurztext;description
+availability;stock_status
+image_link;merchant_image_url
+deeplink;link
+additional_image_link;aw_image_url
+color;colour
+google_product_category_text;category_name
+material;description2
+sale_price;search_price
+shipping;delivery_cost
