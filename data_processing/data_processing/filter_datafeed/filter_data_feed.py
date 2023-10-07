@@ -1,8 +1,6 @@
 import tokenizer
 from multiprocessing import Pool
 from typing import Union
-import numpy as np
-from farm.infer import Inferencer
 from nltk import word_tokenize
 import tqdm
 

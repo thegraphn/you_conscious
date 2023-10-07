@@ -1,6 +1,9 @@
 import os
 import sys
 
+from dl_xp.train.config import config_model_category
+from dl_xp.train.predict import Predictor
+
 folder = os.path.dirname(os.path.realpath(__file__))
 folder = folder.replace("/data_processing/data_processing/cleansing_datafeed", "")
 print("+++++", folder)
@@ -10,7 +13,6 @@ from collections import defaultdict
 from multiprocessing import Pool
 
 import tqdm
-from farm.infer import Inferencer
 
 from data_processing.data_processing.cleansing_datafeed.config import merchant_to_identifier
 from data_processing.data_processing.cleansing_datafeed.size_finder import SizeFinder
@@ -319,13 +321,11 @@ class Cleanser:
             for position in list_index_interesting_data:
                 article_data.append(article[position])
             article_data = " [SEP] ".join(article_data)
-            interesting_data.append({"text": article_data})
+            interesting_data.append(article_data)
 
         interesting_data = interesting_data[1:]  # skip headers
-        model = Inferencer.load(self.model_path_categories, batch_size=batch_size, gpu=True,
-                                task_type="text_classification",
-                                disable_tqdm=True, use_fast=True)
-        results = model.inference_from_dicts(dicts=interesting_data)
+        predictor = Predictor(config=config_model_category)
+        results = predictor.run(interesting_data)
         prediction_position = 0
         for i, predictions in enumerate(results):
             for prediction in predictions["predictions"]:

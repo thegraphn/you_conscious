@@ -26,8 +26,8 @@ import datetime
 def main_app():
     begin = datetime.datetime.now()
     print("Begin data processing", begin)
-    processes: dict = {"downloading": False,
-                       "merging": False,
+    processes: dict = {"downloading": True,
+                       "merging": True,
                        "filtering": True,
                        "adding_features": True,
                        "filtering_without_label": True,
