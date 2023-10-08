@@ -10,26 +10,31 @@ import os
 import sys
 import pandas as pd
 import tqdm
+import glob
+import urllib.request
+import datetime
+from multiprocessing import Pool
+import logging
 
+from data_processing.data_processing.config import loveco
 from data_processing.data_processing.utils.file_paths import file_paths
 from data_processing.data_processing.utils.utils import download_data_feeds_directory_path, \
-    change_delimiter_csv, rename_column
+    change_delimiter_csv, rename_column, run_multi_processing_job
 
 folder = os.path.dirname(os.path.realpath(__file__))
 folder = folder.replace("/data_processing/download_data_feeds", "")
 folder = folder.replace(r"\data_processing\download_data_feeds", "")
 sys.path.append(folder)
-import glob
-import urllib.request
-import datetime
-from multiprocessing import Pool
-import pandas as pd
+
+
+logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 
 class Downloader:
 
-    def __init__(self):
+    def __init__(self, download_dir_path: str):
         self.datafeed_info: list = self.get_datafeed_info()
+        self.download_dir_path = download_dir_path
 
     @staticmethod
     def get_datafeed_info() -> list:
@@ -39,15 +44,6 @@ class Downloader:
                         ....
                         }
         """
-        # datafeed_info: list = []
-        # with open(file_paths["file_datafeed_location"], "r", encoding="utf-8") as input_file:
-        #   csv_reader = csv.reader(input_file, delimiter=";")
-        #  next(csv_reader)
-        # for row in csv_reader:
-        #    datafeed_name: str = row[0]
-        #   datafeed_url: str = row[1]
-        #  datafeed_delimiter: str = row[2]
-        # datafeed_info.append([datafeed_name, datafeed_url, datafeed_delimiter])
 
         df = pd.read_csv(file_paths["file_datafeed_location"], sep=";")
         datafeed_names = df["Advertiser Name"].tolist()
@@ -60,6 +56,7 @@ class Downloader:
     @staticmethod
     def read_datafeed_url_file(file: str) -> dict:
         """
+        not in used
         :param file: file containing the mapping of Shops and URLS
         :return: dictionary. key:name of shop, value: url
         """
@@ -82,10 +79,8 @@ class Downloader:
         """
 
         if "LOVECO" in in_file:
-            sep = ","
-            df = pd.read_csv(in_file, sep=sep)
-            merchant_name = "LOVECO - Fair & Vegan Fashion and Shoes"
-            df["merchant_name"] = merchant_name
+            df = pd.read_csv(in_file, sep=loveco["sep"])
+            df["merchant_name"] = loveco["merchant_name"]
 
         if "JW_PEI" in in_file:
             sep = ","
@@ -128,7 +123,7 @@ class Downloader:
             df = pd.read_csv(in_file, sep=sep, quotechar='"')
             df.insert(0, "merchant_name", merchant_name, True)
         if "LOVECO" in in_file:
-            df = pd.read_csv(in_file,sep=",")
+            df = pd.read_csv(in_file, sep=",")
             merchant_name = "LOVECO - Fair & Vegan Fashion and Shoes"
             df["merchant_name"] = merchant_name
         if "JW_PEI" in in_file:
@@ -138,17 +133,8 @@ class Downloader:
 
         return df
 
-    def add_merchant_names(self, list_file_paths: list):
-        """
-        :param list_file_paths:
-        :return:
-        """
-        print("1", list_file_paths)
-        with Pool()as p:
-            list_df = list(tqdm.tqdm(p.imap(self.add_merchant_name, list_file_paths), total=len(list_file_paths)))
-        for file, df in zip(list_file_paths, list_df):
-            print(df.head())
-            df.to_csv(file, sep=",")
+
+
 
     def download_datafeeds(self, list_tuples_shops_urls: list):
         """
@@ -156,14 +142,13 @@ class Downloader:
         The number of processes is set to 2 because of the internet connection.
         :param list_tuples_shops_urls: List of tuples (shop name, link)
         """
-        for element in list_tuples_shops_urls:
+        for element in tqdm.tqdm(list_tuples_shops_urls,total=len(list_tuples_shops_urls),desc="Downloading Datafeeds"):
             try:
                 self.download_datafeed(element)
             except:
-                print(element, " did not work")
+                logging.error(str(element) + " did not work")
 
-    @staticmethod
-    def download_datafeed(tuple_shop_url: tuple):
+    def download_datafeed(self, tuple_shop_url: tuple):
         """
         Download a data feed. If the file is LOVECO, the extension of the file is immediately changed into csv
         :param tuple_shop_url: tuple containing (shop_name,url)
@@ -172,10 +157,13 @@ class Downloader:
         link: str = tuple_shop_url[1]
         shop_name = shop_name.replace(" ", "_")
         already_csv_files = ["LOVECO", "SORBAS", "Le_Shop_Vegan", "Uli_Schott", "muso_koroni", "ETHLETIC", "recolution"]
+        if shop_name =="Le_Shop_Vegan":
+            x = 0
         try:
             if shop_name in already_csv_files:
                 format_file = ".csv"
-                path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
+
+                path_file: str = os.path.join(self.download_dir_path, shop_name + "-" +
                                               datetime.datetime.now().strftime("%y-%m-%d") + format_file)
                 urllib.request.urlretrieve(link, path_file)
 
@@ -183,19 +171,19 @@ class Downloader:
 
             else:
                 format_file = ".gz"
-                path_file: str = os.path.join(download_data_feeds_directory_path, shop_name + "-" +
+                path_file: str = os.path.join(self.download_dir_path, shop_name + "-" +
                                               datetime.datetime.now().strftime("%y-%m-%d") + format_file)
                 urllib.request.urlretrieve(link, path_file)
 
         except ValueError:
-            print(" did not worked", shop_name, link)
+            logging.error(" did not worked"+ str(shop_name)+ str(link))
 
     def unzip_files(self, list_files: list):
         """
         This function uses Pool and call the sub-function unzipFile
             :param list_files: List of the files to try to unzip
         """
-        with Pool(processes=2)as p:
+        with Pool(processes=2) as p:
             list(tqdm.tqdm(p.imap(self.unzip_file, list_files), total=len(list_files)))
 
     @staticmethod
@@ -206,7 +194,7 @@ class Downloader:
         :param file: file to unzip
         """
         if ".csv" in file:
-            return 1
+            logging.info(str(file) + "is ending with .csv")
         if "Le_Shop_Vegan" in file:
             return 1
         if "LOVECO" in file:
@@ -223,25 +211,23 @@ class Downloader:
         if "Nordgreen" in file:
             os.rename(file, file[:-3] + ".csv")
             return 1
-        # if "recolution" in file:
-        # os.rename(file[:-3],file[:-3]+".csv")
+
         if "gz" in file:
             length_to_delete: int = -3
             os.system("gunzip -kc " + str(file) + " > " + str(file[:length_to_delete]) + ".csv")
 
-    @staticmethod
-    def delete_non_csv_datafeeds(directory: str):
+    def delete_non_csv_datafeeds(self):
         """
         Delete all file in a directory except py and csv files
         :param directory: Directory where the files will be deleted
         """
-        list_files: list = glob.glob(os.path.join(directory, "*"))
+        list_files: list = glob.glob(os.path.join(self.download_dir_path, "*"))
         for file in list_files:
             if not file.endswith("csv") and not file.endswith(".py"):
                 os.system("rm " + file)
 
     def change_delimiters(self, list_files: list):
-        with Pool()as p:
+        with Pool() as p:
             list(tqdm.tqdm(p.imap(self.change_delimiter, list_files), total=len(list_files)))
 
     def change_delimiter(self, csv_file_path: str):
@@ -262,27 +248,36 @@ class Downloader:
 
 
 def downloading():
-    downloader: Downloader = Downloader()
-    downloader.delete_non_csv_datafeeds(download_data_feeds_directory_path)
-    print("Downloading - Downloading data feeds: Begin")
+    downloader: Downloader = Downloader(download_data_feeds_directory_path)
+    downloader.delete_non_csv_datafeeds()
+    logging.info("Downloading - Downloading data feeds: Begin")
     downloader.download_datafeeds(list_tuples_shops_urls=downloader.datafeed_info)
-    print("Downloading - Downloading data feeds: End")
+    logging.info("Downloading - Downloading data feeds: End")
     list_downloaded_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*"))  # it works
-    print("Downloading - Unzipping data feeds: Begin")
+    logging.info("Downloading - Unzipping data feeds: Begin")
     downloader.unzip_files(list_files=list_downloaded_files)
-    print("Downloading - Change csv file delimiter: Begin")
+    logging.info("Downloading - Change csv file delimiter: Begin")
     downloader.change_delimiters(list_files=glob.glob(os.path.join(download_data_feeds_directory_path, "*.csv")))
-    print("Downloading - Change csv file delimiter: End")
-    print("Downloading - Unzipping data feeds: Begin")
-    downloader.delete_non_csv_datafeeds(download_data_feeds_directory_path)  # does not work
-    merchant_names_to_add = ["*muso_koroni*.csv", "*SORBAS*.csv", "*ETHLETIC*.csv", "*recolution*.csv", "*LOVECO*.csv",
-                             "*JW_PEI*.csv", "*Uli_Sc*.csv", "*Le_Shop_Vegan*.csv"
-                             ]
+    logging.info("Downloading - Change csv file delimiter: End")
+    logging.info("Downloading - Unzipping data feeds: Begin")
+    downloader.delete_non_csv_datafeeds()  # does not work
+    merchant_names_to_add = [ "SORBAS.csv", "ETHLETIC.csv", "recolution.csv", "LOVECO.csv",
+                             "JW_PEI.csv", "Uli_Sc.csv"
+                             ]#"*muso_koroni*.csv","*Le_Shop_Vegan*.csv"
     # merchant_names_to_add = ["*Le_Shop_Vegan*.csv"]
-    list_file_merchant_name_to_add = [glob.glob(os.path.join(download_data_feeds_directory_path, shop))[0]
-                                      for shop in merchant_names_to_add]
+    list_file_merchant_name_to_add = []
+    list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csv"))
+    for file in list_files:
+        for merchant_name in merchant_names_to_add:
+            if merchant_name in file:
+                list_file_merchant_name_to_add.append(file)
 
-    downloader.add_merchant_names(list_file_merchant_name_to_add)
+    list_df = run_multi_processing_job(function_name=downloader.add_merchant_name,
+                                       nbr_process=16,
+                                       list_to_process=list_file_merchant_name_to_add,
+                                       message="Adding merchant names")
+    for file, df in zip(list_file_merchant_name_to_add, list_df):
+        df.to_csv(file, sep=",")
 
     if os.path.exists(os.path.join(download_data_feeds_directory_path,
                                    "JW_PEI" + datetime.datetime.now().strftime("%y-%m-%d") + ".csv")) == 1:

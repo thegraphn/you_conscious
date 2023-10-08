@@ -6,16 +6,13 @@ import datetime
 import sys
 from multiprocessing import Pool
 import tqdm
-import numpy as np
-
-from data_processing.data_processing.merging_datafeeds.size_merger import SizeMerger
 from data_processing.data_processing.utils.columns_order import column_ord
 import logging
 
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 folder = os.path.dirname(os.path.realpath(__file__))
-folder = folder.replace("/data_processing/merging", "")
+folder = folder.replace("/data_processing/merging_datafeeds", "")
 folder = folder.replace(r"\data_processing\merging_datafeeds", "")
 sys.path.append(folder)
 from data_processing.data_processing.utils.utils import download_data_feeds_directory_path, \
@@ -65,10 +62,15 @@ class FilesAggregator:
 
     def change_column_name(self, csv_file, mapping_file):
         dict_mapping_column = self.get_mapping_2_columns(mapping_file, "from", "to")
+        sep = ","
         if "ETHLETIC" in csv_file:
             sep = ";"
-        else:
-            sep = ","
+        if "LOVECO" in csv_file:
+            sep = "	"
+        if "muso" in csv_file:
+            sep = ";"
+
+
         df = pd.read_csv(csv_file, sep=sep, low_memory=False)
         df = df.rename(columns=dict_mapping_column)
         df.to_csv(csv_file + "change.csv", sep=",")
@@ -89,6 +91,7 @@ def merging():
     list_files = glob.glob(os.path.join(download_data_feeds_directory_path, "*.csv"))
     logging.info("Merging - Changing column names: Begin")
     for file in tqdm.tqdm(list_files, total=len(list_files), desc="Aggregating files"):
+        print(file)
         file_aggregator.change_column_name(file, column_mapping_merging_path)
     logging.info("Merging - Changing column names: Done")
     logging.info("Merging - Merging : Begin")
@@ -104,6 +107,5 @@ def merging():
     df_merged.replace(to_replace=mapping_to_utf)
     df_merged = df_merged[column_ord]
     df_merged.to_csv(merged_data_feed_path, sep="\t")
-
 
     logging.info("Merging: Done ")

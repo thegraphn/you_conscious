@@ -93,7 +93,7 @@ class DataPreparer:  # pylint:disable=R0902
             self.config["LOCAL_CSV_PATH"],
             delimiter=self.config.get('DELIMITER'),
             low_memory=False
-        )[0:1000]
+        )
         # keep only features of interest from config
         data_frame = data_frame[self.config.get('INPUT_FEATURES') + [self.config.get('TARGET_FEATURE')]]
         data_frame = data_frame.rename(columns={self.config.get('TARGET_FEATURE'): 'labels'})

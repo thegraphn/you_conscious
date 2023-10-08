@@ -6,9 +6,9 @@ config_model_category = {
     "DELIMITER": ";",
     "DIR_MODEL": "category_model",
     "MODEL_NAME": "category_model",
-    "NUM_EPOCHS": 2,
-    "MAX_LENGTH": 50,
-    "BATCH_SIZE_TRAIN": 32,  # for 4 P100 GPUs
+    "NUM_EPOCHS": 15,
+    "MAX_LENGTH": 150,
+    "BATCH_SIZE_TRAIN": 64,  # for 4 P100 GPUs
     "BATCH_SIZE_DEV": 32,  # for 4 P100 GPUs
     "BATCH_SIZE_TEST": 32,  # because we will predict with only 1 P100 GPU
     "PRED_BATCH_SIZE": 32,

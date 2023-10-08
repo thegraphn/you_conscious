@@ -6,7 +6,9 @@ generated.
 import glob
 import os
 import sys
+from multiprocessing import freeze_support
 
+from data_processing.data_processing.merging.merging_datafeeds import merging
 from data_processing.data_processing.utils.utils import download_data_feeds_directory_path
 
 folder = os.path.dirname(os.path.realpath(__file__))
@@ -19,7 +21,6 @@ from data_processing.data_processing.cleansing_datafeed.cleansing_datafeed impor
 from data_processing.data_processing.download_data_feeds.download_datafeeds import downloading
 from data_processing.data_processing.filter_datafeed.filter_data_feed import filter_data_feed, \
     get_articles_with_label, delete_non_matching_categories
-from data_processing.data_processing.merging_datafeeds.merging_datafeeds_old import merging
 import datetime
 
 
@@ -69,4 +70,6 @@ def main_app():
     print("It took ", end - begin)
 
 
-main_app()
+if __name__ == "__main__":
+    freeze_support()
+    main_app()

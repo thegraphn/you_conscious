@@ -1,4 +1,6 @@
 import csv
+from multiprocessing import Pool
+
 from tokenizer import tokenize
 import tqdm
 from progressbar import *
@@ -195,6 +197,12 @@ def rename_column(file: str, sep: str, column_input: str, column_target: str):
     df.rename(columns=mapping, inplace=False)
     return df
 
+def run_multi_processing_job(function_name, nbr_process, list_to_process, message):
+    with Pool(nbr_process) as p:
+        processed_list = list(tqdm.tqdm(p.imap(function_name, list_to_process),
+                                        total=len(list_to_process),
+                                        desc=message))
+    return processed_list
 
 number_processes = os.cpu_count()
 
